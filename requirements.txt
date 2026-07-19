@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+mediapipe
+opencv-python-headless
+numpy
+Pillow
+qrcode
+anthropic
+requests
+boto3
+python-multipart
