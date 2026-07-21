@@ -1,72 +1,67 @@
 """
-Stage 4 + 5: prompt construction and poster generation.
+Stage 3: poster generation via OpenAI's gpt-image-1, using the
+`images.edit` endpoint so the original photo is used as the input image
+(image-to-image styling) rather than generating purely from a text prompt.
 
+Why images.edit and not images.generate: `generate` only takes a text
+prompt and produces *a* person in the character's style -- not *this*
+person. `edit` takes the captured photo plus the prompt and asks the model
+to transform that specific image, which keeps the subject's likeness/pose
+recognizable, matching what the booth promises ("styled as a character, in
+the person's own pose"). This mirrors the old ControlNet+img2img design in
+spirit, just via OpenAI's editing endpoint instead of a pose-conditioned
+diffusion model.
+
+This call blocks for the duration of generation. app.py runs it via
+asyncio.to_thread and wraps it in a hard timeout so one slow request can't
+stall the booth -- unchanged from the previous architecture.
 """
 
 import os
-import time
-import base64
+import io
 import requests
+import base64
+from openai import OpenAI
 
-API_KEY = os.environ["DIFFUSION_API_KEY"]
-BASE_URL = os.environ.get("DIFFUSION_API_BASE", "https://api.example-fast-diffusion.com/v1")
-MODEL_ID = os.environ.get("DIFFUSION_MODEL_ID", "fast-turbo-controlnet")
+IMAGE_MODEL = os.environ.get("OPENAI_IMAGE_MODEL", "gpt-image-1")
+POSTER_SIZE = os.environ.get("OPENAI_IMAGE_SIZE", "1024x1536")  # portrait poster
+REQUEST_TIMEOUT_S = 15  # for the plain HTTP calls this module might still make
 
-POLL_INTERVAL_S = 0.5
-POLL_TIMEOUT_S = 20  # hard ceiling so one slow job can't blow the 30s budget
+_client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
 
-def build_prompt(traits: dict, match: dict) -> str:
-    """Merge extracted traits + matched character into a single diffusion prompt."""
-    pose_phrase = match.get("pose_phrase") or traits["pose"].replace("_", " ")
-    return (
-        f"cinematic movie poster, subject styled as {match['character']}, "
-        f"{traits['outfit_color']} costume accent, {pose_phrase} pose, "
-        f"dramatic studio lighting, bold poster typography, high detail, photorealistic, "
-        f"college fest promotional poster style"
+def generate_poster(person_image_bytes: bytes, diffusion_prompt: str) -> bytes:
+    """
+    Submit the captured photo + Gemini's diffusion_prompt to gpt-image-1's
+    edit endpoint and return the raw poster image bytes.
+
+    gpt-image-1 requires the input image to be a png/webp/jpg file object,
+    not raw bytes directly -- wrap the bytes in an in-memory file-like
+    object with a name so the SDK can infer content type, no temp file
+    needed on disk.
+    """
+    input_file = io.BytesIO(person_image_bytes)
+    input_file.name = "capture.jpg"  # SDK uses this to infer the mime type
+
+    result = _client.images.edit(
+        model=IMAGE_MODEL,
+        image=input_file,
+        prompt=diffusion_prompt,
+        size=POSTER_SIZE,
+        n=1,
     )
 
+    image_entry = result.data[0]
 
-def generate_poster(person_image_np, prompt: str, pose_keypoints) -> bytes:
-    """
-    Submit an image-to-image + pose-conditioned generation job.
-    Returns the raw image bytes of the generated poster.
-    """
-    from PIL import Image
-    import io
+    # gpt-image-1 returns base64-encoded image data (b64_json) by default;
+    # handle both that and a hosted url just in case a future response
+    # shape switches to url-based delivery.
+    if getattr(image_entry, "b64_json", None):
+        return base64.b64decode(image_entry.b64_json)
 
-    buf = io.BytesIO()
-    Image.fromarray(person_image_np).save(buf, format="JPEG", quality=90)
-    image_b64 = base64.b64encode(buf.getvalue()).decode()
+    if getattr(image_entry, "url", None):
+        resp = requests.get(image_entry.url, timeout=REQUEST_TIMEOUT_S)
+        resp.raise_for_status()
+        return resp.content
 
-    payload = {
-        "model": MODEL_ID,
-        "prompt": prompt,
-        "image": image_b64,          # img2img reference for identity
-        "control_type": "pose",       # ControlNet-style pose conditioning
-        "control_points": pose_keypoints,
-        "num_inference_steps": 4,     # turbo/schnell-class models: 1-8 steps
-        "guidance_scale": 1.5,
-        "strength": 0.65,             # how much to preserve vs. the source photo
-    }
-    headers = {"Authorization": f"Bearer {API_KEY}"}
-
-    submit = requests.post(f"{BASE_URL}/generate", json=payload, headers=headers, timeout=10)
-    submit.raise_for_status()
-    job = submit.json()
-
-    if job.get("status") == "completed":
-        return requests.get(job["output_url"], timeout=10).content
-
-    job_id = job["job_id"]
-    waited = 0.0
-    while waited < POLL_TIMEOUT_S:
-        time.sleep(POLL_INTERVAL_S)
-        waited += POLL_INTERVAL_S
-        status = requests.get(f"{BASE_URL}/jobs/{job_id}", headers=headers, timeout=10).json()
-        if status["status"] == "completed":
-            return requests.get(status["output_url"], timeout=10).content
-        if status["status"] == "failed":
-            raise RuntimeError(f"Poster generation failed: {status.get('error')}")
-
-    raise TimeoutError("Poster generation exceeded time budget -- fall back to a retry or a cached template")
+    raise RuntimeError("gpt-image-1 edit response contained no image data")

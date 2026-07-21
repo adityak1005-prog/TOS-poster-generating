@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Movie Booth</title>
+<style>
+  :root {
+    --bg: #0f0f14;
+    --panel: #1a1a22;
+    --panel-2: #23232e;
+    --accent: #8b5cf6;
+    --accent-2: #ec4899;
+    --text: #f4f4f6;
+    --text-dim: #a3a3b0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: radial-gradient(circle at 20% 20%, #1c1430 0%, var(--bg) 55%);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+  .app {
+    width: 100%;
+    max-width: 640px;
+  }
+  .screen { display: none; }
+  .screen.active { display: block; animation: fadeIn .35s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .card {
+    background: var(--panel);
+    border: 1px solid #2b2b38;
+    border-radius: 20px;
+    padding: 2rem 1.75rem;
+    box-shadow: 0 20px 60px rgba(0,0,0,.35);
+  }
+
+  h1 { font-size: 1.7rem; margin: 0 0 .5rem; }
+  .lede { color: var(--text-dim); line-height: 1.5; margin: 0 0 1.5rem; }
+  .brand { font-size: .8rem; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); font-weight: 700; margin-bottom: .5rem; }
+
+  .actions { display: flex; flex-direction: column; gap: .75rem; margin-top: 1.5rem; }
+  button {
+    font: inherit;
+    cursor: pointer;
+    border: none;
+    border-radius: 14px;
+    padding: 1rem 1.25rem;
+    font-size: 1.02rem;
+    font-weight: 600;
+    transition: transform .12s ease, opacity .12s ease;
+  }
+  button:active { transform: scale(.98); }
+  .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: white; }
+  .btn-secondary { background: var(--panel-2); color: var(--text); border: 1px solid #33333f; }
+  .btn-ghost { background: transparent; color: var(--text-dim); font-size: .85rem; padding: .5rem; }
+  .btn-row { display: flex; gap: .75rem; }
+  .btn-row button { flex: 1; }
+
+  /* character showcase */
+  .showcase-title { font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: var(--text-dim); margin: 1.75rem 0 .75rem; }
+  .showcase { display: flex; gap: .6rem; overflow-x: auto; padding-bottom: .4rem; scrollbar-width: thin; }
+  .char-card {
+    flex: 0 0 auto;
+    width: 84px;
+    text-align: center;
+  }
+  .char-thumb {
+    width: 84px;
+    height: 84px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+    font-weight: 700;
+    object-fit: cover;
+  }
+  .char-name { font-size: .7rem; color: var(--text-dim); margin-top: .4rem; line-height: 1.2; }
+
+  /* capture */
+  video, #previewImg { width: 100%; border-radius: 14px; background: #000; display: block; }
+  #cameraWrap, #previewWrap { display: none; }
+  #cameraWrap.active, #previewWrap.active { display: block; }
+  .file-input-hidden { display: none; }
+
+  /* processing */
+  .processing-wrap { text-align: center; padding: 1rem 0; }
+  .spinner {
+    width: 64px; height: 64px; margin: 0 auto 1.5rem;
+    border-radius: 50%;
+    border: 4px solid #2b2b38;
+    border-top-color: var(--accent);
+    animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #processingText { font-size: 1.05rem; min-height: 1.4em; }
+  #processingSub { color: var(--text-dim); font-size: .85rem; margin-top: .4rem; }
+
+  /* reveal */
+  #resultImage { width: 100%; border-radius: 14px; margin-bottom: 1rem; }
+  .catchphrase { font-size: 1.15rem; font-weight: 600; line-height: 1.4; margin: .25rem 0 1rem; }
+  .reasoning-box {
+    background: var(--panel-2);
+    border-left: 3px solid var(--accent);
+    padding: .85rem 1rem;
+    border-radius: 10px;
+    font-size: .92rem;
+    color: var(--text-dim);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+  }
+  .reasoning-box b { color: var(--text); }
+  .traits-line { font-size: .8rem; color: var(--text-dim); margin-bottom: 1.25rem; }
+  .qr-row { display: flex; align-items: center; gap: 1rem; background: var(--panel-2); border-radius: 14px; padding: .9rem; margin-bottom: 1.25rem; }
+  .qr-row img { width: 84px; height: 84px; border-radius: 8px; background: white; }
+  .qr-row p { margin: 0; font-size: .85rem; color: var(--text-dim); }
+
+  .footer-toggle { text-align: center; margin-top: 1rem; }
+  .footer-toggle label { font-size: .72rem; color: var(--text-dim); cursor: pointer; user-select: none; }
+
+  pre.test-json {
+    background: #0b0b10;
+    padding: 1rem;
+    border-radius: 10px;
+    font-size: .78rem;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 50vh;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ============ INTRO ============ -->
+  <div class="screen active card" id="screen-intro">
+    <div class="brand">AI Movie Booth</div>
+    <h1>Which character are you?</h1>
+    <p class="lede">
+      Snap a photo (or upload one) and our AI reads your pose, outfit, and vibe
+      to match you to a movie character -- then generates a full poster-style
+      version of you in that role, with a caption and the reasoning behind
+      the match.
+    </p>
+
+    <div class="showcase-title">Featuring</div>
+    <div class="showcase" id="showcase"></div>
+
+    <div class="actions">
+      <button class="btn-primary" id="btnTakePhoto">📸 Take a Photo</button>
+      <button class="btn-secondary" id="btnUploadPhoto">🖼️ Upload a Photo</button>
+    </div>
+
+    <div class="footer-toggle">
+      <label><input type="checkbox" id="testModeToggle"> dev: test analysis only (no poster generated)</label>
+    </div>
+  </div>
+
+  <!-- ============ CAPTURE ============ -->
+  <div class="screen card" id="screen-capture">
+    <h1 id="captureTitle">Take a photo</h1>
+
+    <div id="cameraWrap">
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="canvas" style="display:none;"></canvas>
+      <div class="btn-row" style="margin-top:1rem;">
+        <button class="btn-secondary" id="btnCancelCamera">Cancel</button>
+        <button class="btn-primary" id="btnShutter">Capture</button>
+      </div>
+    </div>
+
+    <div id="previewWrap">
+      <img id="previewImg" alt="preview">
+      <div class="btn-row" style="margin-top:1rem;">
+        <button class="btn-secondary" id="btnRetake">Retake / choose again</button>
+        <button class="btn-primary" id="btnConfirm">Use this photo</button>
+      </div>
+    </div>
+
+    <input type="file" accept="image/*" class="file-input-hidden" id="fileInput">
+  </div>
+
+  <!-- ============ PROCESSING ============ -->
+  <div class="screen card" id="screen-processing">
+    <div class="processing-wrap">
+      <div class="spinner"></div>
+      <div id="processingText">Analyzing your photo...</div>
+      <div id="processingSub">This usually takes 10-25 seconds.</div>
+    </div>
+  </div>
+
+  <!-- ============ REVEAL ============ -->
+  <div class="screen card" id="screen-reveal">
+    <img id="resultImage" alt="Your poster">
+    <div class="catchphrase" id="catchphrase"></div>
+    <div class="reasoning-box" id="reasoningBox"></div>
+    <div class="traits-line" id="traitsLine"></div>
+    <div class="qr-row">
+      <img id="qrImage" alt="QR code">
+      <p>Scan to save your poster to your phone.</p>
+    </div>
+    <button class="btn-primary" id="btnRestart" style="width:100%;">Do it again</button>
+  </div>
+
+  <!-- ============ TEST RESULT (dev only) ============ -->
+  <div class="screen card" id="screen-test">
+    <h1>Gemini output (test mode)</h1>
+    <p class="lede">No poster was generated -- this is only the analysis stage, for checking match quality and the prompt that would go to OpenAI.</p>
+    <pre class="test-json" id="testJson"></pre>
+    <button class="btn-secondary" id="btnTestBack" style="width:100%; margin-top:1rem;">Back</button>
+  </div>
+
+</div>
+
+<script>
+  // ---- character showcase (local placeholder styling; real images can be
+  // dropped into /static/characters/<slug>.jpg later -- see fallback below) ----
+  const CHAR_STYLE = {
+    "Batman":        { emoji: "🦇", grad: "linear-gradient(135deg,#1a1a1a,#3b3b55)" },
+    "Iron Man":      { emoji: "🤖", grad: "linear-gradient(135deg,#b91c1c,#d97706)" },
+    "Joker":         { emoji: "🃏", grad: "linear-gradient(135deg,#6b21a8,#166534)" },
+    "Spider-Man":    { emoji: "🕷️", grad: "linear-gradient(135deg,#b91c1c,#1d4ed8)" },
+    "Thomas Shelby": { emoji: "🎩", grad: "linear-gradient(135deg,#57534e,#292524)" },
+    "Naruto":        { emoji: "🍥", grad: "linear-gradient(135deg,#ea580c,#1d4ed8)" },
+    "Black Widow":   { emoji: "🕶️", grad: "linear-gradient(135deg,#18181b,#7f1d1d)" },
+    "Barbie":        { emoji: "💗", grad: "linear-gradient(135deg,#ec4899,#f472b6)" },
+  };
+  const DEFAULT_STYLE = { emoji: "🎬", grad: "linear-gradient(135deg,#3f3f46,#52525b)" };
+
+  function slugify(name) { return name.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, ""); }
+
+  async function loadShowcase() {
+    const el = document.getElementById("showcase");
+    let names = Object.keys(CHAR_STYLE);
+    try {
+      const res = await fetch("/booth/characters");
+      const data = await res.json();
+      if (Array.isArray(data.characters) && data.characters.length) names = data.characters;
+    } catch (e) { /* fall back to local list if backend isn't reachable yet */ }
+
+    el.innerHTML = "";
+    names.forEach((name) => {
+      const style = CHAR_STYLE[name] || DEFAULT_STYLE;
+      const slug = slugify(name);
+      const card = document.createElement("div");
+      card.className = "char-card";
+      card.innerHTML = `
+        <img class="char-thumb" style="background:${style.grad}"
+             src="/static/characters/${slug}.jpg"
+             onerror="this.onerror=null; this.removeAttribute('src'); this.textContent='${style.emoji}';">
+        <div class="char-name">${name}</div>`;
+      el.appendChild(card);
+    });
+  }
+  loadShowcase();
+
+  // ---- screen management ----
+  function showScreen(id) {
+    document.querySelectorAll(".screen").forEach((s) => s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+  }
+
+  // ---- state ----
+  let capturedBlob = null;
+  let cameraStream = null;
+  let testMode = false;
+
+  document.getElementById("testModeToggle").addEventListener("change", (e) => {
+    testMode = e.target.checked;
+  });
+
+  // ---- intro actions ----
+  document.getElementById("btnTakePhoto").addEventListener("click", startCamera);
+  document.getElementById("btnUploadPhoto").addEventListener("click", () => {
+    document.getElementById("fileInput").click();
+  });
+
+  document.getElementById("fileInput").addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    capturedBlob = file;
+    showCapturePreview(URL.createObjectURL(file));
+  });
+
+  // ---- camera ----
+  async function startCamera() {
+    showScreen("screen-capture");
+    document.getElementById("captureTitle").innerText = "Take a photo";
+    document.getElementById("cameraWrap").classList.add("active");
+    document.getElementById("previewWrap").classList.remove("active");
+    try {
+      cameraStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "user" }, audio: false,
+      });
+      document.getElementById("video").srcObject = cameraStream;
+    } catch (err) {
+      alert("Couldn't access the camera. You can upload a photo instead.");
+      stopCamera();
+      showScreen("screen-intro");
+    }
+  }
+
+  function stopCamera() {
+    if (cameraStream) {
+      cameraStream.getTracks().forEach((t) => t.stop());
+      cameraStream = null;
+    }
+  }
+
+  document.getElementById("btnCancelCamera").addEventListener("click", () => {
+    stopCamera();
+    showScreen("screen-intro");
+  });
+
+  document.getElementById("btnShutter").addEventListener("click", () => {
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext("2d").drawImage(video, 0, 0);
+    canvas.toBlob((blob) => {
+      capturedBlob = blob;
+      showCapturePreview(URL.createObjectURL(blob));
+    }, "image/jpeg", 0.92);
+  });
+
+  function showCapturePreview(url) {
+    stopCamera();
+    document.getElementById("cameraWrap").classList.remove("active");
+    document.getElementById("previewWrap").classList.add("active");
+    document.getElementById("previewImg").src = url;
+    document.getElementById("captureTitle").innerText = "Look good?";
+    showScreen("screen-capture");
+  }
+
+  document.getElementById("btnRetake").addEventListener("click", () => {
+    capturedBlob = null;
+    showScreen("screen-intro");
+  });
+
+  document.getElementById("btnConfirm").addEventListener("click", () => {
+    if (!capturedBlob) return;
+    if (testMode) {
+      runTestAnalyze(capturedBlob);
+    } else {
+      runFullPipeline(capturedBlob);
+    }
+  });
+
+  // ---- real pipeline (unchanged backend behavior: capture -> poll status) ----
+  async function runFullPipeline(blob) {
+    showScreen("screen-processing");
+    setProcessingText("Analyzing your photo...", "This usually takes 10-25 seconds.");
+
+    const formData = new FormData();
+    formData.append("file", blob, "capture.jpg");
+
+    try {
+      const res = await fetch("/booth/capture", { method: "POST", body: formData });
+      const data = await res.json();
+      if (!data.job_id) {
+        alert("Upload failed. Please try again.");
+        showScreen("screen-intro");
+        return;
+      }
+      pollStatus(data.job_id);
+    } catch (err) {
+      alert("Network error. Please try again.");
+      showScreen("screen-intro");
+    }
+  }
+
+  function setProcessingText(main, sub) {
+    document.getElementById("processingText").innerText = main;
+    document.getElementById("processingSub").innerText = sub;
+  }
+
+  function pollStatus(jobId) {
+    let shownCharacter = false;
+    const interval = setInterval(async () => {
+      let data;
+      try {
+        const res = await fetch(`/booth/status/${jobId}`);
+        data = await res.json();
+      } catch (err) {
+        return; // transient network hiccup, keep polling
+      }
+
+      if (data.character && !shownCharacter) {
+        shownCharacter = true;
+        setProcessingText(`You're a match for ${data.character}! 🎬`, "Generating your poster now...");
+      }
+
+      if (data.status === "done") {
+        clearInterval(interval);
+        showReveal(data);
+      } else if (data.status === "failed") {
+        clearInterval(interval);
+        alert("Something went wrong: " + (data.error || "unknown error"));
+        showScreen("screen-intro");
+      }
+    }, 1500);
+  }
+
+  function showReveal(data) {
+    document.getElementById("resultImage").src = data.image_url;
+    document.getElementById("catchphrase").innerText = data.caption || "";
+    const reasoning = data.reasoning
+      ? `<b>Why ${data.character}?</b> ${data.reasoning}`
+      : `<b>Matched:</b> ${data.character}`;
+    document.getElementById("reasoningBox").innerHTML = reasoning;
+    const t = data.traits || {};
+    let traitsText = `Detected: ${t.outfit_color || "?"} outfit, ${t.pose_description || "neutral pose"}`;
+    if (t.glasses) traitsText += ", glasses";
+    document.getElementById("traitsLine").innerText = traitsText;
+    document.getElementById("qrImage").src = data.qr_url;
+    showScreen("screen-reveal");
+  }
+
+  document.getElementById("btnRestart").addEventListener("click", () => {
+    capturedBlob = null;
+    showScreen("screen-intro");
+  });
+
+  // ---- dev test-only path: Gemini analysis, no poster generated ----
+  async function runTestAnalyze(blob) {
+    showScreen("screen-processing");
+    setProcessingText("Running Gemini analysis...", "Test mode -- no poster will be generated.");
+
+    const formData = new FormData();
+    formData.append("file", blob, "capture.jpg");
+
+    try {
+      const res = await fetch("/booth/test-analyze", { method: "POST", body: formData });
+      const data = await res.json();
+      document.getElementById("testJson").innerText = JSON.stringify(data, null, 2);
+      showScreen("screen-test");
+    } catch (err) {
+      alert("Test analysis failed. Check the server logs.");
+      showScreen("screen-intro");
+    }
+  }
+
+  document.getElementById("btnTestBack").addEventListener("click", () => {
+    capturedBlob = null;
+    showScreen("screen-intro");
+  });
+</script>
+</body>
+</html>

@@ -1,48 +1,44 @@
 """
-Stage 6: compose the split-screen image and generate the shareable QR code.
+Stage 4: compose the split-screen image and generate the shareable QR code.
 
+Left panel: the original captured photo, with a text overlay of the traits
+Gemini reported (outfit color, pose description, glasses) -- no skeleton
+dots, since there are no local pose keypoints in this architecture anymore.
+Right panel: the generated poster from stage 3.
 """
 
 import io
 import qrcode
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 
 CANVAS_H = 1400
 PANEL_W = 900
-SKELETON_COLOR = (255, 210, 60)
-SWATCH_SIZE = 60
 
 
-def _draw_overlay(original_np, traits: dict) -> Image.Image:
-    """Left panel: original photo annotated with the detected skeleton + a
-    color swatch + trait labels, so people can see what the CV stage saw."""
-    img = Image.fromarray(original_np).convert("RGB")
-    img = img.resize((PANEL_W, CANVAS_H), Image.LANCZOS)
-    scale_x, scale_y = PANEL_W / original_np.shape[1], CANVAS_H / original_np.shape[0]
-    draw = ImageDraw.Draw(img)
+def _draw_overlay(original_image: Image.Image, traits: dict) -> Image.Image:
+    """Left panel: original photo with a semi-transparent label bar
+    showing what Gemini detected."""
+    img = original_image.convert("RGB").resize((PANEL_W, CANVAS_H), Image.LANCZOS)
 
-    # skeleton dots (full connective drawing omitted here for brevity --
-    # draw lines between the MediaPipe POSE_CONNECTIONS pairs for a real skeleton)
-    if traits.get("pose_keypoints"):
-        for x, y, visibility in traits["pose_keypoints"]:
-            if visibility < 0.5:
-                continue
-            px, py = x * scale_x, y * scale_y
-            draw.ellipse([px - 5, py - 5, px + 5, py + 5], fill=SKELETON_COLOR)
+    # Draw a translucent bar behind the text so it stays readable over any
+    # photo background, then the trait text on top of it.
+    overlay = Image.new("RGBA", img.size, (0, 0, 0, 0))
+    draw = ImageDraw.Draw(overlay)
+    bar_height = 90
+    draw.rectangle([0, 0, PANEL_W, bar_height], fill=(0, 0, 0, 140))
 
-    # color swatch + label bar
-    swatch_rgb = traits.get("outfit_color_rgb", (128, 128, 128))
-    draw.rectangle([20, 20, 20 + SWATCH_SIZE, 20 + SWATCH_SIZE], fill=swatch_rgb, outline="white", width=3)
-    label = f"{traits['outfit_color']}  |  {traits['pose'].replace('_', ' ')}"
+    label = f"{traits.get('outfit_color', 'unknown')} outfit  |  {traits.get('pose_description', 'neutral pose')}"
     if traits.get("glasses"):
         label += "  |  glasses"
-    draw.text((20 + SWATCH_SIZE + 15, 30), label, fill="white")
 
-    return img
+    draw.text((20, 30), label, fill=(255, 255, 255, 255))
+
+    return Image.alpha_composite(img.convert("RGBA"), overlay).convert("RGB")
 
 
-def compose_split_screen(original_np, poster_bytes: bytes, traits: dict, match: dict) -> bytes:
-    left = _draw_overlay(original_np, traits)
+def compose_split_screen(original_image_bytes: bytes, poster_bytes: bytes, traits: dict, match: dict) -> bytes:
+    original = Image.open(io.BytesIO(original_image_bytes))
+    left = _draw_overlay(original, traits)
     right = Image.open(io.BytesIO(poster_bytes)).convert("RGB").resize((PANEL_W, CANVAS_H), Image.LANCZOS)
 
     canvas = Image.new("RGB", (PANEL_W * 2 + 20, CANVAS_H + 100), "black")
