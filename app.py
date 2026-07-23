@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 import traceback
 load_dotenv()
 
-import gemini_analysis
+import openai_analysis
 import image_gen
 import compose
 import storage  # Supabase Storage upload/list/delete helpers
@@ -46,9 +46,9 @@ async def serve_frontend():
 @app.get("/booth/characters")
 async def characters():
     """Returns the fixed character roster so the frontend showcase always
-    matches whatever is actually in gemini_analysis.py -- add a character
+    matches whatever is actually in openai_analysis.py -- add a character
     there and it shows up here automatically, no frontend edit needed."""
-    return {"characters": gemini_analysis.CHARACTERS}
+    return {"characters": openai_analysis.CHARACTERS}
 
 
 JOBS: dict[str, dict] = {}  # swap for Redis if running multiple booth machines
@@ -138,13 +138,14 @@ async def run_pipeline(job_id: str, image_bytes: bytes):
         # Stage 1 already happened client-side (the capture). image_bytes
         # is the raw photo as uploaded -- no local decode/CV needed here.
 
-        # Stage 2: single multimodal Gemini call -- replaces MediaPipe trait
+        # Stage 2: single multimodal OpenAI call -- replaces MediaPipe trait
         # extraction, the rule-based character scorer, the LLM tie-break,
         # and the prompt-builder all at once. Network-bound, so run in a
-        # thread like every other blocking stage.
+        # thread like every other blocking stage. (Moved from Gemini to
+        # OpenAI so this call runs on the same paid account as stage 3.)
         t0 = time.time()
-        match = await asyncio.to_thread(gemini_analysis.analyze_and_match, image_bytes)
-        mark("gemini_analysis", t0)
+        match = await asyncio.to_thread(openai_analysis.analyze_and_match, image_bytes)
+        mark("openai_analysis", t0)
 
         # Update job dict immediately so the status endpoint exposes the character choice
         JOBS[job_id].update({
@@ -262,18 +263,18 @@ async def email_poster(job_id: str, email: str = Form(...)):
 # --------------------------------------------------------------------------
 # TEMPORARY DEV/TESTING ENDPOINT -- remove before the event.
 #
-# Runs Gemini analysis only (character match + reasoning + caption + the
-# diffusion_prompt that would be sent to OpenAI) and returns it directly.
-# Deliberately does NOT call image_gen, compose, or storage, so you can
-# sanity-check matches and prompt quality without burning gpt-image-1
-# credits/quota. Synchronous (no job queue) since this stage alone is fast.
+# Runs stage-2 analysis only (character match + reasoning + caption + the
+# diffusion_prompt used in stage 3) and returns it directly. Deliberately
+# does NOT call image_gen, compose, or storage, so you can sanity-check
+# matches and prompt quality without burning image-generation credits/quota.
+# Synchronous (no job queue) since this stage alone is fast.
 # --------------------------------------------------------------------------
 @app.post("/booth/test-analyze")
 async def test_analyze(file: UploadFile = File(...)):
     image_bytes = await file.read()
     t0 = time.time()
     try:
-        match = await asyncio.to_thread(gemini_analysis.analyze_and_match, image_bytes)
+        match = await asyncio.to_thread(openai_analysis.analyze_and_match, image_bytes)
     except Exception as e:
         traceback.print_exc()
         return JSONResponse(status_code=500, content={"error": str(e)})
@@ -284,21 +285,20 @@ async def test_analyze(file: UploadFile = File(...)):
 # --------------------------------------------------------------------------
 # TEMPORARY DEV/ADMIN ENDPOINT -- remove before the event.
 #
-# Rebuilds the Gemini character-reference cache from whatever's currently in
-# static/characters/. --reload only restarts on .py file changes, so dropping
-# a new image in that folder while the server is already running won't pick
-# it up on its own -- hit this endpoint after adding/replacing images instead
-# of restarting uvicorn.
+# Left in place for interface parity with the previous Gemini-backed build.
+# openai_analysis.py has no reference-image cache (text-only matching), so
+# this now always reports no cache / no images -- kept as a stub rather than
+# deleted so nothing else that calls this endpoint breaks.
 # --------------------------------------------------------------------------
 @app.post("/booth/admin/rebuild-cache")
 async def rebuild_cache():
     try:
-        cache_name = await asyncio.to_thread(gemini_analysis.rebuild_character_cache)
+        cache_name = await asyncio.to_thread(openai_analysis.rebuild_character_cache)
     except Exception as e:
         traceback.print_exc()
         return JSONResponse(status_code=500, content={"error": str(e)})
     return {
         "cache_name": cache_name,
         "cached": cache_name is not None,
-        "characters_with_images": gemini_analysis.list_characters_with_images(),
+        "characters_with_images": openai_analysis.list_characters_with_images(),
     }
