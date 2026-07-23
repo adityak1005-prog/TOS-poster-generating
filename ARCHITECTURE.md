@@ -37,7 +37,7 @@ a hard network dependency anyway (poster generation always required
 cloud), so this doesn't introduce a new failure mode, it just moves more
 work behind an already-required network call.
 
-## 3. Why Gemini 2.5 Flash-Lite (or 2.0 Flash) for stage 2
+## 3. Why Gemini 2.5 Flash-Lite for stage 2
 
 **What:** Google's smallest/fastest current Gemini tier, called through
 the current `google-genai` SDK (not the deprecated `google-generativeai`
@@ -45,9 +45,14 @@ package, which is EOL and doesn't get new-model access going forward).
 **Why here:** This call needs to be multimodal (photo in), fast (single
 low-latency response, not a chat loop), and cheap enough to run on every
 photo rather than only ambiguous ones — flash-lite is free-tier eligible
-and built for exactly this shape of workload. `gemini-2.0-flash` is kept
-as a drop-in env-var fallback since it's on the same free tier and same
-SDK surface, in case flash-lite quota runs out mid-event.
+and built for exactly this shape of workload.
+**Update (2026-06):** `gemini-2.0-flash` was previously documented here as
+a drop-in fallback for quota exhaustion; Google shut it down on 2026-06-01,
+so it's no longer a valid fallback. The hardcoded default in
+`gemini_analysis.py` now points at `gemini-2.5-flash-lite` itself -- if you
+want a genuine fallback tier for a live event, pick a currently-supported
+model and verify it before the day, don't assume an old model name still
+works.
 **How it works:** One `client.models.generate_content()` call with the
 photo passed as inline bytes (`types.Part.from_bytes`) alongside the
 instruction text, using `response_mime_type="application/json"` and a

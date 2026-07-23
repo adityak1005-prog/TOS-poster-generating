@@ -209,6 +209,19 @@
       <img id="qrImage" alt="QR code">
       <p>Scan to save your poster to your phone.</p>
     </div>
+
+    <div style="margin-bottom:1.25rem;">
+      <label for="mailEmailInput" style="display:block; font-size:.8rem; color:var(--text-dim); margin-bottom:.4rem;">
+        Want it in your inbox too?
+      </label>
+      <div class="btn-row">
+        <input type="email" id="mailEmailInput" placeholder="you@example.com"
+          style="flex:2; padding:.75rem 1rem; border-radius:12px; border:1px solid #33333f; background:var(--panel-2); color:var(--text); font-size:1rem;">
+        <button class="btn-secondary" id="btnMailPoster" style="flex:1;">Email me</button>
+      </div>
+      <div id="mailStatus" style="font-size:.8rem; color:var(--text-dim); margin-top:.5rem; min-height:1.2em;"></div>
+    </div>
+
     <button class="btn-primary" id="btnRestart" style="width:100%;">Do it again</button>
   </div>
 
@@ -226,18 +239,46 @@
   // ---- character showcase (local placeholder styling; real images can be
   // dropped into /static/characters/<slug>.jpg later -- see fallback below) ----
   const CHAR_STYLE = {
-    "Batman":        { emoji: "🦇", grad: "linear-gradient(135deg,#1a1a1a,#3b3b55)" },
-    "Iron Man":      { emoji: "🤖", grad: "linear-gradient(135deg,#b91c1c,#d97706)" },
-    "Joker":         { emoji: "🃏", grad: "linear-gradient(135deg,#6b21a8,#166534)" },
-    "Spider-Man":    { emoji: "🕷️", grad: "linear-gradient(135deg,#b91c1c,#1d4ed8)" },
-    "Thomas Shelby": { emoji: "🎩", grad: "linear-gradient(135deg,#57534e,#292524)" },
-    "Naruto":        { emoji: "🍥", grad: "linear-gradient(135deg,#ea580c,#1d4ed8)" },
-    "Black Widow":   { emoji: "🕶️", grad: "linear-gradient(135deg,#18181b,#7f1d1d)" },
-    "Barbie":        { emoji: "💗", grad: "linear-gradient(135deg,#ec4899,#f472b6)" },
+    "Iron Man":                  { emoji: "🤖", grad: "linear-gradient(135deg,#b91c1c,#d97706)" },
+    "Batman":                    { emoji: "🦇", grad: "linear-gradient(135deg,#1a1a1a,#3b3b55)" },
+    "Spider-Man":                { emoji: "🕷️", grad: "linear-gradient(135deg,#b91c1c,#1d4ed8)" },
+    "Thomas Shelby":              { emoji: "🎩", grad: "linear-gradient(135deg,#57534e,#292524)" },
+    "Naruto":                    { emoji: "🍥", grad: "linear-gradient(135deg,#ea580c,#1d4ed8)" },
+    "Professor from Money Heist": { emoji: "🎭", grad: "linear-gradient(135deg,#7f1d1d,#292524)" },
+    "Gwen Stacy":                { emoji: "🕸️", grad: "linear-gradient(135deg,#ec4899,#f9a8d4)" },
+    "Black Widow":               { emoji: "🕶️", grad: "linear-gradient(135deg,#18181b,#7f1d1d)" },
+    "Daenerys Targaryen":        { emoji: "🐉", grad: "linear-gradient(135deg,#94a3b8,#1e3a8a)" },
+    "Hermione Granger":          { emoji: "📚", grad: "linear-gradient(135deg,#7f1d1d,#a16207)" },
+    "Wednesday Addams":          { emoji: "🖤", grad: "linear-gradient(135deg,#18181b,#3f3f46)" },
+    "Kakashi Hatake":            { emoji: "🍃", grad: "linear-gradient(135deg,#1e3a5f,#64748b)" },
+    "Sasuke Uchiha":             { emoji: "⚡", grad: "linear-gradient(135deg,#1e1b4b,#3730a3)" },
+    "Joker":                     { emoji: "🃏", grad: "linear-gradient(135deg,#6b21a8,#166534)" },
+    "Jon Snow":                  { emoji: "❄️", grad: "linear-gradient(135deg,#334155,#0f172a)" },
+    "Shinchan":                  { emoji: "😜", grad: "linear-gradient(135deg,#facc15,#dc2626)" },
+    "Harry Potter":              { emoji: "🧙", grad: "linear-gradient(135deg,#7f1d1d,#78350f)" },
+    "Dr. Doom":                  { emoji: "🦾", grad: "linear-gradient(135deg,#166534,#3f3f46)" },
+    "Regina George":             { emoji: "💅", grad: "linear-gradient(135deg,#ec4899,#fbcfe8)" },
+    "Elle Woods":                { emoji: "🎀", grad: "linear-gradient(135deg,#f472b6,#fde68a)" },
+    "Sheldon Cooper":            { emoji: "🤓", grad: "linear-gradient(135deg,#1d4ed8,#64748b)" },
   };
   const DEFAULT_STYLE = { emoji: "🎬", grad: "linear-gradient(135deg,#3f3f46,#52525b)" };
 
   function slugify(name) { return name.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, ""); }
+
+  // Reference images can be saved in any of these formats (matches the
+  // same priority order gemini_analysis.py checks on the backend) -- try
+  // each extension in turn before giving up and showing the placeholder.
+  const REF_EXTS = ["jpg", "jpeg", "png", "webp"];
+
+  function loadCharacterImage(imgEl, slug, emoji, extIndex = 0) {
+    if (extIndex >= REF_EXTS.length) {
+      imgEl.removeAttribute("src");
+      imgEl.textContent = emoji;
+      return;
+    }
+    imgEl.onerror = () => loadCharacterImage(imgEl, slug, emoji, extIndex + 1);
+    imgEl.src = `/static/characters/${slug}.${REF_EXTS[extIndex]}`;
+  }
 
   async function loadShowcase() {
     const el = document.getElementById("showcase");
@@ -255,10 +296,9 @@
       const card = document.createElement("div");
       card.className = "char-card";
       card.innerHTML = `
-        <img class="char-thumb" style="background:${style.grad}"
-             src="/static/characters/${slug}.jpg"
-             onerror="this.onerror=null; this.removeAttribute('src'); this.textContent='${style.emoji}';">
+        <img class="char-thumb" style="background:${style.grad}">
         <div class="char-name">${name}</div>`;
+      loadCharacterImage(card.querySelector("img"), slug, style.emoji);
       el.appendChild(card);
     });
   }
@@ -274,6 +314,7 @@
   let capturedBlob = null;
   let cameraStream = null;
   let testMode = false;
+  let currentJobId = null;
 
   document.getElementById("testModeToggle").addEventListener("change", (e) => {
     testMode = e.target.checked;
@@ -373,6 +414,7 @@
         showScreen("screen-intro");
         return;
       }
+      currentJobId = data.job_id;
       pollStatus(data.job_id);
     } catch (err) {
       alert("Network error. Please try again.");
@@ -424,11 +466,78 @@
     if (t.glasses) traitsText += ", glasses";
     document.getElementById("traitsLine").innerText = traitsText;
     document.getElementById("qrImage").src = data.qr_url;
+
+    // reset the mail widget for this new poster
+    document.getElementById("mailEmailInput").value = "";
+    document.getElementById("mailEmailInput").disabled = false;
+    document.getElementById("btnMailPoster").disabled = false;
+    document.getElementById("btnMailPoster").innerText = "Email me";
+    document.getElementById("mailStatus").innerText = "";
+
     showScreen("screen-reveal");
   }
 
+  // ---- "email me this poster" -- fires the request and returns
+  // immediately (fire-and-forget from the browser's perspective too); the
+  // actual send happens server-side in a background task, so this never
+  // blocks the UI or the next capture. ----
+  document.getElementById("btnMailPoster").addEventListener("click", async () => {
+    const emailInput = document.getElementById("mailEmailInput");
+    const status = document.getElementById("mailStatus");
+    const btn = document.getElementById("btnMailPoster");
+    const address = emailInput.value.trim();
+
+    if (!address || !address.includes("@")) {
+      status.innerText = "Enter a valid email address first.";
+      return;
+    }
+    if (!currentJobId) {
+      status.innerText = "Something went wrong -- try refreshing.";
+      return;
+    }
+
+    btn.disabled = true;
+    emailInput.disabled = true;
+    status.innerText = "Sending...";
+
+    const formData = new FormData();
+    formData.append("email", address);
+
+    try {
+      const res = await fetch(`/booth/email/${currentJobId}`, { method: "POST", body: formData });
+      const data = await res.json();
+      if (!res.ok) {
+        status.innerText = data.error || "Couldn't queue that -- try again.";
+        btn.disabled = false;
+        emailInput.disabled = false;
+        return;
+      }
+      status.innerText = "On its way to your inbox!";
+      btn.innerText = "Sent";
+      // one lightweight follow-up check, not continuous polling -- just
+      // enough to flag a delivery failure so the visitor can retry
+      setTimeout(async () => {
+        try {
+          const r = await fetch(`/booth/status/${currentJobId}`);
+          const d = await r.json();
+          if (d.email_sent === false && d.email_error) {
+            status.innerText = "Couldn't deliver that email -- check the address and try again.";
+            btn.disabled = false;
+            btn.innerText = "Email me";
+            emailInput.disabled = false;
+          }
+        } catch (e) { /* ignore -- the optimistic "on its way" message stands */ }
+      }, 4000);
+    } catch (err) {
+      status.innerText = "Network error -- try again.";
+      btn.disabled = false;
+      emailInput.disabled = false;
+    }
+  });
+
   document.getElementById("btnRestart").addEventListener("click", () => {
     capturedBlob = null;
+    currentJobId = null;
     showScreen("screen-intro");
   });
 
