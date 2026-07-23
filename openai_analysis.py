@@ -386,50 +386,34 @@ def _build_instruction() -> str:
     roster_lines = "\n".join(
         f'- {name}: {style}' for name, style in CHARACTER_STYLE_GUIDE.items()
     )
-    roster_section = (
-        "Pick from this fixed list only (do not invent a character not "
-        f"on this list):\n{roster_lines}"
-    )
-
     return f"""You are the analysis brain for a college-fest photo booth.
 Look at the attached photo of a person and do all of the following in one pass:
 
-1. Pick the single best-matching character for this person.
-{roster_section}
+1. Pick the single best-matching character for this person from this fixed
+   list only (do not invent a character not on this list):
+{roster_lines}
 
-Base the match on whatever is visually striking in the photo -- pose, outfit
-color, expression, accessories (e.g. glasses) -- combined with the mood/style
-of each character above.
+Base the match heavily on the person's unique physical and facial traits -- specifically noting skin color, beards, mustaches, glasses, sunglasses, or distinct facial structures. Combine these physical traits with their pose and outfit color to make a mapping that feels highly personalized, witty, and logically sound to the user.
 
 2. Write "reasoning": one or two short sentences, written directly to the
    person ("you"), explaining *why* they were matched to this character --
-   ground it in specific things you actually saw (e.g. "Your crossed arms and
-   steady gaze read as calm authority, and the dark jacket matches Batman's
-   brooding palette."). Concrete and specific, not generic.
+   ground it heavily in the specific facial features or accessories you actually saw 
+   (e.g., "Your sharp beard and those dark sunglasses give off major Tony Stark energy..."). 
+   Concrete and specific, never generic.
 
 3. Write "caption": a short, witty, one-line caption (8-12 words) about the
    match. Fun and a bit cheeky, never mean-spirited.
 
 4. Write "diffusion_prompt": a single ready-to-use prompt for an image-editing
-   model that will restyle THIS photo. Keep it TIGHT -- about 50-70 words,
-   one flowing sentence, no filler adjectives repeated for effect.
-
-   The single most important rule: this is a costume/backdrop swap on the
-   SAME person, not a redraw of a different person. The model must keep the
-   subject's actual face (identity, facial features, skin tone, expression)
-   and their exact pose/framing/camera angle from the photo completely
-   unchanged -- only the outfit, props, and background change. Open the
-   prompt by stating this explicitly (e.g. "Keep the exact same person, face,
-   and pose from the photo unchanged;") before describing anything else.
-
-   Then pack in only concrete, high-signal visual anchors: (a) 2-4 specific
-   *costume/prop* details pulled from the chosen character's style cues
-   above -- clothing colors, accessories, iconic props -- but never hair,
-   facial structure, or anything that would alter the person's actual face,
-   (b) one lighting/backdrop cue, (c) "cinematic movie-poster quality,
-   college fest promotional poster style" as a closing style tag.
-   A short, dense prompt lets the image model converge faster with the same
-   fidelity -- do not pad it with restated synonyms.
+   model that will restyle THIS photo. Keep it TIGHT -- about 60-80 words,
+   one flowing sentence, no filler adjectives. Pack in only concrete,
+   high-signal visual anchors:
+   (a) STRICT LIKENESS: explicitly command the model to preserve the person's exact skin color, facial hair (beard/mustache), glasses/sunglasses, and core facial structure,
+   (b) the person keeps their own pose and framing,
+   (c) 2-4 specific visual details pulled from the chosen character's style cues above (exact colors/props/hair, not vague mood words),
+   (d) one lighting/backdrop cue, 
+   (e) "cinematic movie-poster quality, college fest promotional poster style" as a closing style tag.
+   A short, dense prompt forces the image model to lock onto the user's real identity rather than overwriting them with a generic face.
 
 5. Fill "detected_traits": your own quick read of the photo --
    - outfit_color: the single dominant clothing color you see, one word
