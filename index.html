@@ -83,6 +83,11 @@
     color: white;
     font-weight: 700;
     object-fit: cover;
+    /* Reference photos are mostly portrait/full-body shots -- a centered
+       crop on this small square thumb often cut off the face. Anchoring to
+       the top keeps the face in frame even when the rest of the body gets
+       cropped out. */
+    object-position: top;
   }
   .char-name { font-size: .7rem; color: var(--text-dim); margin-top: .4rem; line-height: 1.2; }
 

@@ -400,12 +400,22 @@ of each character above.
 
 4. Write "diffusion_prompt": a single ready-to-use prompt for an image-editing
    model that will restyle THIS photo. Keep it TIGHT -- about 50-70 words,
-   one flowing sentence, no filler adjectives repeated for effect. Pack in
-   only concrete, high-signal visual anchors: (a) the person keeps their own
-   pose/framing, (b) 2-4 specific visual details pulled from the chosen
-   character's style cues above (exact colors/props/hair, not vague mood
-   words), (c) one lighting/backdrop cue, (d) "cinematic movie-poster
-   quality, college fest promotional poster style" as a closing style tag.
+   one flowing sentence, no filler adjectives repeated for effect.
+
+   The single most important rule: this is a costume/backdrop swap on the
+   SAME person, not a redraw of a different person. The model must keep the
+   subject's actual face (identity, facial features, skin tone, expression)
+   and their exact pose/framing/camera angle from the photo completely
+   unchanged -- only the outfit, props, and background change. Open the
+   prompt by stating this explicitly (e.g. "Keep the exact same person, face,
+   and pose from the photo unchanged;") before describing anything else.
+
+   Then pack in only concrete, high-signal visual anchors: (a) 2-4 specific
+   *costume/prop* details pulled from the chosen character's style cues
+   above -- clothing colors, accessories, iconic props -- but never hair,
+   facial structure, or anything that would alter the person's actual face,
+   (b) one lighting/backdrop cue, (c) "cinematic movie-poster quality,
+   college fest promotional poster style" as a closing style tag.
    A short, dense prompt lets the image model converge faster with the same
    fidelity -- do not pad it with restated synonyms.
 

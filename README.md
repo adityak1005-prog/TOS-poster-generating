@@ -232,6 +232,16 @@ curl -X POST "http://localhost:8000/booth/admin/cleanup"
   ever expires or becomes invalid mid-event: it drops the dead cache,
   retries that one request without it so the capture in progress still
   succeeds, and the next call rebuilds a fresh cache automatically.
+- **On a free-tier Gemini API key, this cache never builds — permanently.**
+  `TotalCachedContentStorageTokensPerModelFreeTier` is hardcoded to `0` on
+  free tier, so explicit caching is blocked outright, not just under some
+  quota you might grow into. In that case the booth matches on the text
+  style-guide descriptions only — the reference images in
+  `static/characters/` are not sent to Gemini at all (they're still used by
+  the frontend showcase). This is a deliberate trade-off to avoid resending
+  the full image set's tokens (~24,700 for the current 21-image roster) on
+  every single capture. If you want the images to actually influence
+  matching, the only way is a paid Gemini tier so the cache can build once.
 - Gemini's `diffusion_prompt` output is intentionally kept short and dense
   (~50-70 words) rather than free-form, so less gets sent to OpenAI per
   request while keeping the same visual fidelity.
