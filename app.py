@@ -305,7 +305,7 @@ async def _stream_capture(image_bytes: bytes, base_url: str):
         # see image_gen.py).
         t0 = time.time()
         poster_bytes = await asyncio.to_thread(
-            image_gen.generate_poster, image_bytes, match["diffusion_prompt"]
+            image_gen.generate_poster, image_bytes, match["diffusion_prompt"], match["character"]
         )
         mark("poster_generation", t0)
 

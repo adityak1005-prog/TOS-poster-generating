@@ -110,21 +110,73 @@ def _edit_once(image_bytes: bytes, diffusion_prompt: str, model: str, quality: s
     raise RuntimeError(f"{model} edit response contained no image data")
 
 
-def generate_poster(person_image_bytes: bytes, diffusion_prompt: str) -> bytes:
+def _is_moderation_blocked(exc: Exception) -> bool:
+    """OpenAI's images.edit has its own output-side safety moderation on top
+    of whatever the analysis-stage prompt tried to avoid -- it can still
+    reject a specific generated image (code 'moderation_blocked') even with
+    a policy-conscious prompt, since this edits a real photo of a real
+    person and that's held to a stricter bar. Detected by substring since
+    the SDK surfaces this as a generic APIError/BadRequestError whose
+    string form includes the JSON error body."""
+    return "moderation_blocked" in str(exc)
+
+
+def _safe_fallback_prompt(character_name: str) -> str:
+    """Used only when OpenAI's output moderation blocks the model-written
+    diffusion_prompt. Rather than failing the capture outright, retry with a
+    deliberately minimal, low-risk prompt -- no props, no weapons, no
+    costume/mask details that could read as a disguise or crime reference,
+    just a subtle color/lighting nod to the character. This intentionally
+    trades a less on-theme poster for actually completing the capture."""
+    label = character_name or "cinematic"
+    return (
+        f"Keep the exact same person, face, and pose from the photo "
+        f"completely unchanged; apply only a subtle {label}-inspired color "
+        f"palette and cinematic lighting to the background -- no props, no "
+        f"weapons, no masks, no costume changes, nothing that could read as "
+        f"violent or unsafe. Family-friendly cinematic movie-poster style."
+    )
+
+
+def generate_poster(person_image_bytes: bytes, diffusion_prompt: str, character_name: str = "") -> bytes:
     """
     Submit the captured photo + the analysis stage's diffusion_prompt to
     the images.edit endpoint and return the raw poster image bytes.
 
-    Tries the configured IMAGE_MODEL/IMAGE_QUALITY first. If that raises
-    (model unavailable on this account, transient API error, timeout, etc.)
-    it falls back once to FALLBACK_MODEL/FALLBACK_QUALITY (gpt-image-1 at
-    "low" by default) rather than failing the whole capture outright. Every
-    fallback/failure is printed so it's visible in the terminal during a
-    live event, not just swallowed.
+    Two independent failure modes, handled differently:
+    - Ordinary failures (model unavailable on this account, transient API
+      error, timeout, etc.) fall back once to FALLBACK_MODEL/FALLBACK_QUALITY
+      (gpt-image-1 at "low" by default) with the SAME prompt, since the
+      problem is assumed to be the model/quality combination, not the
+      content.
+    - Moderation rejections (code 'moderation_blocked' -- OpenAI's own
+      output-side safety check on the generated image, since this edits a
+      real photo of a real person) are different: retrying the same prompt
+      against a different model wouldn't help, so instead it's retried with
+      a deliberately stripped-down, low-risk prompt (see
+      _safe_fallback_prompt) against both the primary and fallback
+      model/quality before giving up. Every fallback/failure is printed so
+      it's visible in the terminal during a live event, not just swallowed.
     """
     try:
         return _edit_once(person_image_bytes, diffusion_prompt, IMAGE_MODEL, IMAGE_QUALITY)
     except Exception as e:
+        if _is_moderation_blocked(e):
+            print(f"[image_gen] {IMAGE_MODEL}/{IMAGE_QUALITY} edit BLOCKED by OpenAI's "
+                  f"output moderation ({e}); retrying once with a stripped-down, "
+                  f"low-risk prompt instead of the model-written one")
+            safe_prompt = _safe_fallback_prompt(character_name)
+            try:
+                return _edit_once(person_image_bytes, safe_prompt, IMAGE_MODEL, IMAGE_QUALITY)
+            except Exception as e2:
+                print(f"[image_gen] safe-prompt retry also failed ({e2}); "
+                      f"trying {FALLBACK_MODEL}/{FALLBACK_QUALITY} with the safe prompt too")
+                try:
+                    return _edit_once(person_image_bytes, safe_prompt, FALLBACK_MODEL, FALLBACK_QUALITY)
+                except Exception as e3:
+                    print(f"[image_gen] all moderation-safe retries failed ({e3}); "
+                          f"giving up on this capture")
+                    raise
         if (IMAGE_MODEL, IMAGE_QUALITY) == (FALLBACK_MODEL, FALLBACK_QUALITY):
             raise  # already the fallback combination, nothing left to fall back to
         print(f"[image_gen] {IMAGE_MODEL}/{IMAGE_QUALITY} edit failed ({e}); "
@@ -132,6 +184,16 @@ def generate_poster(person_image_bytes: bytes, diffusion_prompt: str) -> bytes:
         try:
             return _edit_once(person_image_bytes, diffusion_prompt, FALLBACK_MODEL, FALLBACK_QUALITY)
         except Exception as e2:
+            if _is_moderation_blocked(e2):
+                print(f"[image_gen] fallback model edit also BLOCKED by moderation "
+                      f"({e2}); retrying once more with a stripped-down, low-risk prompt")
+                safe_prompt = _safe_fallback_prompt(character_name)
+                try:
+                    return _edit_once(person_image_bytes, safe_prompt, FALLBACK_MODEL, FALLBACK_QUALITY)
+                except Exception as e3:
+                    print(f"[image_gen] moderation-safe retry also failed ({e3}); "
+                          f"giving up on this capture")
+                    raise
             print(f"[image_gen] fallback {FALLBACK_MODEL}/{FALLBACK_QUALITY} edit also "
                   f"failed ({e2}); giving up on this capture")
             raise

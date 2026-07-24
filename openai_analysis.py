@@ -182,10 +182,14 @@ CHARACTER_STYLE_GUIDE = {
         "territory instead. But when someone genuinely does read as "
         "older/more mature with that steady, composed gaze, this is a "
         "confident, correct pick, not one to avoid out of caution -- rare "
-        "does not mean off-limits. POSTER LOOK: default to the iconic heist-mode "
-        "costume -- bright red jumpsuit plus a white Salvador Dali mask "
-        "(painted grin, rosy cheeks, thin mustache) -- a bank vault or "
-        "sunbaked Spanish plaza backdrop. Only use the alternate academic "
+        "does not mean off-limits. POSTER LOOK: default to the iconic "
+        "costume from the show -- bright red jumpsuit plus a neat, "
+        "stylized white Salvador Dali theatrical mask (painted grin, "
+        "rosy cheeks, thin mustache) -- worn purely as a recognizable pop-"
+        "culture costume reference, not staged as an active robbery or "
+        "crime in progress. Backdrop: a sunbaked Spanish plaza, or a "
+        "vault-styled set with gold bars purely as set dressing. Only use "
+        "the alternate academic "
         "look (thick-rimmed glasses, tousled hair, rumpled cardigan) if "
         "the person's own glasses/cardigan were themselves the standout "
         "match reason."
@@ -252,7 +256,8 @@ CHARACTER_STYLE_GUIDE = {
         "flat. Male-presenting, young, no facial hair, dark hair if "
         "visible. The narrow face shape is the deciding cue against "
         "Batman's broader jaw. POSTER LOOK: navy-and-white high-collared "
-        "ninja outfit, katana on the back, Sharingan eye detail, crackling "
+        "ninja outfit, a sheathed katana worn stylistically across the "
+        "back (never drawn or wielded), Sharingan eye detail, crackling "
         "blue lightning backdrop."
     ),
     "Joker": (
@@ -262,7 +267,8 @@ CHARACTER_STYLE_GUIDE = {
         "Male-presenting. The high-arched raised eyebrows are what "
         "separate this from Naruto (neutral brows) and Shinchan (low, "
         "thick brows). POSTER LOOK: rumpled purple tailcoat over a green "
-        "vest, chalk-white face paint, smeared red smile, chaotic "
+        "vest, neat chalk-white face paint with a clean red-painted smile "
+        "(stylized theatrical makeup, not smeared or wound-like), chaotic "
         "neon-lit city backdrop."
     ),
     "Jon Snow": (
@@ -615,6 +621,18 @@ the same 4-5 famous defaults across many different people.
    still from that character's film, not an event souvenir.
    A short, dense prompt lets the image model converge faster with the same
    fidelity -- do not pad it with restated synonyms.
+
+   Content-safety guardrails (this edits a real photo of a real person, so
+   the image model's output-side moderation is stricter than usual --
+   prompts that read this way get blocked outright and the visitor gets no
+   poster at all): describe any weapon/prop as a clearly stylized,
+   sheathed/holstered costume piece, never being actively wielded,
+   pointed, or swung at anyone or anything. Never describe blood, gore,
+   wounds, or graphic violence. Never frame a scene as an active crime,
+   robbery, or violent act in progress -- reference a character's iconic
+   look/setting (e.g. "in the style of their iconic heist-film look")
+   rather than staging the act itself. Keep any face paint/mask described
+   as neat and stylized, not smeared, wounded-looking, or gory.
 
 5. Fill "detected_traits": your own quick read of the photo --
    - outfit_color: the single dominant clothing color you see, one word
