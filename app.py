@@ -1,26 +1,38 @@
 """
-Orchestrator: ties all four stages into one async job.
+Orchestrator: ties all four stages into one streamed request.
 
-Run with: uvicorn app:app --host 0.0.0.0 --port 8000
+Run with: uvicorn app:app --host 127.0.0.1 --port 8000
+
+Architecture note: this used to be a job-queue design -- POST /booth/capture
+returned a job_id immediately, ran the pipeline in a background asyncio
+task, and the frontend polled GET /booth/status/{job_id} until it saw
+"done". That pattern doesn't survive on serverless hosts like Vercel: a
+bare asyncio.create_task() can be torn down the moment the response is
+sent, and even if it weren't, the in-memory JOBS dict it wrote into isn't
+visible to whichever instance handles the next poll request. Instead,
+/booth/capture now runs the whole pipeline inline and streams progress as
+newline-delimited JSON within a single request/response -- the "character
+matched" early reveal still works (it's just the first streamed line
+instead of a separate poll response), and there's no cross-request state to
+lose. See index.html's runFullPipeline() for the client side of this.
 """
 
 import os
 import time
-import uuid
+import json
 import asyncio
 import datetime
-from fastapi import FastAPI, UploadFile, File, Form
-from fastapi.responses import JSONResponse, HTMLResponse
+import traceback
+from fastapi import FastAPI, UploadFile, File
+from fastapi.responses import JSONResponse, HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
-import traceback
 load_dotenv()
 
 import openai_analysis
 import image_gen
 import compose
-import storage  # Supabase Storage upload/list/delete helpers
-import emailer  # optional Gmail SMTP send of the finished poster
+import storage  # Supabase Storage upload/list/delete helpers (with fallback bucket)
 
 app = FastAPI()
 
@@ -31,6 +43,13 @@ app = FastAPI()
 # generated placeholder card when that happens.
 os.makedirs("static/characters", exist_ok=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+# Shown on the reveal screen next to the QR/share prompt -- the official
+# fest Instagram account freshers are asked to tag themselves when sharing
+# their poster (see index.html). Configurable so it isn't hardcoded into
+# the frontend directly.
+ARIES_INSTAGRAM_URL = os.environ.get("ARIES_INSTAGRAM_URL", "https://www.instagram.com/aries.iitd/")
+ARIES_INSTAGRAM_HANDLE = os.environ.get("ARIES_INSTAGRAM_HANDLE", "@aries.iitd")
 
 
 @app.get("/")
@@ -51,25 +70,35 @@ async def characters():
     return {"characters": openai_analysis.CHARACTERS}
 
 
-JOBS: dict[str, dict] = {}  # swap for Redis if running multiple booth machines
+@app.get("/booth/config")
+async def config():
+    """Small config blob the frontend fetches on load -- currently just the
+    Instagram tag prompt, kept server-side/env-configurable rather than
+    hardcoded into index.html."""
+    return {
+        "aries_instagram_url": ARIES_INSTAGRAM_URL,
+        "aries_instagram_handle": ARIES_INSTAGRAM_HANDLE,
+    }
+
 
 # --------------------------------------------------------------------------
-# Storage cleanup: opt-in (off by default). Turn on with
-# SUPABASE_CLEANUP_ENABLED=true if you ever need to keep the bucket bounded
-# for a bigger event -- every uploaded file (posters + QR codes) then gets
-# deleted once it's older than SUPABASE_CLEANUP_AGE_HOURS, checked on a
-# timer in the background. POST /booth/admin/cleanup for an on-demand sweep
-# is always available regardless of this flag, so you can still force one
-# manually (e.g. end of event) without turning on the automatic timer.
+# On-demand storage cleanup. There is no automatic background sweep anymore
+# -- storage.upload() now fails over to a fallback bucket instead (see
+# storage.py), which is what actually keeps the booth running if the
+# primary bucket fills up or errors, rather than a timer that deletes old
+# files. A permanent background loop (the old _periodic_cleanup_loop) can't
+# survive on serverless hosts like Vercel anyway -- an instance can be
+# paused/recycled between requests, killing a `while True` loop along with
+# it. This endpoint is a manual/on-demand tool only (e.g. an end-of-event
+# purge), not something the app relies on to keep running.
 # --------------------------------------------------------------------------
-CLEANUP_ENABLED = os.environ.get("SUPABASE_CLEANUP_ENABLED", "false").strip().lower() == "true"
 CLEANUP_MAX_AGE_HOURS = float(os.environ.get("SUPABASE_CLEANUP_AGE_HOURS", "6"))
-CLEANUP_INTERVAL_S = int(os.environ.get("SUPABASE_CLEANUP_INTERVAL_S", "3600"))  # hourly by default
 
 
 def _run_cleanup_once() -> list:
-    """Lists the bucket, deletes anything older than CLEANUP_MAX_AGE_HOURS,
-    returns the names removed. Runs in a thread (blocking Supabase calls)."""
+    """Lists the primary bucket, deletes anything older than
+    CLEANUP_MAX_AGE_HOURS, returns the names removed. Runs in a thread
+    (blocking Supabase calls)."""
     objects = storage.list_objects()
     cutoff = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=CLEANUP_MAX_AGE_HOURS)
 
@@ -89,32 +118,11 @@ def _run_cleanup_once() -> list:
     return stale
 
 
-async def _periodic_cleanup_loop():
-    while True:
-        await asyncio.sleep(CLEANUP_INTERVAL_S)
-        try:
-            removed = await asyncio.to_thread(_run_cleanup_once)
-            if removed:
-                print(f"[cleanup] removed {len(removed)} stale object(s): {removed}")
-        except Exception:
-            traceback.print_exc()
-
-
-@app.on_event("startup")
-async def _start_background_cleanup():
-    if CLEANUP_ENABLED:
-        asyncio.create_task(_periodic_cleanup_loop())
-    else:
-        print("[cleanup] automatic sweep disabled (SUPABASE_CLEANUP_ENABLED not set to true) "
-              "-- POST /booth/admin/cleanup is still available for a manual/on-demand sweep")
-
-
 @app.post("/booth/admin/cleanup")
 async def manual_cleanup():
-    """Triggers an immediate cleanup sweep -- handy for an end-of-event
-    cleanup without waiting for the next scheduled tick. Also temporary in
-    spirit like the other /booth/admin/* endpoints; fine to leave running,
-    but don't expose it publicly without auth if you keep it long-term."""
+    """Triggers an immediate cleanup sweep of the primary bucket -- handy
+    for an end-of-event purge. Purely on-demand; nothing calls this
+    automatically."""
     try:
         removed = await asyncio.to_thread(_run_cleanup_once)
     except Exception as e:
@@ -122,10 +130,21 @@ async def manual_cleanup():
         return JSONResponse(status_code=500, content={"error": str(e)})
     return {"removed_count": len(removed), "removed": removed}
 
-POSTER_TIMEOUT_S = 20  # hard budget for the OpenAI image edit call
+
+def _sse(payload: dict) -> str:
+    """One newline-delimited JSON chunk. Not technically Server-Sent-Events
+    framing (no 'data: ' prefix) -- kept as plain NDJSON so the client can
+    parse it with a trivial split('\\n') instead of a full SSE parser."""
+    return json.dumps(payload) + "\n"
 
 
-async def run_pipeline(job_id: str, image_bytes: bytes):
+async def _stream_capture(image_bytes: bytes):
+    """Generator that runs the whole pipeline and yields progress as NDJSON
+    lines. Replaces the old job-queue+poll design (see module docstring) --
+    everything happens inline within this one request/response, so there's
+    no cross-request state (no JOBS dict) for a serverless host to lose
+    track of.
+    """
     timings = {}
     t_start = time.time()
 
@@ -133,131 +152,68 @@ async def run_pipeline(job_id: str, image_bytes: bytes):
         timings[stage] = round(time.time() - t0, 2)
 
     try:
-        JOBS[job_id]["status"] = "processing"
-
-        # Stage 1 already happened client-side (the capture). image_bytes
-        # is the raw photo as uploaded -- no local decode/CV needed here.
-
-        # Stage 2: single multimodal OpenAI call -- replaces MediaPipe trait
-        # extraction, the rule-based character scorer, the LLM tie-break,
-        # and the prompt-builder all at once. Network-bound, so run in a
-        # thread like every other blocking stage. (Moved from Gemini to
-        # OpenAI so this call runs on the same paid account as stage 3.)
+        # Stage 2: single multimodal OpenAI call (analysis + character
+        # match + reasoning + caption + diffusion_prompt). Network-bound,
+        # run in a thread so it doesn't block the event loop.
         t0 = time.time()
         match = await asyncio.to_thread(openai_analysis.analyze_and_match, image_bytes)
         mark("openai_analysis", t0)
 
-        # Update job dict immediately so the status endpoint exposes the character choice
-        JOBS[job_id].update({
+        # First streamed chunk: lets the frontend show the matched
+        # character name immediately, same UX the old polling design gave,
+        # before the (slower) poster generation stage even starts.
+        yield _sse({
+            "stage": "matched",
             "character": match["character"],
             "reasoning": match.get("reasoning", ""),
             "caption": match["caption"],
             "traits": match["detected_traits"],
-            "stage": "generating_poster",
         })
-    # Stage 3: poster generation via OpenAI gpt-image-1 (images.edit,
-        # image-to-image). Timeout removed to allow for slower generations.
+
+        # Stage 3: poster generation (has its own model/quality fallback --
+        # see image_gen.py).
         t0 = time.time()
         poster_bytes = await asyncio.to_thread(
             image_gen.generate_poster, image_bytes, match["diffusion_prompt"]
         )
         mark("poster_generation", t0)
 
-        # Stage 4: compose + upload + QR
+        # Stage 4: compose + upload (has its own fallback bucket -- see
+        # storage.py) + QR.
         t0 = time.time()
         final_bytes = compose.compose_split_screen(
             image_bytes, poster_bytes, match["detected_traits"], match
         )
-        image_url = await asyncio.to_thread(storage.upload, final_bytes, f"{job_id}.jpg")
+        file_id = f"{int(time.time() * 1000)}"
+        image_url = await asyncio.to_thread(storage.upload, final_bytes, f"{file_id}.jpg")
         qr_bytes = compose.make_qr_for_url(image_url)
-        qr_url = await asyncio.to_thread(storage.upload, qr_bytes, f"{job_id}_qr.png")
+        qr_url = await asyncio.to_thread(storage.upload, qr_bytes, f"{file_id}_qr.png")
         mark("compose_and_share", t0)
 
         timings["total"] = round(time.time() - t_start, 2)
 
-        # No email is sent as part of this pipeline. Emailing is a separate,
-        # opt-in action the visitor triggers themselves via the "email me
-        # this poster" button on the reveal screen once they've actually
-        # seen the result -- see /booth/email/{job_id} below. email_sent
-        # starts False here and is only ever flipped by that endpoint.
-        JOBS[job_id].update({
-            "status": "done",
+        yield _sse({
+            "stage": "done",
             "image_url": image_url,
             "qr_url": qr_url,
             "character": match["character"],
             "reasoning": match.get("reasoning", ""),
             "caption": match["caption"],
             "traits": match["detected_traits"],
-            "email_sent": False,
             "timings": timings,
         })
 
-    # ... [inside run_pipeline] ...
     except Exception as e:
-        print(f"\n--- JOB {job_id} FAILED ---")
-        traceback.print_exc()  # This prints the exact file and line number to your terminal!
-        print("---------------------------\n")
-        JOBS[job_id].update({"status": "failed", "error": str(e), "timings": timings})
+        print(f"\n--- CAPTURE FAILED ---")
+        traceback.print_exc()  # exact file/line number in the terminal for real-time debugging
+        print("-----------------------\n")
+        yield _sse({"stage": "failed", "error": str(e), "timings": timings})
 
 
 @app.post("/booth/capture")
 async def capture(file: UploadFile = File(...)):
-    job_id = str(uuid.uuid4())
     image_bytes = await file.read()
-    JOBS[job_id] = {"status": "queued"}
-    asyncio.create_task(run_pipeline(job_id, image_bytes))
-    return {"job_id": job_id}
-
-
-@app.get("/booth/status/{job_id}")
-async def status(job_id: str):
-    job = JOBS.get(job_id)
-    if not job:
-        return JSONResponse(status_code=404, content={"error": "unknown job_id"})
-    return job
-
-
-# --------------------------------------------------------------------------
-# Opt-in email, triggered by the visitor clicking "email me this poster" on
-# the reveal screen -- i.e. after the poster + QR are already showing, not
-# during capture. This is deliberately fire-and-forget: the endpoint
-# schedules the actual fetch+SMTP-send as a background asyncio task and
-# returns immediately, so the click never blocks the browser and the send
-# itself (which can take a few seconds) never blocks the event loop or a
-# concurrent /booth/capture for the next visitor.
-# --------------------------------------------------------------------------
-async def _email_poster_background(job_id: str, to_address: str):
-    job = JOBS.get(job_id)
-    if not job:
-        return
-    try:
-        await asyncio.to_thread(
-            emailer.send_poster_email_from_url,
-            to_address, job["character"], job["caption"], job["image_url"],
-        )
-        JOBS[job_id]["email_sent"] = True
-        JOBS[job_id]["email_error"] = None
-    except Exception as e:
-        traceback.print_exc()
-        JOBS[job_id]["email_sent"] = False
-        JOBS[job_id]["email_error"] = str(e)
-
-
-@app.post("/booth/email/{job_id}")
-async def email_poster(job_id: str, email: str = Form(...)):
-    job = JOBS.get(job_id)
-    if not job:
-        return JSONResponse(status_code=404, content={"error": "unknown job_id"})
-    if job.get("status") != "done":
-        return JSONResponse(status_code=409, content={"error": "poster not ready yet"})
-
-    email = email.strip()
-    if not emailer.is_plausible_email(email):
-        return JSONResponse(status_code=400, content={"error": "that doesn't look like a valid email address"})
-
-    JOBS[job_id]["email_sent"] = None  # None = in flight, distinct from True/False
-    asyncio.create_task(_email_poster_background(job_id, email))
-    return {"queued": True}
+    return StreamingResponse(_stream_capture(image_bytes), media_type="application/x-ndjson")
 
 
 # --------------------------------------------------------------------------
@@ -267,7 +223,6 @@ async def email_poster(job_id: str, email: str = Form(...)):
 # diffusion_prompt used in stage 3) and returns it directly. Deliberately
 # does NOT call image_gen, compose, or storage, so you can sanity-check
 # matches and prompt quality without burning image-generation credits/quota.
-# Synchronous (no job queue) since this stage alone is fast.
 # --------------------------------------------------------------------------
 @app.post("/booth/test-analyze")
 async def test_analyze(file: UploadFile = File(...)):
@@ -286,9 +241,10 @@ async def test_analyze(file: UploadFile = File(...)):
 # TEMPORARY DEV/ADMIN ENDPOINT -- remove before the event.
 #
 # Left in place for interface parity with the previous Gemini-backed build.
-# openai_analysis.py has no reference-image cache (text-only matching), so
-# this now always reports no cache / no images -- kept as a stub rather than
-# deleted so nothing else that calls this endpoint breaks.
+# openai_analysis.py's "cache" is really a memoized in-process reference-
+# image set (OpenAI's own prompt caching is automatic, no handle to return)
+# -- this just forces a reload from static/characters/ without restarting
+# uvicorn.
 # --------------------------------------------------------------------------
 @app.post("/booth/admin/rebuild-cache")
 async def rebuild_cache():

@@ -18,11 +18,10 @@ stall the booth -- unchanged from the previous architecture.
 """
 
 import os
-import io
 import requests
 import base64
 from openai import OpenAI
-from PIL import Image
+import image_utils
 
 # gpt-image-2 (released April 2026) is OpenAI's current state-of-the-art
 # image model and replaces gpt-image-1 as the default here. It uses the
@@ -66,42 +65,27 @@ REQUEST_TIMEOUT_S = 15  # for the plain HTTP calls this module might still make
 _client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
 
-def _prepare_input_image(image_bytes: bytes) -> io.BytesIO:
-    """Downscale + re-encode the captured photo before it's sent to OpenAI.
-    Only affects what gpt-image-1 sees -- the original bytes passed into
-    generate_poster() are untouched and still used as-is for the
-    split-screen compose step and storage upload."""
-    img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-    width, height = img.size
-    scale = MAX_INPUT_DIM / max(width, height)
-    if scale < 1:
-        img = img.resize((round(width * scale), round(height * scale)), Image.LANCZOS)
-
-    buf = io.BytesIO()
-    img.save(buf, format="JPEG", quality=90)
-    buf.seek(0)
-    buf.name = "capture.jpg"  # SDK uses this to infer the mime type
-    return buf
+# Fallback used if the configured model/quality combination fails outright
+# -- e.g. the account doesn't have gpt-image-2 access yet, or a transient
+# API error. "low" quality on gpt-image-1 is the cheapest/fastest/most
+# widely-available combination, so it's the last thing tried before giving
+# up entirely rather than failing the whole capture.
+FALLBACK_MODEL = os.environ.get("OPENAI_IMAGE_MODEL_FALLBACK", "gpt-image-1")
+FALLBACK_QUALITY = "low"
 
 
-def generate_poster(person_image_bytes: bytes, diffusion_prompt: str) -> bytes:
-    """
-    Submit the captured photo + Gemini's diffusion_prompt to gpt-image-1's
-    edit endpoint and return the raw poster image bytes.
-
-    gpt-image-1 requires the input image to be a png/webp/jpg file object,
-    not raw bytes directly -- the photo is downscaled/re-encoded in-memory
-    (see _prepare_input_image) and wrapped in a file-like object with a
-    name so the SDK can infer content type, no temp file needed on disk.
-    """
-    input_file = _prepare_input_image(person_image_bytes)
+def _edit_once(image_bytes: bytes, diffusion_prompt: str, model: str, quality: str) -> bytes:
+    """One attempt at the images.edit call with a given model/quality. A
+    fresh file-like object is built per attempt since a BytesIO already
+    consumed by one upload attempt can't be safely reused for a retry."""
+    input_file = image_utils.prepare_image_file(image_bytes, max_dim=MAX_INPUT_DIM)
 
     edit_kwargs = dict(
-        model=IMAGE_MODEL,
+        model=model,
         image=input_file,
         prompt=diffusion_prompt,
         size=POSTER_SIZE,
-        quality=IMAGE_QUALITY,
+        quality=quality,
         output_format=OUTPUT_FORMAT,
         n=1,
     )
@@ -109,10 +93,9 @@ def generate_poster(person_image_bytes: bytes, diffusion_prompt: str) -> bytes:
         edit_kwargs["output_compression"] = OUTPUT_COMPRESSION
 
     result = _client.images.edit(**edit_kwargs)
-
     image_entry = result.data[0]
 
-    # gpt-image-1 returns base64-encoded image data (b64_json) by default;
+    # gpt-image-1/2 return base64-encoded image data (b64_json) by default;
     # handle both that and a hosted url just in case a future response
     # shape switches to url-based delivery.
     if getattr(image_entry, "b64_json", None):
@@ -123,4 +106,31 @@ def generate_poster(person_image_bytes: bytes, diffusion_prompt: str) -> bytes:
         resp.raise_for_status()
         return resp.content
 
-    raise RuntimeError("gpt-image-1 edit response contained no image data")
+    raise RuntimeError(f"{model} edit response contained no image data")
+
+
+def generate_poster(person_image_bytes: bytes, diffusion_prompt: str) -> bytes:
+    """
+    Submit the captured photo + the analysis stage's diffusion_prompt to
+    the images.edit endpoint and return the raw poster image bytes.
+
+    Tries the configured IMAGE_MODEL/IMAGE_QUALITY first. If that raises
+    (model unavailable on this account, transient API error, timeout, etc.)
+    it falls back once to FALLBACK_MODEL/FALLBACK_QUALITY (gpt-image-1 at
+    "low" by default) rather than failing the whole capture outright. Every
+    fallback/failure is printed so it's visible in the terminal during a
+    live event, not just swallowed.
+    """
+    try:
+        return _edit_once(person_image_bytes, diffusion_prompt, IMAGE_MODEL, IMAGE_QUALITY)
+    except Exception as e:
+        if (IMAGE_MODEL, IMAGE_QUALITY) == (FALLBACK_MODEL, FALLBACK_QUALITY):
+            raise  # already the fallback combination, nothing left to fall back to
+        print(f"[image_gen] {IMAGE_MODEL}/{IMAGE_QUALITY} edit failed ({e}); "
+              f"retrying once with {FALLBACK_MODEL}/{FALLBACK_QUALITY}")
+        try:
+            return _edit_once(person_image_bytes, diffusion_prompt, FALLBACK_MODEL, FALLBACK_QUALITY)
+        except Exception as e2:
+            print(f"[image_gen] fallback {FALLBACK_MODEL}/{FALLBACK_QUALITY} edit also "
+                  f"failed ({e2}); giving up on this capture")
+            raise

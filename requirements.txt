@@ -2,7 +2,6 @@ fastapi
 uvicorn[standard]
 Pillow
 qrcode
-google-genai
 openai
 supabase
 requests

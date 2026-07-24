@@ -1,16 +1,27 @@
-GEMINI_API_KEY=your_gemini_api_key
-GEMINI_MODEL=gemini-2.5-flash-lite
-CHARACTER_REF_DIR=static/characters
-# No true "unlimited" TTL exists on Gemini's caching API -- 24h is a
-# practical stand-in for "don't worry about it for the event." Push higher
-# (days/weeks) if you want; storage cost at this content size is trivial
-# either way, and analyze_and_match() self-heals if it ever expires mid-run.
-GEMINI_CACHE_TTL=86400s
-
 OPENAI_API_KEY=your_openai_api_key
+
+# Stage 2 (analysis: character match + reasoning + caption + diffusion
+# prompt). Vision-capable chat model, distinct from OPENAI_IMAGE_MODEL
+# below. gpt-4o's automatic prompt caching is what replaced Gemini's
+# explicit (and free-tier-blocked) context caching -- no code-side cache
+# object to manage, it's automatic based on repeated identical prefixes.
+OPENAI_ANALYSIS_MODEL=gpt-4o
+
+CHARACTER_REF_DIR=static/characters
+
+# Stage 3 (poster generation via images.edit).
 OPENAI_IMAGE_MODEL=gpt-image-2
+# Used once as a fallback if OPENAI_IMAGE_MODEL/OPENAI_IMAGE_QUALITY fails
+# outright (account doesn't have access, transient error, etc.) -- see
+# image_gen.py. Always tried at "low" quality regardless of the primary
+# quality setting, since that's the fastest/cheapest/most widely available
+# combination.
+OPENAI_IMAGE_MODEL_FALLBACK=gpt-image-1
 OPENAI_IMAGE_SIZE=1024x1536
 OPENAI_IMAGE_QUALITY=medium
+# Shared by both the analysis call and the poster-edit call (see
+# image_utils.py) -- the captured photo is downscaled to this max
+# dimension before being sent to either API call.
 OPENAI_INPUT_MAX_DIM=1280
 OPENAI_OUTPUT_FORMAT=jpeg
 OPENAI_OUTPUT_COMPRESSION=85
@@ -18,13 +29,25 @@ OPENAI_OUTPUT_COMPRESSION=85
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_KEY=your_supabase_service_role_key
 SUPABASE_BUCKET=movie-booth-uploads
-# Auto-delete sweep is opt-in -- set to true if you ever need the bucket
-# kept bounded. POST /booth/admin/cleanup always works for a manual sweep
-# regardless of this setting.
-SUPABASE_CLEANUP_ENABLED=false
+# Optional fallback storage target -- storage.upload() tries the primary
+# bucket first and only falls back if that upload raises (quota exceeded,
+# network error, bad credentials, etc.). All three vars below are
+# independent and optional; leave them unset to disable fallback entirely
+# (same behavior as before -- a failed upload just raises).
+#   - Set only SUPABASE_BUCKET_FALLBACK for a second bucket in the SAME
+#     project -- note Supabase's free-tier storage quota is per-PROJECT,
+#     not per-bucket, so this alone doesn't add real capacity, only
+#     resilience against the primary bucket itself being misconfigured.
+#   - Also set SUPABASE_URL_FALLBACK + SUPABASE_KEY_FALLBACK for a fully
+#     separate Supabase project, which does add independent capacity.
+SUPABASE_URL_FALLBACK=
+SUPABASE_KEY_FALLBACK=
+SUPABASE_BUCKET_FALLBACK=
+# Used only by the on-demand POST /booth/admin/cleanup sweep (manual, not
+# automatic -- see app.py).
 SUPABASE_CLEANUP_AGE_HOURS=6
-SUPABASE_CLEANUP_INTERVAL_S=3600
 
-GMAIL_ADDRESS=your_gmail_address@gmail.com
-GMAIL_APP_PASSWORD=your_16_char_app_password
-EMAIL_FROM_NAME=AI Movie Booth
+# Shown on the reveal screen's "share to Instagram" prompt (see
+# GET /booth/config and index.html's ig-share-box).
+ARIES_INSTAGRAM_URL=https://www.instagram.com/aries.iitd/
+ARIES_INSTAGRAM_HANDLE=@aries.iitd

@@ -129,6 +129,18 @@
   .qr-row img { width: 84px; height: 84px; border-radius: 8px; background: white; }
   .qr-row p { margin: 0; font-size: .85rem; color: var(--text-dim); }
 
+  .ig-share-box {
+    background: var(--panel-2);
+    border-radius: 14px;
+    padding: .9rem 1rem;
+    margin-bottom: 1.25rem;
+    font-size: .88rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+  .ig-share-box a { color: var(--accent); font-weight: 600; text-decoration: none; }
+  .ig-share-box a:hover { text-decoration: underline; }
+
   .footer-toggle { text-align: center; margin-top: 1rem; }
   .footer-toggle label { font-size: .72rem; color: var(--text-dim); cursor: pointer; user-select: none; }
 
@@ -200,7 +212,7 @@
     <div class="processing-wrap">
       <div class="spinner"></div>
       <div id="processingText">Analyzing your photo...</div>
-      <div id="processingSub">This usually takes 10-25 seconds.</div>
+      <div id="processingSub">This usually takes a bit -- hang tight.</div>
     </div>
   </div>
 
@@ -215,16 +227,12 @@
       <p>Scan to save your poster to your phone.</p>
     </div>
 
-    <div style="margin-bottom:1.25rem;">
-      <label for="mailEmailInput" style="display:block; font-size:.8rem; color:var(--text-dim); margin-bottom:.4rem;">
-        Want it in your inbox too?
-      </label>
-      <div class="btn-row">
-        <input type="email" id="mailEmailInput" placeholder="you@example.com"
-          style="flex:2; padding:.75rem 1rem; border-radius:12px; border:1px solid #33333f; background:var(--panel-2); color:var(--text); font-size:1rem;">
-        <button class="btn-secondary" id="btnMailPoster" style="flex:1;">Email me</button>
-      </div>
-      <div id="mailStatus" style="font-size:.8rem; color:var(--text-dim); margin-top:.5rem; min-height:1.2em;"></div>
+    <div class="ig-share-box">
+      <p style="margin:0;">
+        Loved it? Share your poster on your Instagram Story and tag
+        <a id="igHandleLink" href="#" target="_blank" rel="noopener">@aries.iitd</a>
+        so we can see it too!
+      </p>
     </div>
 
     <button class="btn-primary" id="btnRestart" style="width:100%;">Do it again</button>
@@ -232,8 +240,8 @@
 
   <!-- ============ TEST RESULT (dev only) ============ -->
   <div class="screen card" id="screen-test">
-    <h1>Gemini output (test mode)</h1>
-    <p class="lede">No poster was generated -- this is only the analysis stage, for checking match quality and the prompt that would go to OpenAI.</p>
+    <h1>Analysis output (test mode)</h1>
+    <p class="lede">No poster was generated -- this is only the analysis stage, for checking match quality and the prompt that would go to the poster-generation call.</p>
     <pre class="test-json" id="testJson"></pre>
     <button class="btn-secondary" id="btnTestBack" style="width:100%; margin-top:1rem;">Back</button>
   </div>
@@ -309,6 +317,29 @@
   }
   loadShowcase();
 
+  // ---- Instagram tag prompt (shown on the reveal screen) -- fetched from
+  // the server so the handle/URL is configurable via env var (see
+  // ARIES_INSTAGRAM_URL/ARIES_INSTAGRAM_HANDLE in app.py) without needing
+  // to edit this file. Falls back to these hardcoded defaults if the
+  // config endpoint isn't reachable yet. ----
+  let ariesInstagramUrl = "https://www.instagram.com/aries.iitd/";
+  let ariesInstagramHandle = "@aries.iitd";
+
+  async function loadConfig() {
+    try {
+      const res = await fetch("/booth/config");
+      const data = await res.json();
+      if (data.aries_instagram_url) ariesInstagramUrl = data.aries_instagram_url;
+      if (data.aries_instagram_handle) ariesInstagramHandle = data.aries_instagram_handle;
+    } catch (e) { /* keep the hardcoded defaults above */ }
+    const link = document.getElementById("igHandleLink");
+    if (link) {
+      link.href = ariesInstagramUrl;
+      link.innerText = ariesInstagramHandle;
+    }
+  }
+  loadConfig();
+
   // ---- screen management ----
   function showScreen(id) {
     document.querySelectorAll(".screen").forEach((s) => s.classList.remove("active"));
@@ -319,7 +350,6 @@
   let capturedBlob = null;
   let cameraStream = null;
   let testMode = false;
-  let currentJobId = null;
 
   document.getElementById("testModeToggle").addEventListener("change", (e) => {
     testMode = e.target.checked;
@@ -394,33 +424,98 @@
     showScreen("screen-intro");
   });
 
-  document.getElementById("btnConfirm").addEventListener("click", () => {
+  // ---- client-side compression before upload -- keeps the request body
+  // well under Vercel's 4.5MB request-body limit and cuts upload time on a
+  // phone connection, without waiting on the server round-trip to shrink
+  // it. imageOrientation: "from-image" bakes in the photo's EXIF rotation
+  // (phone photos are very often stored "sideways" with an orientation tag
+  // that only viewers normally apply) so a resized capture doesn't come out
+  // rotated. If createImageBitmap or its orientation option isn't
+  // supported, this just falls back to uploading the original blob --
+  // image_utils.py on the server still downscales as a safety net either
+  // way, so nothing breaks, it's just a bit more bandwidth. ----
+  async function compressImageForUpload(blob, maxDim = 1280, quality = 0.85) {
+    try {
+      const bitmap = await createImageBitmap(blob, { imageOrientation: "from-image" });
+      const scale = Math.min(1, maxDim / Math.max(bitmap.width, bitmap.height));
+      const w = Math.round(bitmap.width * scale);
+      const h = Math.round(bitmap.height * scale);
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext("2d").drawImage(bitmap, 0, 0, w, h);
+      const compressed = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", quality));
+      return compressed || blob;
+    } catch (e) {
+      return blob; // compression unsupported/failed -- server-side fallback handles it
+    }
+  }
+
+  document.getElementById("btnConfirm").addEventListener("click", async () => {
     if (!capturedBlob) return;
+    const compact = await compressImageForUpload(capturedBlob);
     if (testMode) {
-      runTestAnalyze(capturedBlob);
+      runTestAnalyze(compact);
     } else {
-      runFullPipeline(capturedBlob);
+      runFullPipeline(compact);
     }
   });
 
-  // ---- real pipeline (unchanged backend behavior: capture -> poll status) ----
+  // ---- real pipeline: one streamed request instead of capture+poll. See
+  // app.py's module docstring for why -- a job-id-and-poll design doesn't
+  // survive on serverless hosts, since the in-memory job state and the
+  // background task that fills it in aren't guaranteed to be visible to a
+  // later poll request. /booth/capture now runs the whole pipeline inline
+  // and streams newline-delimited JSON progress within a single response;
+  // the early "character matched" reveal still happens, it's just the
+  // first line of that stream instead of a separate poll response. ----
   async function runFullPipeline(blob) {
     showScreen("screen-processing");
-    setProcessingText("Analyzing your photo...", "This usually takes 10-25 seconds.");
+    setProcessingText("Analyzing your photo...", "This usually takes a bit -- hang tight.");
 
     const formData = new FormData();
     formData.append("file", blob, "capture.jpg");
 
     try {
       const res = await fetch("/booth/capture", { method: "POST", body: formData });
-      const data = await res.json();
-      if (!data.job_id) {
+      if (!res.ok || !res.body) {
         alert("Upload failed. Please try again.");
         showScreen("screen-intro");
         return;
       }
-      currentJobId = data.job_id;
-      pollStatus(data.job_id);
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+
+        let newlineIndex;
+        while ((newlineIndex = buffer.indexOf("\n")) >= 0) {
+          const line = buffer.slice(0, newlineIndex).trim();
+          buffer = buffer.slice(newlineIndex + 1);
+          if (!line) continue;
+
+          let data;
+          try {
+            data = JSON.parse(line);
+          } catch (e) {
+            continue; // partial/corrupt line, skip rather than crash the reader
+          }
+
+          if (data.stage === "matched") {
+            setProcessingText(`You're a match for ${data.character}! 🎬`, "Generating your poster now...");
+          } else if (data.stage === "done") {
+            showReveal(data);
+          } else if (data.stage === "failed") {
+            alert("Something went wrong: " + (data.error || "unknown error"));
+            showScreen("screen-intro");
+          }
+        }
+      }
     } catch (err) {
       alert("Network error. Please try again.");
       showScreen("screen-intro");
@@ -430,33 +525,6 @@
   function setProcessingText(main, sub) {
     document.getElementById("processingText").innerText = main;
     document.getElementById("processingSub").innerText = sub;
-  }
-
-  function pollStatus(jobId) {
-    let shownCharacter = false;
-    const interval = setInterval(async () => {
-      let data;
-      try {
-        const res = await fetch(`/booth/status/${jobId}`);
-        data = await res.json();
-      } catch (err) {
-        return; // transient network hiccup, keep polling
-      }
-
-      if (data.character && !shownCharacter) {
-        shownCharacter = true;
-        setProcessingText(`You're a match for ${data.character}! 🎬`, "Generating your poster now...");
-      }
-
-      if (data.status === "done") {
-        clearInterval(interval);
-        showReveal(data);
-      } else if (data.status === "failed") {
-        clearInterval(interval);
-        alert("Something went wrong: " + (data.error || "unknown error"));
-        showScreen("screen-intro");
-      }
-    }, 1500);
   }
 
   function showReveal(data) {
@@ -472,84 +540,18 @@
     document.getElementById("traitsLine").innerText = traitsText;
     document.getElementById("qrImage").src = data.qr_url;
 
-    // reset the mail widget for this new poster
-    document.getElementById("mailEmailInput").value = "";
-    document.getElementById("mailEmailInput").disabled = false;
-    document.getElementById("btnMailPoster").disabled = false;
-    document.getElementById("btnMailPoster").innerText = "Email me";
-    document.getElementById("mailStatus").innerText = "";
-
     showScreen("screen-reveal");
   }
 
-  // ---- "email me this poster" -- fires the request and returns
-  // immediately (fire-and-forget from the browser's perspective too); the
-  // actual send happens server-side in a background task, so this never
-  // blocks the UI or the next capture. ----
-  document.getElementById("btnMailPoster").addEventListener("click", async () => {
-    const emailInput = document.getElementById("mailEmailInput");
-    const status = document.getElementById("mailStatus");
-    const btn = document.getElementById("btnMailPoster");
-    const address = emailInput.value.trim();
-
-    if (!address || !address.includes("@")) {
-      status.innerText = "Enter a valid email address first.";
-      return;
-    }
-    if (!currentJobId) {
-      status.innerText = "Something went wrong -- try refreshing.";
-      return;
-    }
-
-    btn.disabled = true;
-    emailInput.disabled = true;
-    status.innerText = "Sending...";
-
-    const formData = new FormData();
-    formData.append("email", address);
-
-    try {
-      const res = await fetch(`/booth/email/${currentJobId}`, { method: "POST", body: formData });
-      const data = await res.json();
-      if (!res.ok) {
-        status.innerText = data.error || "Couldn't queue that -- try again.";
-        btn.disabled = false;
-        emailInput.disabled = false;
-        return;
-      }
-      status.innerText = "On its way to your inbox!";
-      btn.innerText = "Sent";
-      // one lightweight follow-up check, not continuous polling -- just
-      // enough to flag a delivery failure so the visitor can retry
-      setTimeout(async () => {
-        try {
-          const r = await fetch(`/booth/status/${currentJobId}`);
-          const d = await r.json();
-          if (d.email_sent === false && d.email_error) {
-            status.innerText = "Couldn't deliver that email -- check the address and try again.";
-            btn.disabled = false;
-            btn.innerText = "Email me";
-            emailInput.disabled = false;
-          }
-        } catch (e) { /* ignore -- the optimistic "on its way" message stands */ }
-      }, 4000);
-    } catch (err) {
-      status.innerText = "Network error -- try again.";
-      btn.disabled = false;
-      emailInput.disabled = false;
-    }
-  });
-
   document.getElementById("btnRestart").addEventListener("click", () => {
     capturedBlob = null;
-    currentJobId = null;
     showScreen("screen-intro");
   });
 
-  // ---- dev test-only path: Gemini analysis, no poster generated ----
+  // ---- dev test-only path: analysis stage only, no poster generated ----
   async function runTestAnalyze(blob) {
     showScreen("screen-processing");
-    setProcessingText("Running Gemini analysis...", "Test mode -- no poster will be generated.");
+    setProcessingText("Running analysis...", "Test mode -- no poster will be generated.");
 
     const formData = new FormData();
     formData.append("file", blob, "capture.jpg");
