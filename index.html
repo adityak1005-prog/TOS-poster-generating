@@ -213,6 +213,7 @@
       <div class="spinner"></div>
       <div id="processingText">Analyzing your photo...</div>
       <div id="processingSub">This usually takes a bit -- hang tight.</div>
+      <div id="processingReveal" style="display:none; margin-top: 1.25rem;"></div>
     </div>
   </div>
 
@@ -278,6 +279,34 @@
     "Sheldon Cooper":            { emoji: "🤓", grad: "linear-gradient(135deg,#1d4ed8,#64748b)" },
   };
   const DEFAULT_STYLE = { emoji: "🎬", grad: "linear-gradient(135deg,#3f3f46,#52525b)" };
+
+  // Static trivia shown only on the processing screen while the poster is
+  // still generating -- deliberately NOT sent to/shown on the final reveal
+  // page. Hardcoded rather than model-generated so it costs zero extra
+  // tokens/latency on the analysis call.
+  const CHARACTER_FUN_FACTS = {
+    "Iron Man": "Fun fact: Robert Downey Jr. improvised many of Tony Stark's most famous one-liners on set.",
+    "Batman": "Fun fact: Batman has no actual superpowers -- just genius intellect, gadgets, and a lot of gym time.",
+    "Spider-Man": "Fun fact: early Marvel editors almost rejected Spider-Man because they doubted readers would like a teenage hero.",
+    "Thomas Shelby": "Fun fact: Peaky Blinders' flat caps are part of a long-standing (if disputed) gang legend about razor blades hidden in the brim.",
+    "Naruto": "Fun fact: Naruto's whisker markings tie directly into his story -- he has the Nine-Tailed Fox sealed inside him.",
+    "Professor from Money Heist": "Fun fact: the crew's red jumpsuits were chosen partly because the color is nearly impossible to miss on camera.",
+    "Gwen Stacy": "Fun fact: in the comics, Gwen Stacy actually died years before being reintroduced as her own hero, Spider-Gwen.",
+    "Black Widow": "Fun fact: Natasha Romanoff was trained from childhood in the fictional 'Red Room' spy program.",
+    "Daenerys Targaryen": "Fun fact: Daenerys named her three dragons after people she lost -- Rhaegar, Viserys, and Drogo.",
+    "Hermione Granger": "Fun fact: Emma Watson had never acted professionally before landing the role of Hermione Granger.",
+    "Wednesday Addams": "Fun fact: Wednesday Addams got her name from the nursery rhyme line 'Wednesday's child is full of woe.'",
+    "Kakashi Hatake": "Fun fact: Kakashi is nicknamed the 'Copy Ninja' for having copied over a thousand jutsu with his Sharingan.",
+    "Sasuke Uchiha": "Fun fact: Sasuke's clan storyline draws heavily on classic tales of samurai honor and revenge.",
+    "Joker": "Fun fact: the Joker has never had one official origin story -- even he says he prefers it 'multiple choice.'",
+    "Jon Snow": "Fun fact: Jon Snow's line 'You know nothing' became one of the most quoted lines in TV history.",
+    "Shinchan": "Fun fact: Shin-chan's cheeky humor was considered so bold that some broadcasters hesitated to air it unedited.",
+    "Harry Potter": "Fun fact: J.K. Rowling wrote much of the first Harry Potter book in cafes while drafting the series.",
+    "Dr. Doom": "Fun fact: Doctor Doom isn't just a supervillain -- he's technically the ruling monarch of Latveria.",
+    "Regina George": "Fun fact: Mean Girls' 'On Wednesdays we wear pink' became one of the most quoted movie lines ever.",
+    "Elle Woods": "Fun fact: Legally Blonde was based on a novel by Amanda Brown, inspired by her own law school experience.",
+    "Sheldon Cooper": "Fun fact: Sheldon Cooper's habit of knocking exactly three times and saying a name became one of the show's most recognizable running gags.",
+  };
 
   function slugify(name) { return name.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, ""); }
 
@@ -352,6 +381,7 @@
   // ---- state ----
   let capturedBlob = null;
   let cameraStream = null;
+  let processingRevealTimer = null;
   let testMode = false;
 
   document.getElementById("testModeToggle").addEventListener("change", (e) => {
@@ -475,6 +505,10 @@
   async function runFullPipeline(blob) {
     showScreen("screen-processing");
     setProcessingText("Analyzing your photo...", "This usually takes a bit -- hang tight.");
+    clearTimeout(processingRevealTimer);
+    const processingRevealEl = document.getElementById("processingReveal");
+    processingRevealEl.style.display = "none";
+    processingRevealEl.innerHTML = "";
 
     const formData = new FormData();
     formData.append("file", blob, "capture.jpg");
@@ -510,10 +544,35 @@
           }
 
           if (data.stage === "matched") {
+            // Spinner + text stay visible the whole time -- this only adds
+            // content below them, never replaces the loading state, since
+            // the poster generation this is waiting on is still running.
             setProcessingText(`You're a match for ${data.character}! 🎬`, "Generating your poster now...");
+            clearTimeout(processingRevealTimer);
+            const funFact = CHARACTER_FUN_FACTS[data.character] || "";
+            const caption = data.caption || "";
+            const reasoning = data.reasoning
+              ? `<b>Why ${data.character}?</b> ${data.reasoning}`
+              : "";
+            // Fixed 5s delay anchored to this "matched" message, not a
+            // random/variable one -- and this whole block (fun fact +
+            // caption + reasoning) only ever lives on the processing
+            // screen. showReveal() below builds the final reveal page from
+            // caption/reasoning separately and never touches the fun fact,
+            // so it's intentionally gone once the poster is ready.
+            processingRevealTimer = setTimeout(() => {
+              const el = document.getElementById("processingReveal");
+              el.innerHTML =
+                (funFact ? `<div class="reasoning-box">${funFact}</div>` : "") +
+                (caption ? `<div class="catchphrase">${caption}</div>` : "") +
+                (reasoning ? `<div class="reasoning-box">${reasoning}</div>` : "");
+              el.style.display = funFact || caption || reasoning ? "block" : "none";
+            }, 5000);
           } else if (data.stage === "done") {
+            clearTimeout(processingRevealTimer);
             showReveal(data);
           } else if (data.stage === "failed") {
+            clearTimeout(processingRevealTimer);
             alert("Something went wrong: " + (data.error || "unknown error"));
             showScreen("screen-intro");
           }

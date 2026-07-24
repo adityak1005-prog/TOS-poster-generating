@@ -125,10 +125,19 @@ CHARACTER_STYLE_GUIDE = {
         "Male-presenting, clean-shaven. This is the 'plain serious face, "
         "no beard, no smirk' bucket -- if there's a beard, that's Jon "
         "Snow; if there's a one-sided smirk, that's Iron Man or Sheldon. "
-        "POSTER LOOK: matte-black armored bat-suit, flowing cape, cowl "
-        "with pointed ears, utility belt, moody Gotham-noir lighting "
-        "(deep shadows, cold blue-grey highlights, rain-slicked "
-        "rooftops)."
+        "IMPORTANT: 'not smiling' is the single most common default photo "
+        "expression there is -- do not let this become the new automatic "
+        "fallback the way Professor/Sheldon used to be. This means "
+        "checking the alternatives before committing, not avoiding Batman "
+        "altogether -- when the jaw genuinely reads as broad/square AND "
+        "the flatness is notably intense/watchful, Batman is exactly the "
+        "right pick and should be used with full confidence. Only weigh it "
+        "against Thomas Shelby, Sasuke, or Dr. Doom when the face is a "
+        "plainer, less distinctive non-smile with no other standout "
+        "feature. POSTER LOOK: "
+        "matte-black armored bat-suit, flowing cape, cowl with pointed "
+        "ears, utility belt, moody Gotham-noir lighting (deep shadows, "
+        "cold blue-grey highlights, rain-slicked rooftops)."
     ),
     "Spider-Man": (
         "MATCH ON: match this purely from the face, not a costume or "
@@ -170,7 +179,10 @@ CHARACTER_STYLE_GUIDE = {
         "one of the rarer matches given a young crowd, and that's "
         "expected -- do not force it onto young, smooth-faced people just "
         "because they're calm and wearing glasses; that's Sheldon's "
-        "territory instead. POSTER LOOK: default to the iconic heist-mode "
+        "territory instead. But when someone genuinely does read as "
+        "older/more mature with that steady, composed gaze, this is a "
+        "confident, correct pick, not one to avoid out of caution -- rare "
+        "does not mean off-limits. POSTER LOOK: default to the iconic heist-mode "
         "costume -- bright red jumpsuit plus a white Salvador Dali mask "
         "(painted grin, rosy cheeks, thin mustache) -- a bank vault or "
         "sunbaked Spanish plaza backdrop. Only use the alternate academic "
@@ -315,7 +327,11 @@ CHARACTER_STYLE_GUIDE = {
         "corner sits very slightly higher than the other. Male-presenting, "
         "clean-shaven. The rectangular glasses plus neat hair is the "
         "deciding combo against Harry Potter's round glasses and messy "
-        "hair -- if hair is messy, go there instead. POSTER LOOK: "
+        "hair -- if hair is messy, go there instead. Glasses alone "
+        "shouldn't default here without the neat/prim mouth and tidy hair "
+        "too, but when that fuller combination is genuinely present, pick "
+        "it confidently -- this is a real, correct match, not just a "
+        "fallback. POSTER LOOK: "
         "side-swept hair, layered graphic tee under a collared shirt, "
         "cluttered apartment with an equation-covered whiteboard "
         "backdrop."
@@ -539,7 +555,14 @@ graphic tee; check the other dimensions (especially facial hair and gender
 presentation) before committing to a match like that. Several roster entries
 (Professor from Money Heist, Sheldon Cooper, Harry Potter) explicitly warn
 that glasses plus a neutral/calm expression is common and weak evidence on
-its own -- respect those warnings rather than defaulting to those names.
+its own, and Batman explicitly warns that an ordinary non-smiling face is
+common and weak evidence on its own too -- respect those warnings rather
+than defaulting to those names. These warnings exist to stop lazy,
+one-cue-only matching, NOT to exclude these characters -- they are common,
+correct, fully valid picks whenever their fuller combination of cues
+genuinely fits best. Never avoid a character just because it was recently
+over-picked or because a warning exists on its entry; the goal is accuracy
+per photo, not enforcing a quota across visitors.
 
 If more than one character is a genuinely close, plausible match, do not
 always resolve the tie toward the most famous or most "obvious" name --
