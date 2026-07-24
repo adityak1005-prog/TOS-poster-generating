@@ -109,38 +109,16 @@ _client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 # trigger, specifically so the roster doesn't collapse onto a few "safe"
 # names.
 CHARACTER_STYLE_GUIDE = {
-    "Iron Man": (
-        "MATCH ON: visible facial hair in a goatee or defined stubble "
-        "shape, paired with a closed-mouth smirk pulling to ONE side. "
-        "Male-presenting. Facial hair is the deciding cue -- a smirk "
-        "without any beard/stubble points to Sheldon or Thomas Shelby "
-        "instead. POSTER LOOK: sleek red-and-gold powered armor, glowing "
-        "blue arc reactor at the chest, faceplate open to reveal the "
-        "goatee underneath, repulsor palms raised, bright high-tech "
-        "backdrop (lab light, sky, explosion glow)."
-    ),
     "Batman": (
         "MATCH ON: a broad, square-ish jaw held with a completely flat, "
         "unsmiling mouth -- neutral, not a smirk, not a frown. "
         "Male-presenting, clean-shaven. This is the 'plain serious face, "
         "no beard, no smirk' bucket -- if there's a beard, that's Jon "
-        "Snow; if there's a one-sided smirk, that's Iron Man or Sheldon. "
+        "Snow; if there's a one-sided smirk, that's Sheldon instead. "
         "POSTER LOOK: matte-black armored bat-suit, flowing cape, cowl "
         "with pointed ears, utility belt, moody Gotham-noir lighting "
         "(deep shadows, cold blue-grey highlights, rain-slicked "
         "rooftops)."
-    ),
-    "Spider-Man": (
-        "MATCH ON: match this purely from the face, not a costume or "
-        "pose -- nobody will be dressed as or posing like Spider-Man. "
-        "Look for a youthful, boyish face with a lopsided/crooked grin "
-        "(closed or slightly open, higher on one side than the other) "
-        "and bright, slightly squinted, mischievous eyes. Male-presenting, "
-        "no facial hair, leaner/younger-looking build. Distinct from Iron "
-        "Man (no facial hair here) and from Naruto (grin is lopsided/sly "
-        "here, not a big even open-mouth grin). POSTER LOOK: skin-tight "
-        "red-and-blue spandex suit, black web patterning, large white "
-        "reflective eye lenses, city skyline backdrop with web-lines."
     ),
     "Thomas Shelby": (
         "MATCH ON: a lean face with high, sharp cheekbones, held in a "
@@ -188,14 +166,6 @@ CHARACTER_STYLE_GUIDE = {
         "with a black spider emblem, hood down to show "
         "blonde-and-pink-streaked hair, comic-book graffiti backdrop."
     ),
-    "Black Widow": (
-        "MATCH ON: a completely flat, unsmiling mouth held with a "
-        "straight, level head (no tilt at all), on sharp/angular "
-        "cheekbones. Female-presenting. The no-tilt straight posture is "
-        "what separates this from Gwen Stacy's tilted head. POSTER LOOK: "
-        "fitted black tactical bodysuit, utility straps, wavy red hair, "
-        "cool steel-blue or shadowed tactical backdrop."
-    ),
     "Daenerys Targaryen": (
         "MATCH ON: softly rounded cheeks (not sharp/angular) on a wide "
         "forehead, with a calm expression and chin held level or very "
@@ -218,8 +188,9 @@ CHARACTER_STYLE_GUIDE = {
         "MATCH ON: eyebrows completely flat and passive (not furrowed "
         "like Hermione), combined with a mouth that has zero curve at "
         "all and eyes that read as checked-out/unbothered rather than "
-        "alert. Female-presenting, dark or neutral hair. Reads as more "
-        "disengaged than Black Widow's composed flatness. POSTER LOOK: "
+        "alert. Female-presenting, dark or neutral hair. Reads as "
+        "genuinely checked-out/disengaged, not merely a calm, composed "
+        "flatness. POSTER LOOK: "
         "jet-black hair in two tight braids, black Victorian-collared "
         "dress, foggy graveyard or gothic-academy backdrop."
     ),
@@ -324,6 +295,58 @@ CHARACTER_STYLE_GUIDE = {
 }
 
 CHARACTERS = list(CHARACTER_STYLE_GUIDE.keys())
+
+# --------------------------------------------------------------------------
+# Temporarily disabled roster entries. Not part of CHARACTER_STYLE_GUIDE/
+# CHARACTERS above, so the model can never match anyone to these and they
+# won't appear in the frontend showcase (GET /booth/characters) -- pulled
+# out rather than deleted so the hand-tuned MATCH ON/POSTER LOOK text isn't
+# lost. Reason: Iron Man and Spider-Man's poster generations were
+# repeatedly hitting OpenAI's OUTPUT-stage moderation ('moderation_blocked',
+# category 'other') even after image_gen.py's softened-prompt retry --
+# likely their extremely recognizable, heavily-trademarked Marvel costume
+# designs render close enough to the literal copyrighted look that OpenAI's
+# own filter catches it regardless of prompt wording (see image_gen.py's
+# _soften_diffusion_prompt). Black Widow disabled alongside them
+# preemptively for the same reason (another distinctive trademarked Marvel
+# tactical suit), before it actually failed live.
+#
+# To re-enable one: move its entry back into CHARACTER_STYLE_GUIDE above
+# (position in the dict doesn't matter) -- CHARACTERS, the matching
+# instructions, and the frontend showcase all derive from that one dict, so
+# nothing else needs to change.
+DISABLED_CHARACTER_STYLE_GUIDE = {
+    "Iron Man": (
+        "MATCH ON: visible facial hair in a goatee or defined stubble "
+        "shape, paired with a closed-mouth smirk pulling to ONE side. "
+        "Male-presenting. Facial hair is the deciding cue -- a smirk "
+        "without any beard/stubble points to Sheldon or Thomas Shelby "
+        "instead. POSTER LOOK: sleek red-and-gold powered armor, glowing "
+        "blue arc reactor at the chest, faceplate open to reveal the "
+        "goatee underneath, repulsor palms raised, bright high-tech "
+        "backdrop (lab light, sky, explosion glow)."
+    ),
+    "Spider-Man": (
+        "MATCH ON: match this purely from the face, not a costume or "
+        "pose -- nobody will be dressed as or posing like Spider-Man. "
+        "Look for a youthful, boyish face with a lopsided/crooked grin "
+        "(closed or slightly open, higher on one side than the other) "
+        "and bright, slightly squinted, mischievous eyes. Male-presenting, "
+        "no facial hair, leaner/younger-looking build. Distinct from Iron "
+        "Man (no facial hair here) and from Naruto (grin is lopsided/sly "
+        "here, not a big even open-mouth grin). POSTER LOOK: skin-tight "
+        "red-and-blue spandex suit, black web patterning, large white "
+        "reflective eye lenses, city skyline backdrop with web-lines."
+    ),
+    "Black Widow": (
+        "MATCH ON: a completely flat, unsmiling mouth held with a "
+        "straight, level head (no tilt at all), on sharp/angular "
+        "cheekbones. Female-presenting. The no-tilt straight posture is "
+        "what separates this from Gwen Stacy's tilted head. POSTER LOOK: "
+        "fitted black tactical bodysuit, utility straps, wavy red hair, "
+        "cool steel-blue or shadowed tactical backdrop."
+    ),
+}
 
 
 # --------------------------------------------------------------------------
@@ -585,8 +608,8 @@ the same 4-5 famous defaults across many different people.
    costume, pulled from the chosen character's "POSTER LOOK" text above
    (never from "MATCH ON") -- describe it as a complete outfit swap (e.g.
    for the Professor: the entire red jumpsuit AND the white Dali mask, not
-   just "a red accent"; for Iron Man: the full red-and-gold armor, not just
-   a chest piece). The person's actual clothing should be entirely replaced
+   just "a red accent"; for Dr. Doom: the full green-and-metal armor and
+   hooded cloak, not just a mask). The person's actual clothing should be entirely replaced
    by the costume, not layered with or peeking through it. List the 2-4 most
    defining pieces/colors of that full costume so the model has enough to
    fully cover the subject, but never touch hair, facial structure, or

@@ -110,6 +110,39 @@ def _edit_once(image_bytes: bytes, diffusion_prompt: str, model: str, quality: s
     raise RuntimeError(f"{model} edit response contained no image data")
 
 
+def _is_moderation_blocked(e: Exception) -> bool:
+    """OpenAI's images.edit returns this as a 400 with code
+    'moderation_blocked' when its OUTPUT-stage filter rejects the
+    *generated image itself* (as opposed to a plain API/network error).
+    String-matching on str(e) rather than reaching into the SDK exception's
+    internals -- same defensive pattern openai_analysis.py already uses for
+    detecting its own specific error strings, and it's robust across SDK
+    version differences in exactly which attribute carries the error code."""
+    return "moderation_blocked" in str(e).lower()
+
+
+def _soften_diffusion_prompt(diffusion_prompt: str) -> str:
+    """Last-resort rewrite, only tried after BOTH the primary and fallback
+    model/quality combinations get output-moderation-blocked. Seen live and
+    repeatably on characters with extremely strong, heavily-trademarked
+    costume designs (Iron Man, Spider-Man) -- this isn't the violence/gore
+    case app.py's _sanitize_diffusion_prompt already guards against (these
+    prompts don't contain any of those terms). The working theory, based on
+    which characters trip it, is that a good image model rendering these
+    specific costumes literally enough converges on something close enough
+    to the exact copyrighted design that OpenAI's own output-side filter
+    catches it -- a property of what gets DRAWN, not of how the text prompt
+    itself is worded, so this can reduce the odds without guaranteeing a
+    pass. Nudging toward an original/reimagined stylization rather than an
+    exact reproduction is the practical lever actually available here."""
+    return (
+        "A reimagined, original superhero-styled illustration inspired by "
+        "the description below -- an artistic homage, not an exact "
+        "reproduction of any specific copyrighted costume design: "
+        + diffusion_prompt
+    )
+
+
 def generate_poster(person_image_bytes: bytes, diffusion_prompt: str) -> bytes:
     """
     Submit the captured photo + the analysis stage's diffusion_prompt to
@@ -118,20 +151,36 @@ def generate_poster(person_image_bytes: bytes, diffusion_prompt: str) -> bytes:
     Tries the configured IMAGE_MODEL/IMAGE_QUALITY first. If that raises
     (model unavailable on this account, transient API error, timeout, etc.)
     it falls back once to FALLBACK_MODEL/FALLBACK_QUALITY (gpt-image-1 at
-    "low" by default) rather than failing the whole capture outright. Every
-    fallback/failure is printed so it's visible in the terminal during a
-    live event, not just swallowed.
+    "low" by default) rather than failing the whole capture outright. If
+    BOTH attempts specifically failed on output moderation (see
+    _is_moderation_blocked), tries once more with a softened prompt (see
+    _soften_diffusion_prompt) before giving up -- a plain transient/network
+    error on both attempts does NOT get this softened retry, since there's
+    no reason to think rewording would have helped a non-moderation
+    failure. Every fallback/failure is printed so it's visible in the
+    terminal during a live event, not just swallowed.
     """
     try:
         return _edit_once(person_image_bytes, diffusion_prompt, IMAGE_MODEL, IMAGE_QUALITY)
-    except Exception as e:
+    except Exception as e1:
         if (IMAGE_MODEL, IMAGE_QUALITY) == (FALLBACK_MODEL, FALLBACK_QUALITY):
             raise  # already the fallback combination, nothing left to fall back to
-        print(f"[image_gen] {IMAGE_MODEL}/{IMAGE_QUALITY} edit failed ({e}); "
+        print(f"[image_gen] {IMAGE_MODEL}/{IMAGE_QUALITY} edit failed ({e1}); "
               f"retrying once with {FALLBACK_MODEL}/{FALLBACK_QUALITY}")
         try:
             return _edit_once(person_image_bytes, diffusion_prompt, FALLBACK_MODEL, FALLBACK_QUALITY)
         except Exception as e2:
+            if _is_moderation_blocked(e1) or _is_moderation_blocked(e2):
+                print(f"[image_gen] output moderation blocked this prompt on both attempts "
+                      f"({e2}); retrying once more with a softened, less-literal-reproduction prompt")
+                try:
+                    return _edit_once(
+                        person_image_bytes, _soften_diffusion_prompt(diffusion_prompt),
+                        FALLBACK_MODEL, FALLBACK_QUALITY,
+                    )
+                except Exception as e3:
+                    print(f"[image_gen] softened retry also failed ({e3}); giving up on this capture")
+                    raise
             print(f"[image_gen] fallback {FALLBACK_MODEL}/{FALLBACK_QUALITY} edit also "
                   f"failed ({e2}); giving up on this capture")
             raise
