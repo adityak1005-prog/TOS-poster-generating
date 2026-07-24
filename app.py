@@ -23,7 +23,8 @@ import json
 import asyncio
 import datetime
 import traceback
-from fastapi import FastAPI, UploadFile, File
+from urllib.parse import quote
+from fastapi import FastAPI, UploadFile, File, Request
 from fastapi.responses import JSONResponse, HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
@@ -79,6 +80,74 @@ async def config():
         "aries_instagram_url": ARIES_INSTAGRAM_URL,
         "aries_instagram_handle": ARIES_INSTAGRAM_HANDLE,
     }
+
+
+# --------------------------------------------------------------------------
+# QR target: previously the QR just linked straight to the hosted poster
+# image, which on scan just opens/downloads a photo -- there's no way for a
+# plain image URL to hand that image directly to Instagram. This page
+# fetches the image itself and uses the Web Share API's file-sharing
+# support (navigator.canShare({files:...})) to bring up the phone's native
+# share sheet with the poster already attached, so Instagram (Story or
+# Feed) appears as a share target one tap away. Falls back to just opening
+# the raw image (same as before) if the browser doesn't support sharing
+# files -- desktop browsers mostly don't, but this page is meant to be
+# opened from a QR scan on a phone.
+# --------------------------------------------------------------------------
+_SHARE_PAGE_TEMPLATE = """<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Share your poster</title>
+<style>
+  body {{
+    margin: 0; min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 1rem; padding: 1.5rem;
+    background: #0f0f14; color: #f4f4f6;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    text-align: center;
+  }}
+  img {{ max-width: 100%; max-height: 65vh; border-radius: 14px; }}
+  button {{
+    font: inherit; cursor: pointer; border: none; border-radius: 14px;
+    padding: 1rem 1.5rem; font-size: 1.05rem; font-weight: 600; color: white;
+    background: linear-gradient(135deg, #8b5cf6, #ec4899);
+  }}
+  p {{ color: #a3a3b0; font-size: .85rem; max-width: 32em; margin: 0; }}
+</style>
+</head><body>
+  <img id="poster" src="{img_url}" alt="Your AI Movie Booth poster">
+  <button id="shareBtn">Share to Instagram</button>
+  <p>Tap Share, then pick Instagram (Story or Feed). Tag <b>{handle}</b> so we can see it!</p>
+<script>
+  const IMG_URL = {img_url_json};
+  document.getElementById("shareBtn").addEventListener("click", async () => {{
+    try {{
+      const resp = await fetch(IMG_URL);
+      const blob = await resp.blob();
+      const file = new File([blob], "movie-booth-poster.jpg", {{ type: blob.type || "image/jpeg" }});
+      if (navigator.canShare && navigator.canShare({{ files: [file] }})) {{
+        await navigator.share({{ files: [file], title: "My AI Movie Booth poster" }});
+        return;
+      }}
+    }} catch (e) {{ /* fall through to the plain-open fallback below */ }}
+    // Browser doesn't support file sharing (common on desktop) -- just open
+    // the image so the visitor can long-press/save and share manually.
+    window.location.href = IMG_URL;
+  }});
+</script>
+</body></html>"""
+
+
+@app.get("/share")
+async def share_page(img: str):
+    """Renders the Web-Share-API page above for a given poster URL -- this
+    is what the QR code now points at instead of the raw image."""
+    return HTMLResponse(content=_SHARE_PAGE_TEMPLATE.format(
+        img_url=img,
+        img_url_json=json.dumps(img),
+        handle=ARIES_INSTAGRAM_HANDLE,
+    ))
 
 
 # --------------------------------------------------------------------------
@@ -138,12 +207,14 @@ def _sse(payload: dict) -> str:
     return json.dumps(payload) + "\n"
 
 
-async def _stream_capture(image_bytes: bytes):
+async def _stream_capture(image_bytes: bytes, base_url: str):
     """Generator that runs the whole pipeline and yields progress as NDJSON
     lines. Replaces the old job-queue+poll design (see module docstring) --
     everything happens inline within this one request/response, so there's
     no cross-request state (no JOBS dict) for a serverless host to lose
-    track of.
+    track of. base_url is this deployment's own root (e.g.
+    "https://your-app.vercel.app/") -- needed to build an absolute /share
+    link for the QR code, since QR codes can't point at a relative path.
     """
     timings = {}
     t_start = time.time()
@@ -186,7 +257,11 @@ async def _stream_capture(image_bytes: bytes):
         )
         file_id = f"{int(time.time() * 1000)}"
         image_url = await asyncio.to_thread(storage.upload, final_bytes, f"{file_id}.jpg")
-        qr_bytes = compose.make_qr_for_url(image_url)
+        # QR points at our own /share page (Web Share API, see above), not
+        # directly at the image -- that's what lets a scan open a "Share to
+        # Instagram" button instead of just opening/downloading the photo.
+        share_url = f"{base_url.rstrip('/')}/share?img={quote(image_url, safe='')}"
+        qr_bytes = compose.make_qr_for_url(share_url)
         qr_url = await asyncio.to_thread(storage.upload, qr_bytes, f"{file_id}_qr.png")
         mark("compose_and_share", t0)
 
@@ -211,9 +286,12 @@ async def _stream_capture(image_bytes: bytes):
 
 
 @app.post("/booth/capture")
-async def capture(file: UploadFile = File(...)):
+async def capture(request: Request, file: UploadFile = File(...)):
     image_bytes = await file.read()
-    return StreamingResponse(_stream_capture(image_bytes), media_type="application/x-ndjson")
+    return StreamingResponse(
+        _stream_capture(image_bytes, str(request.base_url)),
+        media_type="application/x-ndjson",
+    )
 
 
 # --------------------------------------------------------------------------

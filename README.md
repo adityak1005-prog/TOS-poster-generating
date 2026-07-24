@@ -88,14 +88,14 @@ authoritative, commented version):
 
 ```env
 OPENAI_API_KEY=your_openai_api_key
-OPENAI_ANALYSIS_MODEL=gpt-4o
+OPENAI_ANALYSIS_MODEL=gpt-5-mini
 
 CHARACTER_REF_DIR=static/characters
 
 OPENAI_IMAGE_MODEL=gpt-image-2
 OPENAI_IMAGE_MODEL_FALLBACK=gpt-image-1
 OPENAI_IMAGE_SIZE=1024x1536
-OPENAI_IMAGE_QUALITY=medium
+OPENAI_IMAGE_QUALITY=low
 OPENAI_INPUT_MAX_DIM=1280
 OPENAI_OUTPUT_FORMAT=jpeg
 OPENAI_OUTPUT_COMPRESSION=85
@@ -303,7 +303,7 @@ both of those patterns broke on serverless hosts, and both are gone now.
   backdrop details from the matched character -- this is a deliberate
   costume swap on the same person, not a redraw of a different one.
 - Poster generation speed is controlled by two env vars: `OPENAI_IMAGE_QUALITY`
-  (default `medium`) and `OPENAI_INPUT_MAX_DIM` (default `1280`).
+  (default `low`) and `OPENAI_INPUT_MAX_DIM` (default `1280`).
 - `gpt-image-2` (default; override with `OPENAI_IMAGE_MODEL=gpt-image-1` to
   go back) is OpenAI's image model released April 2026, using the same
   `images.edit` endpoint/parameters as gpt-image-1. It isn't available on
@@ -314,24 +314,28 @@ both of those patterns broke on serverless hosts, and both are gone now.
   on gpt-image-1.** gpt-image-2 runs an internal "agentic" reasoning pass
   (understand -> plan -> generate -> review) at higher quality tiers, so the
   four values behave very differently:
-  - `low`: ~3-8s, ~$0.006/image. Quality at this tier is reported as
-    meaningfully better than previous-generation models' `low` tier -- worth
-    trying for a booth where throughput through a line of people matters
-    more than maximum polish.
-  - `medium` (current default): ~20-40s, ~$0.053/image. Safe general-purpose
-    choice.
+  - `low` (current default): ~3-8s, ~$0.006/image. Quality at this tier is
+    reported as meaningfully better than previous-generation models' `low`
+    tier -- chosen as the default here since booth throughput (a line of
+    people, not one careful portrait) matters more than maximum polish.
+  - `medium`: ~20-40s, ~$0.053/image. Safe general-purpose choice if `low`
+    ever looks too soft for your event.
   - `high`: ~150-235s (minutes, not seconds), ~$0.211/image. Not recommended
     for a live/synchronous booth -- nobody in a fest queue should wait that
     long for one poster.
   - `auto`: resolves to `medium` or `high` depending on prompt complexity --
     avoid it here, since `diffusion_prompt` is a full descriptive paragraph
-    that tends to push `auto` toward the slow `high` tier. The explicit
-    `medium` default in `_env.example`/`.env` already avoids this trap.
+    that tends to push `auto` toward the slow `high` tier.
 
   (All figures at `1024x1024`; the 1536-series sizes this app uses add
-  roughly another 1.5x latency at the same quality tier.) If event-day speed
-  becomes the priority, switching `OPENAI_IMAGE_QUALITY=low` is the single
-  biggest available speedup.
+  roughly another 1.5x latency at the same quality tier.)
+- **`OPENAI_ANALYSIS_MODEL` defaults to `gpt-5-mini`**, not `gpt-4o` --
+  switched specifically for latency (the analysis call was taking ~7s on
+  `gpt-4o`). `gpt-5-mini` is OpenAI's cheapest vision-capable chat model as
+  of mid-2026 and is still covered by automatic prompt caching (all
+  GPT-5-series models support it). This is a real speed/cost trade rather
+  than a strict upgrade -- override back to `gpt-4o` if match/reasoning
+  quality seems to suffer.
 - Both models default to PNG output if you don't ask for anything else,
   which is lossless and noticeably bigger than a compressed photo-style
   poster needs to be -- `OPENAI_OUTPUT_FORMAT` (default `jpeg`) and
@@ -373,9 +377,14 @@ both of those patterns broke on serverless hosts, and both are gone now.
   permits for third-party apps, and getting `instagram_content_publish`
   approved for even a single official account takes Meta 2-4 weeks of App
   Review, which usually doesn't fit a college-fest timeline. The QR code
-  still links to the hosted poster image, same as before -- from there,
-  sharing to Instagram is just whatever the visitor's phone/browser already
-  supports.
+  now points at `GET /share?img=<poster_url>` (see `app.py`) instead of the
+  raw poster image directly -- that page fetches the image and uses the
+  Web Share API's file-sharing support (`navigator.canShare({files:...})`)
+  to bring up the phone's native share sheet with the poster attached, so
+  Instagram appears as a share target one tap away, rather than the QR just
+  opening/downloading a photo. Falls back to opening the raw image if the
+  browser doesn't support sharing files (mainly a desktop-browser
+  limitation -- this page is meant to be opened from a phone via QR scan).
 - **Found and fixed in passing:** `storage.py` was importing
   `from testsupa import create_client` instead of `from supabase import
   create_client`. `testsupa.py` is a standalone script for manually testing

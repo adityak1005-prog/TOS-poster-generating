@@ -15,9 +15,13 @@ straight to OpenAI with one prompt that asks it to (a) look at the person,
 and (d) write a ready-to-use image-editing prompt -- all in one structured
 JSON response. No local model, no local heuristics.
 
-Model: gpt-4o by default (override via OPENAI_ANALYSIS_MODEL env var) -- a
-vision-capable chat model, distinct from OPENAI_IMAGE_MODEL in image_gen.py
-which is the image-generation model used for stage 3.
+Model: gpt-5-mini by default (override via OPENAI_ANALYSIS_MODEL env var) --
+OpenAI's cheapest vision-capable chat model as of mid-2026, chosen for
+latency: this call was taking ~7s on gpt-4o, and gpt-5-mini is meaningfully
+faster/cheaper while still vision-capable and still covered by OpenAI's
+automatic prompt caching (all GPT-5-series models support it). Swap back to
+gpt-4o via the env var if match/reasoning quality ever seems to suffer --
+gpt-5-mini is a real speed/cost trade, not a strict upgrade.
 
 SDK: `openai` (the same SDK/client already used by image_gen.py).
 """
@@ -30,7 +34,7 @@ from openai import OpenAI
 from pydantic import BaseModel
 import image_utils
 
-MODEL_ID = os.environ.get("OPENAI_ANALYSIS_MODEL", "gpt-4o")
+MODEL_ID = os.environ.get("OPENAI_ANALYSIS_MODEL", "gpt-5-mini")
 
 # Shared with image_gen.py's OPENAI_INPUT_MAX_DIM so both calls downscale to
 # the same size -- the captured photo was previously sent full-resolution
@@ -47,227 +51,235 @@ _client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 # Descriptions are intentionally long and specific (build, outfit/colors,
 # expression, iconic prop, backdrop/lighting) -- more concrete visual anchors
 # here means a more accurate match against the photo.
+# Each entry below is split into two clearly labeled halves with very
+# different jobs:
+#
+# MATCH ON -- traits an ORDINARY phone photo could actually contain:
+# expression/mood, pose/posture, gender presentation, facial hair (or lack
+# of it), approximate hair length/color IF plausible, build, and energy
+# level. This is what step 1 of the instruction below uses to decide who
+# someone resembles. Nothing in here requires an actual costume.
+#
+# POSTER LOOK -- the character's iconic costume/props/backdrop. Nobody at
+# the booth is wearing this; it exists purely for step 4 to pull
+# image-editing details from once a character has already been chosen.
+# Never used for matching.
+#
+# This split exists because most of the roster's old descriptions were
+# written costume-first -- e.g. Daenerys's "silver-platinum braided hair",
+# Joker's "chalk-white face paint" -- which are things a real photo can
+# essentially never have. A handful of characters with "everyday" traits
+# (glasses, dark clothing, a calm expression) were soaking up most matches
+# by default, simply because they were the only ones an ordinary photo
+# COULD match. Every character below now has its own realistic, reachable
+# trigger, specifically so the roster doesn't collapse onto a few "safe"
+# names.
 CHARACTER_STYLE_GUIDE = {
     "Iron Man": (
-        "A confident, athletic figure in sleek red-and-gold powered armor -- "
-        "articulated metal plating, a glowing blue arc reactor at the center "
-        "of the chest, repulsor palms raised in a ready stance. Faceplate is "
-        "polished and reflective with narrow glowing eye-slits, or open to "
-        "reveal a sharp goatee and smirk underneath. Backdrop is bright, "
-        "high-tech -- lab light, sky, or explosion glow. Pose reads as "
-        "heroic and self-assured, chin slightly raised. Reads as a man with "
-        "a neat, trimmed goatee when unmasked; the vibe is witty, quippy "
-        "tech-genius bravado, not brooding or withdrawn."
+        "MATCH ON: a cocky, self-assured smirk or half-grin, chin slightly "
+        "raised, a confident/showy pose (hands on hips, one eyebrow up, "
+        "leaning back) -- reads as witty and a little arrogant rather than "
+        "shy. Male-presenting, often a neat short beard or goatee if any "
+        "facial hair is visible. Energy is playful bravado, not serious or "
+        "brooding. POSTER LOOK: sleek red-and-gold powered armor, glowing "
+        "blue arc reactor at the chest, faceplate open to reveal the goatee "
+        "underneath, repulsor palms raised, bright high-tech backdrop (lab "
+        "light, sky, explosion glow)."
     ),
     "Batman": (
-        "A brooding, powerfully built vigilante in a matte-black armored "
-        "bat-suit with a flowing cape and a cowl with pointed ears framing a "
-        "stern, unsmiling jaw. Utility belt with gadget pouches, muscular "
-        "silhouette, gauntlets with blade-like fins. Shot in moody "
-        "Gotham-noir lighting -- deep shadows, cold blue-grey highlights, "
-        "rain-slicked rooftops or a dark alley backdrop. Expression is "
-        "intense, guarded, rarely smiling. Reads as a man, jaw usually "
-        "clean-shaven or with only light stubble beneath the cowl; the vibe "
-        "is grim, controlled, and guarded -- never playful or loud."
+        "MATCH ON: unsmiling, jaw set, an intense/guarded stare straight at "
+        "the camera, arms crossed or a rigid controlled stance -- reads as "
+        "serious and closed-off, not warm or playful. Male-presenting, "
+        "clean-shaven or light stubble. Energy is grim, composed, watchful. "
+        "POSTER LOOK: matte-black armored bat-suit, flowing cape, cowl with "
+        "pointed ears, utility belt, moody Gotham-noir lighting (deep "
+        "shadows, cold blue-grey highlights, rain-slicked rooftops)."
     ),
     "Spider-Man": (
-        "An athletic, lithe figure in a skin-tight red-and-blue spandex "
-        "suit with bold black web patterning and large white reflective eye "
-        "lenses. Pose is dynamic and acrobatic -- mid-swing, crouched on a "
-        "ledge, or a classic web-shooting hand gesture. Backdrop is a dense "
-        "city skyline, skyscrapers and web-lines cutting across a dusk sky. "
-        "Overall feel is energetic, youthful, and playful. The full mask "
-        "conceals the entire face, including any facial hair, so a match "
-        "here should lean on youthful build, dynamic pose, and playful "
-        "energy rather than facial resemblance, which isn't visible "
-        "in-costume."
+        "MATCH ON: youthful, athletic build, a dynamic/mid-action pose "
+        "(jumping, crouching, an exaggerated hand gesture) or an "
+        "easygoing friendly grin -- reads as energetic and playful, "
+        "younger-skewing. Gender/facial hair aren't useful signals here "
+        "since the costume masks the whole face -- lean entirely on "
+        "youthful energy and dynamic pose. POSTER LOOK: skin-tight "
+        "red-and-blue spandex suit, black web patterning, large white "
+        "reflective eye lenses, city skyline backdrop with web-lines."
     ),
     "Thomas Shelby": (
-        "A sharply dressed, composed figure in a fitted 1920s tweed "
-        "three-piece suit with a flat cap pulled low, hair slicked back and "
-        "undercut at the sides. Expression is unreadable, jaw set, eyes "
-        "narrowed with quiet menace, often holding or about to light a "
-        "cigarette. Backdrop is muted sepia-toned Birmingham streets, "
-        "factory smoke, or a dim pub interior. Mood is restrained power, "
-        "cold calculation, old-world formality. Reads as a man, usually "
-        "clean-shaven or close-cropped stubble, never a full beard; the "
-        "vibe is cold and controlled, the opposite of warm or playful."
+        "MATCH ON: an unreadable, composed expression -- not smiling, eyes "
+        "narrowed or steady, a still and controlled posture that reads as "
+        "reserved/formal rather than relaxed. Male-presenting, clean-shaven "
+        "or close-cropped stubble, neat/tidy overall look even in casual "
+        "clothes. Energy is cold, calculated restraint. POSTER LOOK: fitted "
+        "1920s tweed three-piece suit, flat cap pulled low, slicked-back "
+        "undercut hair, muted sepia Birmingham streets or a dim pub."
     ),
     "Naruto": (
-        "An energetic, wiry young ninja in an orange-and-black jumpsuit, a "
-        "blue forehead protector with a metal leaf-village emblem, and "
-        "spiky sun-bleached blonde hair. Whisker-like markings on each "
-        "cheek, wide grinning expression, often mid-jump or making a "
-        "hand-sign with one fist raised. Backdrop is a dynamic anime-style "
-        "burst of energy, orange and blue chakra swirls, motion lines. Mood "
-        "is upbeat, determined, full of youthful energy. Reads as a young "
-        "man, no real facial hair (only the whisker markings); the vibe is "
-        "loud, warm, unguarded energy -- the opposite of brooding or aloof."
+        "MATCH ON: a big genuine grin or open-mouthed smile, an "
+        "energetic/playful pose (peace sign, fist raised, mid-jump) -- "
+        "reads as loud, upbeat, and unguarded. Male-presenting, young, no "
+        "facial hair. Energy is warm and full of enthusiasm, the opposite "
+        "of reserved. POSTER LOOK: orange-and-black jumpsuit, blue "
+        "forehead protector, spiky blonde hair, whisker cheek markings, "
+        "anime-style chakra-burst backdrop."
     ),
     "Professor from Money Heist": (
-        "A calm, calculating mastermind -- disheveled academic look with "
-        "thick-rimmed glasses, tousled hair, and a rumpled cardigan when "
-        "planning, contrasted with the crew's signature red jumpsuit and a "
-        "white Salvador Dali mask (wide painted grin, rosy cheeks, thin "
-        "mustache) when in heist mode. Composed, quietly intense gaze that "
-        "reads as always three steps ahead. Backdrop is a bank vault stacked "
-        "with gold bars or a sunbaked Spanish plaza. Mood is restrained, "
-        "cerebral, unshakeable control. Reads as a man; the disguise mask "
-        "has a thin mustache, but his own unmasked face is clean-shaven "
-        "with a tired, scholarly look. Vibe is calm and cerebral, never "
-        "loud or theatrical."
+        "MATCH ON: a calm, composed, quietly intense expression -- "
+        "genuinely striking stillness or a look that reads as \"already "
+        "three steps ahead,\" not just a neutral non-smile. Male-presenting, "
+        "clean-shaven. IMPORTANT: this character is easy to over-match -- "
+        "glasses plus an ordinary neutral expression is common in regular "
+        "photos and is NOT enough on its own. Only pick this character when "
+        "the calm/composed intensity is genuinely the single strongest, "
+        "most distinctive thing about the photo, not a default for someone "
+        "who simply isn't smiling. POSTER LOOK: default to the iconic "
+        "heist-mode costume -- bright red jumpsuit plus a white Salvador "
+        "Dali mask (painted grin, rosy cheeks, thin mustache) -- a bank "
+        "vault or sunbaked Spanish plaza backdrop. Only use the alternate "
+        "academic look (thick-rimmed glasses, tousled hair, rumpled "
+        "cardigan) if the person's own glasses/cardigan were themselves the "
+        "standout match reason."
     ),
     "Gwen Stacy": (
-        "An athletic, confident figure in a pink-and-white hooded Spider "
-        "suit with a bold black spider emblem, hood down to show "
-        "blonde-and-pink-streaked hair and a smirking, self-assured "
-        "expression. Pose is dynamic -- perched on a ledge, mid-leap, or "
-        "leaning back casually. Backdrop is a comic-book-style graffiti "
-        "splash of pink and blue against a city skyline. Mood is cool, "
-        "playful, quietly rebellious. Reads as a woman, no facial hair; "
-        "the vibe is relaxed, cool confidence rather than fierce or icy."
+        "MATCH ON: a cool, relaxed smirk or half-smile, a casual confident "
+        "pose (leaning, perched, one hip cocked) -- reads as playful and "
+        "self-assured rather than fierce or serious. Female-presenting. "
+        "Energy is easygoing rebellious cool. POSTER LOOK: pink-and-white "
+        "hooded Spider suit with a black spider emblem, hood down to show "
+        "blonde-and-pink-streaked hair, comic-book graffiti backdrop."
     ),
     "Black Widow": (
-        "A lean, athletic figure in a fitted black tactical bodysuit with "
-        "subtle utility straps and holsters, in a confident, combat-ready "
-        "stance -- often crouched low or mid-motion. Wavy red hair, sharp "
-        "focused eyes, minimal but striking makeup, a calm and controlled "
-        "expression that reads as dangerous competence rather than "
-        "aggression. Backdrop is cool steel-blue or shadowed tactical "
-        "environments -- a dim corridor, rain, or muted urban night. Mood "
-        "is composed, precise, quietly formidable. Reads as a woman, no "
-        "facial hair; the vibe is composed and controlled, not overtly "
-        "emotional, warm, or playful."
+        "MATCH ON: a focused, controlled expression -- not smiling, alert "
+        "and composed rather than relaxed, a poised/upright stance. "
+        "Female-presenting. Energy is quiet competence, deliberate and "
+        "precise rather than warm or bubbly. POSTER LOOK: fitted black "
+        "tactical bodysuit, utility straps, wavy red hair, cool steel-blue "
+        "or shadowed tactical backdrop."
     ),
     "Daenerys Targaryen": (
-        "A regal, striking figure with long silver-platinum braided hair and "
-        "a flowing pale ivory or deep-blue gown with intricate detailing. "
-        "Expression is composed but fierce -- calm authority with the "
-        "implication of real power underneath. Subtle dragon-scale texture "
-        "or drifting smoke/embers in the frame. Backdrop is a sunbaked "
-        "desert city, a grand throne hall, or a dragon's silhouette against "
-        "the sky. Mood is commanding, regal, quietly dangerous. Reads as a "
-        "woman, no facial hair; the vibe is regal and commanding, cool "
-        "rather than warm or bubbly."
+        "MATCH ON: a composed, chin-up posture and a calm but assertive "
+        "expression -- reads as quietly commanding rather than aggressive "
+        "or shy. Female-presenting; light/blonde hair is a bonus cue if "
+        "visible but not required. Energy is regal, controlled authority, "
+        "the opposite of giggly or bubbly. POSTER LOOK: long "
+        "silver-platinum braided hair, flowing pale ivory or deep-blue "
+        "gown, sunbaked desert city or grand throne-hall backdrop."
     ),
     "Hermione Granger": (
-        "A sharp, studious figure with bushy brown hair and Gryffindor "
-        "school robes -- black robe, maroon-and-gold tie, house crest. "
-        "Often shown mid-gesture with a wand raised, holding a stack of "
-        "books, or with a focused, thinking expression. Backdrop is a "
-        "candlelit castle library or stone corridor. Mood is intelligent, "
-        "quietly confident, prepared for anything. Reads as a woman, no "
-        "facial hair; the vibe is studious and quietly confident, not "
-        "flashy or loud."
+        "MATCH ON: a focused, thinking expression -- attentive, alert eyes, "
+        "a neat/put-together overall look, maybe glasses or a slight "
+        "furrowed-brow concentration. Female-presenting. Energy is "
+        "studious and quietly confident, not flashy or loud -- distinct "
+        "from Wednesday's flat deadpan or the Professor's stillness by "
+        "being visibly engaged/alert rather than withdrawn. POSTER LOOK: "
+        "bushy brown hair, black Gryffindor robes with a maroon-and-gold "
+        "tie, candlelit castle library backdrop."
     ),
     "Wednesday Addams": (
-        "A pale, deadpan figure with jet-black hair in two tight braids, "
-        "dressed in a black Victorian-collared dress or a dark academy "
-        "uniform. Expression is flat, unimpressed, and unblinking -- no "
-        "smile, dry composure. Backdrop is a foggy graveyard, a gothic "
-        "academy hallway, or muted grey-and-black tones throughout. Mood is "
-        "dark, dry-witted, completely unbothered. Reads as a woman/girl, no "
-        "facial hair; the vibe is flat and deadpan, the direct opposite of "
-        "warm, bubbly, or expressive."
+        "MATCH ON: a flat, unimpressed, unblinking expression -- genuinely "
+        "no smile, dry and still, reads as bored/unbothered rather than "
+        "merely neutral. Female-presenting, dark hair if visible. Energy "
+        "is dry, deadpan, completely checked-out -- more extreme than an "
+        "ordinary neutral photo face, which is what separates this from "
+        "over-matching on \"not smiling\" alone. POSTER LOOK: jet-black hair "
+        "in two tight braids, black Victorian-collared dress, foggy "
+        "graveyard or gothic-academy backdrop."
     ),
     "Kakashi Hatake": (
-        "A relaxed but sharp-eyed ninja with messy silver hair and a Leaf "
-        "Village forehead protector tilted to cover one eye. Navy-blue "
-        "flak vest over a dark long-sleeve uniform, a fabric mask covering "
-        "the nose and mouth, one hand often in his pocket or holding an "
-        "orange book. Backdrop is a misty forest or a village rooftop at "
-        "dusk. Mood is cool, effortlessly skilled, quietly amused. The "
-        "fabric mask covers the lower half of the face, so facial hair "
-        "isn't visible in-costume; reads as a man. Vibe is relaxed and "
-        "effortlessly cool, quietly amused rather than intense or brooding."
+        "MATCH ON: a relaxed, casual half-smile or amused look, one "
+        "shoulder dropped or a hand-in-pocket kind of ease -- reads as "
+        "effortlessly cool rather than trying hard. Male-presenting. Energy "
+        "is laid-back confidence, quietly amused rather than intense. "
+        "POSTER LOOK: messy silver hair, Leaf Village forehead protector "
+        "tilted over one eye, fabric mask over nose and mouth, navy flak "
+        "vest, misty forest or rooftop-at-dusk backdrop."
     ),
     "Sasuke Uchiha": (
-        "A dark-haired, sharp-featured young ninja with a brooding, intense "
-        "stare -- red-and-black Sharingan eye detail implied. Navy-and-white "
-        "high-collared ninja outfit, a katana slung across the back. Pose "
-        "is still and coiled, ready to strike. Backdrop is crackling blue "
-        "lightning energy or a dark storm-lit battlefield. Mood is aloof, "
-        "intense, quietly powerful. Reads as a young man, no facial hair; "
-        "the vibe is aloof and controlled, never warm or goofy."
+        "MATCH ON: an intense, brooding stare directly at the camera, a "
+        "still and coiled posture (not relaxed, not smiling) -- reads as "
+        "guarded and aloof. Male-presenting, young, dark hair if visible, "
+        "no facial hair. Energy is controlled intensity, colder than "
+        "Batman's grimness and younger/less world-weary than Jon Snow's. "
+        "POSTER LOOK: navy-and-white high-collared ninja outfit, katana on "
+        "the back, Sharingan eye detail, crackling blue lightning backdrop."
     ),
     "Joker": (
-        "A lean, theatrical figure in a rumpled purple tailcoat suit over a "
-        "green vest, with slicked-back or unkempt green-dyed hair. "
-        "Chalk-white face paint, a smeared red smile carved wide across the "
-        "mouth, dark heavy eye makeup. Pose is loose and expressive -- a "
-        "wide grin, jazz hands, or leaning in menacingly. Backdrop is "
-        "chaotic neon-lit city grime, graffiti, or flickering carnival "
-        "light. Reads as a man under heavy face paint, no real facial hair "
-        "emphasized; the vibe is loud, unstable, theatrical energy -- the "
-        "opposite of calm or composed."
+        "MATCH ON: a wide, manic grin or exaggerated theatrical expression, "
+        "loose/expressive body language (jazz hands, leaning in, "
+        "over-the-top gesture) -- reads as unpredictable and loud. "
+        "Male-presenting. Energy is chaotic and theatrical, distinctly "
+        "unstable rather than just \"happy\" -- this is what separates it "
+        "from Naruto's warm enthusiasm or Shinchan's innocent silliness. "
+        "POSTER LOOK: rumpled purple tailcoat over a green vest, "
+        "chalk-white face paint, smeared red smile, chaotic neon-lit city "
+        "backdrop."
     ),
     "Jon Snow": (
-        "A brooding, weathered figure with dark tousled shoulder-length "
-        "hair, dressed in thick black furs and layered leather armor. A "
-        "sword often at the hip, stoic and burdened expression. Backdrop is "
-        "a snow-covered northern landscape, a massive icy wall, or a grey "
-        "overcast sky. Mood is honorable, quietly resolute, world-weary. "
-        "Reads as a man, usually with visible stubble or a light-to-medium "
-        "beard; the vibe is weary and honorable, serious rather than "
-        "playful or loud."
+        "MATCH ON: a weary, stoic expression -- serious and a little "
+        "burdened-looking, not smiling, a grounded/still stance. "
+        "Male-presenting, visible stubble or a light-to-medium beard is a "
+        "strong cue if present. Energy is honorable and world-weary, "
+        "warmer/more resigned than Batman's grim control. POSTER LOOK: dark "
+        "tousled shoulder-length hair, thick black furs and leather armor, "
+        "snow-covered northern landscape or icy-wall backdrop."
     ),
     "Shinchan": (
-        "A goofy, exaggerated cartoon kid with spiky messy black hair and "
-        "a wide, mischievous grin, dressed in a simple bright shirt and "
-        "shorts. Pose is playful and over-the-top -- eyebrows raised, "
-        "cheeky wink, hands on hips. Backdrop is bold, flat, colorful "
-        "cartoon-style scenery. Mood is comedic, carefree, unapologetically "
-        "silly. Reads as a young boy, no facial hair; the vibe is loud, "
-        "silly, and over-the-top -- the most purely comedic character on "
-        "this roster."
+        "MATCH ON: an exaggerated goofy grin, eyebrows raised, a playful "
+        "over-the-top pose (cheeky wink, hands on hips) -- reads as young "
+        "and silly rather than composed. Energy is loud, carefree, "
+        "unapologetically comedic -- more cartoonish/over-the-top than "
+        "Naruto's genuine warmth. POSTER LOOK: spiky messy black hair, "
+        "simple bright shirt and shorts, bold flat colorful cartoon-style "
+        "backdrop."
     ),
     "Harry Potter": (
-        "A boyish, earnest figure with round glasses, a lightning-bolt scar "
-        "on the forehead, and messy black hair. Gryffindor robes with a "
-        "red-and-gold scarf, often holding a wand or a broomstick. "
-        "Expression is determined but still a little wide-eyed. Backdrop is "
-        "a Hogwarts castle silhouette or a starry night sky over a "
-        "quidditch pitch. Mood is brave, hopeful, quietly heroic. Reads as "
-        "a young man, no facial hair; the vibe is earnest and a little "
-        "wide-eyed, not jaded, cold, or aloof."
+        "MATCH ON: an earnest, a-little-wide-eyed expression, glasses are "
+        "a supporting cue here but must be paired with a youthful, "
+        "determined-but-slightly-unsure look -- not enough alone (see "
+        "Professor/Sheldon, who also often get matched on glasses). "
+        "Male-presenting, young, no facial hair. Energy is brave but "
+        "still a bit uncertain, warmer and more hopeful than the "
+        "Professor's calm intensity or Sheldon's rigid condescension. "
+        "POSTER LOOK: round glasses, lightning-bolt scar, messy black "
+        "hair, Gryffindor robes with a red-and-gold scarf, Hogwarts "
+        "castle or starry quidditch-pitch backdrop."
     ),
     "Dr. Doom": (
-        "An imposing figure in full green-and-metal armor with a long, "
-        "flowing green hooded cloak. A smooth, expressionless metal mask, "
-        "arms often crossed or raised with commanding, regal authority. "
-        "Backdrop is a gothic stone castle or crackling green arcane "
-        "energy. Mood is imperious, coldly intellectual, quietly menacing. "
-        "The full mask conceals the entire face, so no facial features "
-        "(including facial hair) are visible in-costume -- a match here "
-        "should lean on commanding posture and imperious vibe, not facial "
-        "resemblance."
+        "MATCH ON: a commanding, imperious posture -- arms crossed or "
+        "raised, chin up, an authoritative/no-nonsense stance -- rather "
+        "than facial expression, since the costume fully masks the face. "
+        "Works for either gender presentation; lean entirely on posture and "
+        "an air of cold, superior authority. POSTER LOOK: full "
+        "green-and-metal armor, smooth expressionless mask, flowing green "
+        "hooded cloak, gothic stone castle or arcane-green-energy backdrop."
     ),
     "Regina George": (
-        "A poised, sharply styled figure with sleek blonde hair and a "
-        "trendy, put-together pink or designer outfit. Confident smirk, "
-        "hand on hip, a look that reads as effortless social power. "
-        "Backdrop is a glossy high-school hallway or a soft pastel-pink "
-        "gradient. Mood is icy confidence, queen-bee charisma, sharp wit. "
-        "Reads as a woman, no facial hair; the vibe is icy and socially "
-        "sharp, not warm or approachable."
+        "MATCH ON: a confident smirk, a poised hand-on-hip stance, a "
+        "sleek/put-together overall look -- reads as socially sharp and "
+        "effortlessly in-control. Female-presenting. Energy is icy "
+        "confidence, cooler and more socially pointed than Elle Woods's "
+        "open warmth. POSTER LOOK: sleek blonde hair, trendy pink or "
+        "designer outfit, glossy high-school-hallway or pastel-pink "
+        "backdrop."
     ),
     "Elle Woods": (
-        "A bright, confident figure with voluminous blonde hair and a "
-        "bold pink outfit -- blazer, dress, or matching accessories. Wide, "
-        "genuine smile, often holding a legal pad or striking a poised, "
-        "self-assured pose. Backdrop is a sunny pastel campus or a "
-        "courtroom. Mood is bubbly, sharp, underestimated but brilliant. "
-        "Reads as a woman, no facial hair; the vibe is warm, bright, and "
-        "openly enthusiastic -- the opposite of icy or deadpan."
+        "MATCH ON: a wide, genuine, bright smile, an enthusiastic/poised "
+        "pose -- reads as warm and openly confident rather than guarded. "
+        "Female-presenting. Energy is bubbly and sincere, distinctly "
+        "warmer than Regina George's icy poise. POSTER LOOK: voluminous "
+        "blonde hair, bold pink outfit (blazer, dress, or accessories), "
+        "sunny pastel-campus or courtroom backdrop."
     ),
     "Sheldon Cooper": (
-        "A neat, precise figure with side-swept hair and a layered graphic "
-        "tee under a collared shirt. Posture is prim and exact, arms often "
-        "crossed, expression deadpan and faintly superior. Backdrop is a "
-        "cluttered apartment with a whiteboard full of equations or a "
-        "comic-book-lined room. Mood is hyper-logical, socially oblivious, "
-        "quietly self-satisfied. Reads as a man, clean-shaven; the vibe is "
-        "rigid, logical, and mildly condescending, not scruffy or rugged."
+        "MATCH ON: a rigid, exact posture (arms crossed, upright, prim), a "
+        "deadpan and faintly superior expression -- reads as "
+        "hyper-logical and mildly condescending, not merely neutral. "
+        "Male-presenting, clean-shaven. IMPORTANT: glasses plus a serious "
+        "expression is common in ordinary photos and is not enough alone -- "
+        "this needs the specific rigid/condescending posture and "
+        "faint-superiority look, not just \"not smiling.\" POSTER LOOK: "
+        "side-swept hair, layered graphic tee under a collared shirt, "
+        "cluttered apartment with an equation-covered whiteboard backdrop."
     ),
 }
 
@@ -452,6 +464,14 @@ Look at the attached photo of a person and do all of the following in one pass:
 1. Pick the single best-matching character for this person.
 {roster_section}
 
+Each roster entry below has two parts: "MATCH ON" (realistic cues an
+ordinary, un-costumed phone photo can actually show -- expression, pose,
+gender presentation, facial hair, build, energy) and "POSTER LOOK" (the
+character's iconic costume, purely for step 4, never a matching cue). Base
+this decision ONLY on the "MATCH ON" text -- ignore "POSTER LOOK" details
+entirely when deciding who someone resembles, since nobody at the booth is
+actually wearing a costume.
+
 Weigh ALL of these dimensions together when deciding, with NO fixed priority
 order between them: facial resemblance/features, general vibe or energy,
 complexion, gender presentation, facial hair (or the lack of it), pose, type
@@ -467,7 +487,16 @@ match. The goal is a varied, personalized set of matches across many
 people -- avoid converging on the same handful of "safe" characters just
 because their descriptions mention easy-to-spot items like glasses or a
 graphic tee; check the other dimensions (especially facial hair and gender
-presentation) before committing to a match like that.
+presentation) before committing to a match like that. Several roster entries
+(Professor from Money Heist, Sheldon Cooper, Harry Potter) explicitly warn
+that glasses plus a neutral/calm expression is common and weak evidence on
+its own -- respect those warnings rather than defaulting to those names.
+
+If more than one character is a genuinely close, plausible match, do not
+always resolve the tie toward the most famous or most "obvious" name --
+treat close ties as a real choice and let a less-expected but still
+well-supported character win sometimes, so the roster doesn't collapse onto
+the same 4-5 famous defaults across many different people.
 
 2. Write "reasoning": one or two short sentences, written directly to the
    person ("you"), explaining *why* they were matched to this character --
@@ -494,10 +523,16 @@ presentation) before committing to a match like that.
    prompt by stating this explicitly (e.g. "Keep the exact same person, face,
    and pose from the photo unchanged;") before describing anything else.
 
-   Then pack in only concrete, high-signal visual anchors: (a) 2-4 specific
-   *costume/prop* details pulled from the chosen character's style cues
-   above -- clothing colors, accessories, iconic props -- but never hair,
-   facial structure, or anything that would alter the person's actual face,
+   Then pack in only concrete, high-signal visual anchors: (a) the character's
+   FULL iconic costume, pulled from the chosen character's "POSTER LOOK" text
+   above (never from "MATCH ON") -- describe it as a complete outfit swap
+   (e.g. for the Professor: the entire red jumpsuit AND the white Dali mask,
+   not just "a red accent"; for Iron Man: the full red-and-gold armor, not
+   just a chest piece). The person's actual clothing should be entirely
+   replaced by the costume, not layered with or peeking through it. List the
+   2-4 most defining pieces/colors of that full costume so the model has
+   enough to fully cover the subject, but never touch hair, facial structure,
+   or anything that would alter the person's actual face,
    (b) one lighting/backdrop cue that evokes that character's own film or
    franchise (e.g. Gotham-noir shadows for Batman, a Hogwarts corridor for
    Harry Potter, chakra-burst energy for Naruto) -- the backdrop should feel
@@ -565,7 +600,11 @@ def _call_openai(image_bytes: bytes, mime_type: str, include_reference_images: b
                 "strict": True,
             },
         },
-        temperature=0.8,
+        # Bumped from 0.8 -- schema validity is guaranteed regardless of
+        # temperature (strict:True enforces structure), so this is a free
+        # lever for more varied tie-breaking between close character
+        # matches rather than always resolving to the same famous default.
+        temperature=0.95,
     )
 
 

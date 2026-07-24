@@ -5,7 +5,7 @@ OPENAI_API_KEY=your_openai_api_key
 # below. gpt-4o's automatic prompt caching is what replaced Gemini's
 # explicit (and free-tier-blocked) context caching -- no code-side cache
 # object to manage, it's automatic based on repeated identical prefixes.
-OPENAI_ANALYSIS_MODEL=gpt-4o
+OPENAI_ANALYSIS_MODEL=gpt-5-mini
 
 CHARACTER_REF_DIR=static/characters
 
@@ -18,7 +18,7 @@ OPENAI_IMAGE_MODEL=gpt-image-2
 # combination.
 OPENAI_IMAGE_MODEL_FALLBACK=gpt-image-1
 OPENAI_IMAGE_SIZE=1024x1536
-OPENAI_IMAGE_QUALITY=medium
+OPENAI_IMAGE_QUALITY=low
 # Shared by both the analysis call and the poster-edit call (see
 # image_utils.py) -- the captured photo is downscaled to this max
 # dimension before being sent to either API call.

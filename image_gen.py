@@ -34,12 +34,13 @@ import image_utils
 IMAGE_MODEL = os.environ.get("OPENAI_IMAGE_MODEL", "gpt-image-2")
 POSTER_SIZE = os.environ.get("OPENAI_IMAGE_SIZE", "1024x1536")  # portrait poster
 
-# "auto" lets OpenAI pick (effectively the slowest/highest tier for
-# gpt-image-1). Explicitly requesting "medium" cuts generation time a lot
-# with only a modest fidelity trade-off -- this is the single biggest lever
-# on the ~1min generation time. Override with OPENAI_IMAGE_QUALITY=high/low
-# if you want to trade speed for quality either direction.
-IMAGE_QUALITY = os.environ.get("OPENAI_IMAGE_QUALITY", "medium")
+# "auto" lets OpenAI pick (effectively the slowest/highest tier). "low" is
+# the fastest/cheapest tier on gpt-image-2 (~3-8s vs ~20-40s for "medium"),
+# with quality reported as meaningfully better than previous-generation
+# models' "low" tier -- worth it for a live booth where throughput matters
+# more than maximum polish. Override with OPENAI_IMAGE_QUALITY=medium/high
+# if you want to trade speed for quality.
+IMAGE_QUALITY = os.environ.get("OPENAI_IMAGE_QUALITY", "low")
 
 # The captured photo (especially a phone upload) can be several thousand
 # pixels on a side. None of that extra resolution improves the edit result --
