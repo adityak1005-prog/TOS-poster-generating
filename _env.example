@@ -1,29 +1,19 @@
 OPENAI_API_KEY=your_openai_api_key
+# Only needed for stage 3 (poster generation, below) -- stage 2 (character
+# analysis) now runs locally via local_llm/qwen_local.py's Qwen3-VL
+# pipeline and needs no API key/network access. See README.md
+# "Prerequisites" for the CUDA/GPU setup that stage needs instead.
 
 # Stage 2 (analysis: character match + reasoning + caption + diffusion
-# prompt). Vision-capable chat model, distinct from OPENAI_IMAGE_MODEL
-# below. gpt-4o's automatic prompt caching is what replaced Gemini's
-# explicit (and free-tier-blocked) context caching -- no code-side cache
-# object to manage, it's automatic based on repeated identical prefixes.
-OPENAI_ANALYSIS_MODEL=gpt-5-mini
-# gpt-5-mini is a reasoning model -- "minimal" skips most of its internal
-# thinking time, which is what was causing 35+s analysis latency. Raise to
-# "low"/"medium" only if match quality suffers.
-OPENAI_REASONING_EFFORT=minimal
-
-CHARACTER_REF_DIR=static/characters
-# Reference images are re-sent inline on every analysis call that misses
-# OpenAI's cache -- downscaled to this size at load time so 21 stacked
-# images don't dominate request latency. Leave at 400 unless matching
-# quality suffers.
-OPENAI_REFERENCE_IMAGE_MAX_DIM=400
-# Attempts to extend OpenAI's automatic cache retention from its default
-# ~5-10min window to 24h. NOT confirmed supported on gpt-5-mini -- if the
-# API rejects it, openai_analysis.py disables it automatically after the
-# first failure and logs a line starting "EXTENDED CACHE RETENTION NOT
-# SUPPORTED" so you can check the terminal to see whether it's actually in
-# effect. Set to empty to skip trying it at all.
-OPENAI_EXTENDED_CACHE_RETENTION=24h
+# prompt), now running locally instead of through OpenAI -- see
+# local_llm/README.md and FINDINGS.md for what this is and the benchmark
+# that validated it (4B matched 8B on both quality axes measured there, at
+# roughly half the VRAM/load time, hence the default below).
+LOCAL_VLM_MODEL=4b
+# Ceiling on generated tokens for the JSON response -- 500 is comfortably
+# above what a valid response needs (character/reasoning/caption/
+# diffusion_prompt/detected_traits), raise only if you extend the prompt.
+LOCAL_VLM_MAX_NEW_TOKENS=500
 
 # Stage 3 (poster generation via images.edit).
 OPENAI_IMAGE_MODEL=gpt-image-2

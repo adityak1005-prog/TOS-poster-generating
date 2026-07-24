@@ -6,6 +6,13 @@ Kept deliberately simple/single-file: load once, call `analyze_and_match()`
 repeatedly. Model/processor are cached at module level (see `_get_model`)
 so the benchmark harness can loop over many images without reloading
 weights each time.
+
+Loads at full bfloat16 -- needs a GPU with ~10-12GB+ free VRAM for the 4B
+model (roughly 8GB for weights alone, plus activations/KV-cache for the
+roster prompt + image). No quantization here: this was previously added
+(via bitsandbytes) to squeeze the model onto 6-8GB laptop GPUs, but was
+removed once the deployment moved to hardware with real VRAM headroom --
+see git history if you need to run this on a smaller card again.
 """
 
 import gc

@@ -18,6 +18,8 @@ lose. See index.html's runFullPipeline() for the client side of this.
 """
 
 import os
+import io
+import sys
 import time
 import json
 import asyncio
@@ -30,10 +32,66 @@ from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 load_dotenv()
 
-import openai_analysis
+# Stage 2 (analysis) now runs locally via the Qwen3-VL pipeline already
+# built out in local_llm/ (see local_llm/README.md and FINDINGS.md for what
+# it is and the benchmark that validated it) instead of the old OpenAI
+# reasoning-model call. local_llm/qwen_local.py does `import shared_prompt`
+# as a bare/top-level import (it's designed to be run from inside that
+# folder), so it needs local_llm/ on sys.path -- it is NOT a package, this
+# is the same thing `cd local_llm && python benchmark.py` gets for free.
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "local_llm"))
+import qwen_local  # noqa: E402
+import shared_prompt  # noqa: E402  (roster/CHARACTERS -- also imported inside qwen_local, same cached module)
+
+from PIL import Image  # noqa: E402
+import image_utils  # noqa: E402  (shared photo downscale, same helper image_gen.py uses)
 import image_gen
 import compose
 import storage  # Supabase Storage upload/list/delete helpers (with fallback bucket)
+
+# Which local model size / how many tokens to generate for stage 2 -- see
+# local_llm/FINDINGS.md: 4B matched 8B on both quality axes it measured at
+# roughly half the VRAM/load time, so 4B is the default. Override via env
+# if you want to try 8B on your own hardware.
+LOCAL_VLM_MODEL = os.environ.get("LOCAL_VLM_MODEL", "4b")
+LOCAL_VLM_MAX_NEW_TOKENS = int(os.environ.get("LOCAL_VLM_MAX_NEW_TOKENS", "500"))
+# Shared with image_gen.py's OPENAI_INPUT_MAX_DIM so every stage downscales
+# the captured photo to the same size before doing anything with it.
+LOCAL_VLM_MAX_DIM = int(os.environ.get("OPENAI_INPUT_MAX_DIM", "1280"))
+
+
+def _analyze_photo(image_bytes: bytes) -> dict:
+    """Stage 2 entry point, same contract the old
+    openai_analysis.analyze_and_match(image_bytes) had: takes the captured
+    photo's raw bytes, returns a dict with character/reasoning/caption/
+    diffusion_prompt/detected_traits.
+
+    qwen_local.analyze_and_match() (see local_llm/qwen_local.py) takes a
+    PIL Image instead of raw bytes, and -- since Qwen3-VL isn't
+    schema-constrained the way the OpenAI call was -- returns debug/
+    validity fields (_valid_json, _error, etc.) rather than raising on a
+    malformed response. This wrapper adapts both of those: downscale +
+    decode bytes -> PIL Image the same way image_gen.py already does, then
+    raise if generation didn't produce valid JSON (so the existing
+    try/except in _stream_capture below turns it into a "failed" stage
+    exactly like an OpenAI API error used to), and clamp/default the two
+    fields the old code guaranteed were always present.
+    """
+    small_bytes = image_utils.prepare_image_bytes(image_bytes, max_dim=LOCAL_VLM_MAX_DIM)
+    image = Image.open(io.BytesIO(small_bytes)).convert("RGB")
+
+    result = qwen_local.analyze_and_match(
+        image, model_key=LOCAL_VLM_MODEL, max_new_tokens=LOCAL_VLM_MAX_NEW_TOKENS,
+    )
+    if not result["_valid_json"]:
+        raise RuntimeError(f"local analysis did not return valid JSON: {result['_error']}")
+
+    if result.get("character") not in shared_prompt.CHARACTERS:
+        result["character"] = shared_prompt.CHARACTERS[0]
+    result.setdefault("reasoning", "")
+
+    return result
+
 
 app = FastAPI()
 
@@ -66,9 +124,12 @@ async def serve_frontend():
 @app.get("/booth/characters")
 async def characters():
     """Returns the fixed character roster so the frontend showcase always
-    matches whatever is actually in openai_analysis.py -- add a character
-    there and it shows up here automatically, no frontend edit needed."""
-    return {"characters": openai_analysis.CHARACTERS}
+    matches whatever is actually in the roster (shared_prompt.py, which
+    reads it from openai_analysis.py's CHARACTER_STYLE_GUIDE -- that file's
+    OpenAI *calling* code is unused now, but it's still the one place the
+    roster text itself is defined) -- add a character there and it shows
+    up here automatically, no frontend edit needed."""
+    return {"characters": shared_prompt.CHARACTERS}
 
 
 @app.get("/booth/config")
@@ -283,12 +344,14 @@ async def _stream_capture(image_bytes: bytes, base_url: str):
         timings[stage] = round(time.time() - t0, 2)
 
     try:
-        # Stage 2: single multimodal OpenAI call (analysis + character
-        # match + reasoning + caption + diffusion_prompt). Network-bound,
-        # run in a thread so it doesn't block the event loop.
+        # Stage 2: local Qwen3-VL call (analysis + character match +
+        # reasoning + caption + diffusion_prompt) -- see _analyze_photo()
+        # above and local_llm/README.md. GPU-bound, not network-bound, but
+        # still run in a thread so a multi-second generate() call doesn't
+        # block the event loop from serving other requests.
         t0 = time.time()
-        match = await asyncio.to_thread(openai_analysis.analyze_and_match, image_bytes)
-        mark("openai_analysis", t0)
+        match = await asyncio.to_thread(_analyze_photo, image_bytes)
+        mark("local_analysis", t0)
 
         # First streamed chunk: lets the frontend show the matched
         # character name immediately, same UX the old polling design gave,
@@ -367,32 +430,9 @@ async def test_analyze(file: UploadFile = File(...)):
     image_bytes = await file.read()
     t0 = time.time()
     try:
-        match = await asyncio.to_thread(openai_analysis.analyze_and_match, image_bytes)
+        match = await asyncio.to_thread(_analyze_photo, image_bytes)
     except Exception as e:
         traceback.print_exc()
         return JSONResponse(status_code=500, content={"error": str(e)})
     match["elapsed_s"] = round(time.time() - t0, 2)
     return match
-
-
-# --------------------------------------------------------------------------
-# TEMPORARY DEV/ADMIN ENDPOINT -- remove before the event.
-#
-# Left in place for interface parity with the previous Gemini-backed build.
-# openai_analysis.py's "cache" is really a memoized in-process reference-
-# image set (OpenAI's own prompt caching is automatic, no handle to return)
-# -- this just forces a reload from static/characters/ without restarting
-# uvicorn.
-# --------------------------------------------------------------------------
-@app.post("/booth/admin/rebuild-cache")
-async def rebuild_cache():
-    try:
-        cache_name = await asyncio.to_thread(openai_analysis.rebuild_character_cache)
-    except Exception as e:
-        traceback.print_exc()
-        return JSONResponse(status_code=500, content={"error": str(e)})
-    return {
-        "cache_name": cache_name,
-        "cached": cache_name is not None,
-        "characters_with_images": openai_analysis.list_characters_with_images(),
-    }

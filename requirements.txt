@@ -8,3 +8,19 @@ requests
 python-multipart
 python-dotenv
 pydantic
+
+# Stage 2 (character analysis) runs locally via local_llm/qwen_local.py's
+# Qwen3-VL pipeline -- see README.md "Prerequisites" for the CUDA/GPU setup
+# these need. transformers needs a version with Qwen3-VL support; if
+# `Qwen3VLForConditionalGeneration` fails to import, upgrade transformers
+# (pip install -U transformers) or install from source if it hasn't hit a
+# stable release yet.
+#
+# IMPORTANT: install torch yourself from https://pytorch.org/get-started/
+# (or the CUDA-specific pip command in README.md) BEFORE running this
+# file -- a plain `pip install torch` from PyPI can grab a CPU-only build
+# depending on platform/version, and torch's CUDA wheels aren't reliably
+# resolvable through a requirements.txt line. Installing it first also
+# means this file won't try to reinstall/downgrade it.
+transformers>=4.57
+accelerate
