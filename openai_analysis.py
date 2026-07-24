@@ -600,11 +600,12 @@ def _call_openai(image_bytes: bytes, mime_type: str, include_reference_images: b
                 "strict": True,
             },
         },
-        # Bumped from 0.8 -- schema validity is guaranteed regardless of
-        # temperature (strict:True enforces structure), so this is a free
-        # lever for more varied tie-breaking between close character
-        # matches rather than always resolving to the same famous default.
-        temperature=0.95,
+        # No temperature override -- gpt-5-mini (a reasoning model) only
+        # supports its default value of 1 and errors on any other value
+        # (confirmed live: "Unsupported value: 'temperature' does not
+        # support 0.95 with this model"). Match variety for close ties is
+        # instead handled entirely via the tie-break prompt language in
+        # _build_instruction() rather than a sampling-temperature knob.
     )
 
 
