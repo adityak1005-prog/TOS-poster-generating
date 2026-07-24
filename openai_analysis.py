@@ -164,10 +164,11 @@ CHARACTER_STYLE_GUIDE = {
     ),
     "Professor from Money Heist": (
         "MATCH ON: a calm, composed, steady gaze held with a closed, "
-        "still mouth, on a face that reads as more mature/older-looking "
-        "than most people in the photo set -- a light beard or mustache "
-        "is a supporting cue if present. Male-presenting. This will be "
-        "one of the rarer matches given a young crowd, and that's "
+        "still mouth, on a face that reads as noticeably more mature or "
+        "older-looking than a typical college-age student on its own "
+        "merits (not by comparing to any other photo) -- a light beard or "
+        "mustache is a supporting cue if present. Male-presenting. This "
+        "will be one of the rarer matches given a young crowd, and that's "
         "expected -- do not force it onto young, smooth-faced people just "
         "because they're calm and wearing glasses; that's Sheldon's "
         "territory instead. POSTER LOOK: default to the iconic heist-mode "

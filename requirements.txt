@@ -24,3 +24,11 @@ pydantic
 # means this file won't try to reinstall/downgrade it.
 transformers>=4.57
 accelerate
+
+# Used by local_llm/qwen_local.py's attention-capture path (the "where the
+# AI looked" heatmap shown on the reveal screen) -- opencv resizes the
+# attention grid up to the photo's resolution, matplotlib supplies the
+# jet colormap. headless build: the booth server has no display, and the
+# regular opencv-python package pulls in GUI/Qt deps it'll never use.
+opencv-python-headless
+matplotlib

@@ -22,6 +22,7 @@ import io
 import sys
 import time
 import json
+import base64
 import asyncio
 import datetime
 import traceback
@@ -60,7 +61,7 @@ LOCAL_VLM_MAX_NEW_TOKENS = int(os.environ.get("LOCAL_VLM_MAX_NEW_TOKENS", "500")
 LOCAL_VLM_MAX_DIM = int(os.environ.get("OPENAI_INPUT_MAX_DIM", "1280"))
 
 
-def _analyze_photo(image_bytes: bytes) -> dict:
+def _analyze_photo(image_bytes: bytes, capture_attention: bool = True) -> dict:
     """Stage 2 entry point, same contract the old
     openai_analysis.analyze_and_match(image_bytes) had: takes the captured
     photo's raw bytes, returns a dict with character/reasoning/caption/
@@ -76,12 +77,20 @@ def _analyze_photo(image_bytes: bytes) -> dict:
     try/except in _stream_capture below turns it into a "failed" stage
     exactly like an OpenAI API error used to), and clamp/default the two
     fields the old code guaranteed were always present.
+
+    capture_attention=True (the live booth's default) additionally gets a
+    "where the AI looked" heatmap out of this same call -- see
+    qwen_local.analyze_and_match's docstring for why this doesn't cost a
+    second model invocation. /booth/test-analyze passes False instead,
+    since that endpoint is just for eyeballing match quality quickly and
+    doesn't need the (slower, eager-attention) heatmap.
     """
     small_bytes = image_utils.prepare_image_bytes(image_bytes, max_dim=LOCAL_VLM_MAX_DIM)
     image = Image.open(io.BytesIO(small_bytes)).convert("RGB")
 
     result = qwen_local.analyze_and_match(
         image, model_key=LOCAL_VLM_MODEL, max_new_tokens=LOCAL_VLM_MAX_NEW_TOKENS,
+        capture_attention=capture_attention,
     )
     if not result["_valid_json"]:
         raise RuntimeError(f"local analysis did not return valid JSON: {result['_error']}")
@@ -353,6 +362,18 @@ async def _stream_capture(image_bytes: bytes, base_url: str):
         match = await asyncio.to_thread(_analyze_photo, image_bytes)
         mark("local_analysis", t0)
 
+        # The "where the AI looked" heatmap (see qwen_local.analyze_and_match's
+        # capture_attention path) comes back as raw JPEG bytes -- not JSON
+        # serializable as-is, so pull it out and inline it as a base64 data
+        # URL instead of a separate upload+URL round trip (it's a small
+        # image and this is the fastest way to get it to the browser).
+        # None if capture failed for some reason (non-fatal upstream).
+        attn_jpeg = match.pop("_attention_overlay_jpeg", None)
+        attention_overlay = (
+            "data:image/jpeg;base64," + base64.b64encode(attn_jpeg).decode("ascii")
+            if attn_jpeg else None
+        )
+
         # First streamed chunk: lets the frontend show the matched
         # character name immediately, same UX the old polling design gave,
         # before the (slower) poster generation stage even starts.
@@ -398,6 +419,7 @@ async def _stream_capture(image_bytes: bytes, base_url: str):
             "reasoning": match.get("reasoning", ""),
             "caption": match["caption"],
             "traits": match["detected_traits"],
+            "attention_overlay": attention_overlay,
             "timings": timings,
         })
 
@@ -430,7 +452,7 @@ async def test_analyze(file: UploadFile = File(...)):
     image_bytes = await file.read()
     t0 = time.time()
     try:
-        match = await asyncio.to_thread(_analyze_photo, image_bytes)
+        match = await asyncio.to_thread(_analyze_photo, image_bytes, False)
     except Exception as e:
         traceback.print_exc()
         return JSONResponse(status_code=500, content={"error": str(e)})

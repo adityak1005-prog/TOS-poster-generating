@@ -77,7 +77,6 @@ import json
 from pathlib import Path
 
 import cv2
-import matplotlib
 import numpy as np
 import torch
 from PIL import Image, ImageDraw
@@ -85,55 +84,25 @@ from PIL import Image, ImageDraw
 import benchmark
 import qwen_local
 import shared_prompt
-from transformers.models.qwen3_vl.modeling_qwen3_vl import Qwen3VLTextAttention
-
-IMAGE_TOKEN_ID = 151655  # Qwen's <|image_pad|> token id, confirmed via processor inspection
+# AttentionCollector, IMAGE_TOKEN_ID, aggregate_map, clip_outliers,
+# render_overlay, token_char_spans, find_phrase_token_indices all now live
+# in qwen_local.py (promoted there so the production booth pipeline can
+# reuse them for its own live heatmap -- see qwen_local.analyze_and_match's
+# capture_attention path). This module keeps only what's specific to
+# offline benchmarking: face-box grounding metrics, sink diagnostics, and
+# the per-image/all-roster-images CLI loop.
+from qwen_local import (
+    AttentionCollector,
+    IMAGE_TOKEN_ID,
+    aggregate_map,
+    clip_outliers,
+    render_overlay,
+)
 
 RESULTS_DIR = Path(__file__).parent / "results" / "attention"
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
 _FACE_CASCADE = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
-
-
-class AttentionCollector:
-    """Registers forward hooks on every Qwen3VLTextAttention layer; see
-    module docstring for why this replaces output_attentions=True."""
-
-    def __init__(self, model, image_token_positions: torch.Tensor):
-        self.image_token_positions = image_token_positions
-        self.per_layer: dict[int, list[np.ndarray]] = {}
-        self._handles = []
-        for _, module in model.named_modules():
-            if isinstance(module, Qwen3VLTextAttention):
-                self.per_layer[module.layer_idx] = []
-                self._handles.append(module.register_forward_hook(self._make_hook(module.layer_idx)))
-
-    def _make_hook(self, layer_idx):
-        def hook(module, inputs, output):
-            attn_output, attn_weights = output
-            if attn_weights is None:
-                return output
-            q_len = attn_weights.shape[2]
-            row = -1 if q_len > 1 else 0  # prefill: last prompt position predicts token 0; decode: the only row
-            row_weights = attn_weights[0, :, row, :]  # (heads, k_len)
-            cols = self.image_token_positions.to(row_weights.device)
-            img_weights = row_weights.index_select(1, cols)  # (heads, n_img_tokens)
-            reduced = img_weights.mean(dim=0).float().cpu().numpy()
-            self.per_layer[layer_idx].append(reduced)
-            return (attn_output, None)  # prevent upstream accumulation of the full tensor
-        return hook
-
-    def remove(self):
-        for h in self._handles:
-            h.remove()
-
-    def stacked(self) -> np.ndarray:
-        """(num_layers, num_generation_steps, n_image_tokens). Step i is
-        the attention used to produce generated token i (see docstring
-        derivation: forward-call #1 is the prefill that produces token 0,
-        forward-call #k+1 produces token k)."""
-        layers = sorted(self.per_layer.keys())
-        return np.stack([np.stack(self.per_layer[l], axis=0) for l in layers], axis=0)
 
 
 def generate_with_attention(image: Image.Image, model_key: str, max_new_tokens: int):
@@ -173,43 +142,8 @@ def generate_with_attention(image: Image.Image, model_key: str, max_new_tokens: 
     }
 
 
-def token_char_spans(tokenizer, token_ids: list[int]):
-    """[(char_start, char_end), ...] for each token, aligned to the fully
-    decoded string -- built by incremental decode since Qwen's tokenizer
-    merges bytes/BPE pieces in ways a naive per-token decode wouldn't
-    reproduce exactly."""
-    spans = []
-    prev_len = 0
-    for i in range(len(token_ids)):
-        text = tokenizer.decode(token_ids[: i + 1], skip_special_tokens=True)
-        spans.append((prev_len, len(text)))
-        prev_len = len(text)
-    return spans, prev_len
-
-
 def find_phrase_token_indices(tokenizer, token_ids: list[int], full_text: str, phrase: str) -> list[int]:
-    start = full_text.find(phrase)
-    if start == -1:
-        return []
-    end = start + len(phrase)
-    spans, _ = token_char_spans(tokenizer, token_ids)
-    return [i for i, (s, e) in enumerate(spans) if e > start and s < end]
-
-
-def aggregate_map(attn_stack: np.ndarray, step_indices: list[int], layer_agg: str) -> np.ndarray | None:
-    if not step_indices:
-        return None
-    layers = attn_stack.shape[0]
-    sub = attn_stack[:, step_indices, :]
-    if layer_agg == "all":
-        sel = sub
-    elif layer_agg == "last_half":
-        sel = sub[layers // 2:]
-    elif layer_agg == "last":
-        sel = sub[-1:]
-    else:
-        raise ValueError(layer_agg)
-    return sel.mean(axis=(0, 1))  # (n_img_tokens,)
+    return qwen_local.find_phrase_token_indices(tokenizer, token_ids, full_text, phrase)
 
 
 def sink_diagnostics(raw_vec: np.ndarray) -> dict:
@@ -230,16 +164,6 @@ def sink_diagnostics(raw_vec: np.ndarray) -> dict:
         "top1_fraction": round(float(sorted_vals[0] / total), 4),
         "top3_fraction": round(float(sorted_vals[:3].sum() / total), 4),
     }
-
-
-def clip_outliers(raw_vec: np.ndarray, percentile: float = 99.0) -> np.ndarray:
-    """Winsorizes values above the given percentile -- used both for
-    visualization contrast and for a 'sink-robust' version of the face-
-    mass metric, so a single artifact cell can't single-handedly decide
-    the reported grounding number. Sum is intentionally not renormalized
-    after clipping (only relative shape matters for what follows)."""
-    cap = np.percentile(raw_vec, percentile)
-    return np.minimum(raw_vec, cap)
 
 
 def detect_face_box(image: Image.Image):
@@ -279,27 +203,6 @@ def face_attention_stats(raw_vec: np.ndarray, grid_hw: tuple[int, int], face_box
         "area_fraction": round(area_fraction, 4),
         "enrichment": round(mass_fraction / area_fraction, 3) if area_fraction > 0 else None,
     }
-
-
-def render_overlay(image: Image.Image, raw_vec: np.ndarray, grid_hw: tuple[int, int], alpha: float = 0.45,
-                    clip_percentile: float = 99.0) -> Image.Image:
-    grid_h, grid_w = grid_hw
-    # Clip before normalizing -- without this, one or two attention-sink
-    # cells (see sink_diagnostics) stretch the color scale so hard that
-    # every other, potentially more meaningful, cell renders as flat
-    # near-zero blue. See module docstring / sink_diagnostics.
-    display_vec = clip_outliers(raw_vec, clip_percentile) if clip_percentile else raw_vec
-    grid = display_vec.reshape(grid_h, grid_w).astype(np.float32)
-    grid = grid - grid.min()
-    if grid.max() > 0:
-        grid = grid / grid.max()
-    W, H = image.size
-    heat = cv2.resize(grid, (W, H), interpolation=cv2.INTER_CUBIC)
-    heat = np.clip(heat, 0, 1)
-    colored = (matplotlib.colormaps["jet"](heat)[..., :3] * 255).astype(np.uint8)
-    base = np.array(image.convert("RGB"))
-    blended = (base.astype(np.float32) * (1 - alpha) + colored.astype(np.float32) * alpha).astype(np.uint8)
-    return Image.fromarray(blended)
 
 
 def run_one_image(image_path: Path, model_key: str, max_new_tokens: int, layer_agg: str) -> dict:

@@ -210,9 +210,16 @@
   <!-- ============ PROCESSING ============ -->
   <div class="screen card" id="screen-processing">
     <div class="processing-wrap">
-      <div class="spinner"></div>
+      <div class="spinner" id="processingSpinner"></div>
       <div id="processingText">Analyzing your photo...</div>
       <div id="processingSub">This usually takes a bit -- hang tight.</div>
+      <!-- Filled in ~10s after the "matched" stage arrives, replacing the
+           spinner/sub line -- see revealProcessingPreview() -- so visitors
+           have the caption/reasoning to read instead of staring at a bare
+           spinner for however long poster generation + upload actually
+           takes. -->
+      <div class="catchphrase" id="processingCatchphrase" style="display:none;"></div>
+      <div class="reasoning-box" id="processingReasoningBox" style="display:none; text-align:left;"></div>
     </div>
   </div>
 
@@ -221,6 +228,15 @@
     <img id="resultImage" alt="Your poster">
     <div class="catchphrase" id="catchphrase"></div>
     <div class="reasoning-box" id="reasoningBox"></div>
+    <!-- "Where the AI looked" heatmap -- grounded in the original photo
+         (the poster is a wholly regenerated image with no pixel
+         correspondence to it, so the heatmap can only overlay the
+         original capture, not the poster itself). Hidden entirely if the
+         backend couldn't produce one for some reason (non-fatal upstream). -->
+    <div id="attentionWrap" style="display:none; margin-bottom: 1.25rem;">
+      <div class="showcase-title" style="margin: 0 0 .5rem;">Where the AI looked</div>
+      <img id="attentionImage" alt="Attention heatmap on the original photo" style="width:100%; border-radius: 14px;">
+    </div>
     <div class="traits-line" id="traitsLine"></div>
     <div class="qr-row">
       <img id="qrImage" alt="QR code">
@@ -353,6 +369,7 @@
   let capturedBlob = null;
   let cameraStream = null;
   let testMode = false;
+  let previewRevealTimer = null; // see revealProcessingPreview()
 
   document.getElementById("testModeToggle").addEventListener("change", (e) => {
     testMode = e.target.checked;
@@ -472,8 +489,45 @@
   // and streams newline-delimited JSON progress within a single response;
   // the early "character matched" reveal still happens, it's just the
   // first line of that stream instead of a separate poll response. ----
+  // Called ~10s after the "matched" stage arrives (see the "matched"
+  // branch below) so the spinner-only wait doesn't stretch across however
+  // long poster generation + compose/upload actually takes -- by the 10s
+  // mark the visitor at least has the witty caption + reasoning to read.
+  // Swaps out the spinner/sub-line rather than stacking content on top of
+  // it, so the processing screen doesn't get visually crowded.
+  function revealProcessingPreview(data) {
+    document.getElementById("processingSpinner").style.display = "none";
+    document.getElementById("processingSub").style.display = "none";
+    const catchEl = document.getElementById("processingCatchphrase");
+    const reasonEl = document.getElementById("processingReasoningBox");
+    if (data.caption) {
+      catchEl.innerText = data.caption;
+      catchEl.style.display = "block";
+    }
+    if (data.reasoning) {
+      reasonEl.innerHTML = `<b>Why ${data.character}?</b> ${data.reasoning}`;
+      reasonEl.style.display = "block";
+    }
+  }
+
+  // Resets the processing screen back to its pre-reveal state (spinner
+  // visible, no caption/reasoning shown yet) -- called at the start of
+  // every new capture so leftover content/timers from a previous run
+  // don't leak into this one.
+  function resetProcessingPreview() {
+    if (previewRevealTimer) {
+      clearTimeout(previewRevealTimer);
+      previewRevealTimer = null;
+    }
+    document.getElementById("processingSpinner").style.display = "";
+    document.getElementById("processingSub").style.display = "";
+    document.getElementById("processingCatchphrase").style.display = "none";
+    document.getElementById("processingReasoningBox").style.display = "none";
+  }
+
   async function runFullPipeline(blob) {
     showScreen("screen-processing");
+    resetProcessingPreview();
     setProcessingText("Analyzing your photo...", "This usually takes a bit -- hang tight.");
 
     const formData = new FormData();
@@ -511,9 +565,12 @@
 
           if (data.stage === "matched") {
             setProcessingText(`You're a match for ${data.character}! 🎬`, "Generating your poster now...");
+            previewRevealTimer = setTimeout(() => revealProcessingPreview(data), 10000);
           } else if (data.stage === "done") {
+            resetProcessingPreview();
             showReveal(data);
           } else if (data.stage === "failed") {
+            resetProcessingPreview();
             alert("Something went wrong: " + (data.error || "unknown error"));
             showScreen("screen-intro");
           }
@@ -537,6 +594,16 @@
       ? `<b>Why ${data.character}?</b> ${data.reasoning}`
       : `<b>Matched:</b> ${data.character}`;
     document.getElementById("reasoningBox").innerHTML = reasoning;
+
+    const attnWrap = document.getElementById("attentionWrap");
+    const attnImg = document.getElementById("attentionImage");
+    if (data.attention_overlay) {
+      attnImg.src = data.attention_overlay;
+      attnWrap.style.display = "block";
+    } else {
+      attnWrap.style.display = "none";
+    }
+
     const t = data.traits || {};
     let traitsText = `Detected: ${t.outfit_color || "?"} outfit, ${t.pose_description || "neutral pose"}`;
     if (t.glasses) traitsText += ", glasses";
