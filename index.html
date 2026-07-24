@@ -210,15 +210,19 @@
   <!-- ============ PROCESSING ============ -->
   <div class="screen card" id="screen-processing">
     <div class="processing-wrap">
-      <div class="spinner" id="processingSpinner"></div>
+      <div class="spinner"></div>
       <div id="processingText">Analyzing your photo...</div>
       <div id="processingSub">This usually takes a bit -- hang tight.</div>
-      <!-- Filled in ~10s after the "matched" stage arrives, replacing the
-           spinner/sub line -- see revealProcessingPreview() -- so visitors
-           have the caption/reasoning to read instead of staring at a bare
-           spinner for however long poster generation + upload actually
-           takes. -->
-      <div class="catchphrase" id="processingCatchphrase" style="display:none;"></div>
+      <!-- Fun fact about the matched character -- shown immediately on the
+           "matched" stage (see showFunFact()), processing-screen only,
+           deliberately never carried over to screen-reveal. -->
+      <div id="processingFunFact" style="display:none; color: var(--text-dim); font-size: .85rem; font-style: italic; margin-top: .75rem;"></div>
+      <!-- Filled in 5s after "matched" -- see revealProcessingPreview() --
+           so visitors have the caption/reasoning to read instead of
+           staring at just the spinner for however long poster generation +
+           upload actually takes. The spinner itself stays visible the
+           whole time -- this is added alongside it, not a replacement. -->
+      <div class="catchphrase" id="processingCatchphrase" style="display:none; margin-top: .75rem;"></div>
       <div class="reasoning-box" id="processingReasoningBox" style="display:none; text-align:left;"></div>
     </div>
   </div>
@@ -294,6 +298,44 @@
     "Sheldon Cooper":            { emoji: "🤓", grad: "linear-gradient(135deg,#1d4ed8,#64748b)" },
   };
   const DEFAULT_STYLE = { emoji: "🎬", grad: "linear-gradient(135deg,#3f3f46,#52525b)" };
+
+  // ---- fun facts shown on the processing screen only (see showFunFact) --
+  // one per character, deliberately not shown on screen-reveal. Fictional
+  // trivia about the character/franchise, not about any real person. ----
+  const FUN_FACTS = {
+    "Iron Man": "Robert Downey Jr. reportedly improvised many of Tony Stark's most quotable lines on set.",
+    "Batman": "Unlike most superheroes, Batman has no powers at all -- just training, gadgets, and money.",
+    "Spider-Man": "Spider-Man was one of the first major superheroes written as an actual teenager, not an adult's sidekick.",
+    "Thomas Shelby": "Peaky Blinders is loosely inspired by a real Birmingham street gang from the late 1800s.",
+    "Naruto": "Naruto's orange jumpsuit was picked specifically to make him stand out clearly in every scene.",
+    "Professor from Money Heist": "The Professor's mask depicts Salvador Dali, a real Spanish artist known for surrealism.",
+    "Gwen Stacy": "Gwen Stacy appeared in the comics years before she ever got spider powers of her own.",
+    "Black Widow": "Black Widow's fighting style in the films blends real techniques like judo, boxing, and aikido.",
+    "Daenerys Targaryen": "Daenerys' dragons started out as simple stand-in props before being replaced entirely by CGI.",
+    "Hermione Granger": "Hermione was the top-scoring student at Hogwarts in every one of her seven years there.",
+    "Wednesday Addams": "Wednesday Addams gets her name from the old rhyme 'Wednesday's child is full of woe.'",
+    "Kakashi Hatake": "Kakashi earned the nickname 'Copy Ninja' for mastering over a thousand jutsu with his Sharingan.",
+    "Sasuke Uchiha": "The Uchiha clan's fan emblem is based on a real traditional Japanese family crest style.",
+    "Joker": "The Joker is one of the only major comic villains who has never had a single agreed-on origin story.",
+    "Jon Snow": "Jon Snow's line 'the North remembers' became one of the most quoted lines from the whole show.",
+    "Shinchan": "Shinchan's cheeky jokes got the show restricted or edited for content in several countries.",
+    "Harry Potter": "Harry Potter's round glasses became one of the most recognizable accessories in movie history.",
+    "Dr. Doom": "Doctor Doom rules his own fictional country, Latveria, as both supervillain and head of state.",
+    "Regina George": "Mean Girls' famous 'On Wednesdays we wear pink' line was improvised on set, not in the original script.",
+    "Elle Woods": "Legally Blonde was inspired by author Amanda Brown's own time at Stanford Law School.",
+    "Sheldon Cooper": "Sheldon Cooper's IQ is often quoted as 187, though the show itself never confirms an exact number on-screen.",
+  };
+
+  function showFunFact(character) {
+    const el = document.getElementById("processingFunFact");
+    const fact = FUN_FACTS[character];
+    if (fact) {
+      el.innerText = `Fun fact: ${fact}`;
+      el.style.display = "block";
+    } else {
+      el.style.display = "none";
+    }
+  }
 
   function slugify(name) { return name.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, ""); }
 
@@ -489,14 +531,13 @@
   // and streams newline-delimited JSON progress within a single response;
   // the early "character matched" reveal still happens, it's just the
   // first line of that stream instead of a separate poll response. ----
-  // Called ~10s after the "matched" stage arrives (see the "matched"
-  // branch below) so the spinner-only wait doesn't stretch across however
-  // long poster generation + compose/upload actually takes -- by the 10s
-  // mark the visitor at least has the witty caption + reasoning to read.
-  // Swaps out the spinner/sub-line rather than stacking content on top of
-  // it, so the processing screen doesn't get visually crowded.
+  // Called exactly 5s after the "matched" stage arrives (see the "matched"
+  // branch below) -- a fixed, deliberate delay, not a random/whenever-it-
+  // happens reveal -- so the wait for poster generation + compose/upload
+  // isn't just a bare spinner the whole time. The spinner keeps spinning
+  // throughout; this only adds the caption + reasoning alongside it (and
+  // hides the now-redundant sub-line), it doesn't replace the spinner.
   function revealProcessingPreview(data) {
-    document.getElementById("processingSpinner").style.display = "none";
     document.getElementById("processingSub").style.display = "none";
     const catchEl = document.getElementById("processingCatchphrase");
     const reasonEl = document.getElementById("processingReasoningBox");
@@ -510,17 +551,16 @@
     }
   }
 
-  // Resets the processing screen back to its pre-reveal state (spinner
-  // visible, no caption/reasoning shown yet) -- called at the start of
-  // every new capture so leftover content/timers from a previous run
-  // don't leak into this one.
+  // Resets the processing screen back to its pre-reveal state -- called at
+  // the start of every new capture so leftover content/timers from a
+  // previous run don't leak into this one.
   function resetProcessingPreview() {
     if (previewRevealTimer) {
       clearTimeout(previewRevealTimer);
       previewRevealTimer = null;
     }
-    document.getElementById("processingSpinner").style.display = "";
     document.getElementById("processingSub").style.display = "";
+    document.getElementById("processingFunFact").style.display = "none";
     document.getElementById("processingCatchphrase").style.display = "none";
     document.getElementById("processingReasoningBox").style.display = "none";
   }
@@ -565,7 +605,8 @@
 
           if (data.stage === "matched") {
             setProcessingText(`You're a match for ${data.character}! 🎬`, "Generating your poster now...");
-            previewRevealTimer = setTimeout(() => revealProcessingPreview(data), 10000);
+            showFunFact(data.character);
+            previewRevealTimer = setTimeout(() => revealProcessingPreview(data), 5000);
           } else if (data.stage === "done") {
             resetProcessingPreview();
             showReveal(data);

@@ -567,22 +567,30 @@ the same 4-5 famous defaults across many different people.
 
    The single most important rule: this is a costume/backdrop swap on the
    SAME person, not a redraw of a different person. The model must keep the
-   subject's actual face (identity, facial features, skin tone, expression)
-   and their exact pose/framing/camera angle from the photo completely
-   unchanged -- only the outfit, props, and background change. Open the
-   prompt by stating this explicitly (e.g. "Keep the exact same person, face,
-   and pose from the photo unchanged;") before describing anything else.
+   subject's actual face (identity, facial features, skin tone, expression),
+   body shape/proportions, and exact pose/framing/camera angle from the
+   photo completely unchanged -- only the outfit, props, and background
+   change. Open the prompt by stating this explicitly (e.g. "Keep the exact
+   same person, face, and pose from the photo unchanged;") before describing
+   anything else. Because most of these characters are extremely
+   recognizable, the biggest real risk is the image model leaning on its own
+   strong prior for that character's famous face/actor and drifting toward
+   THAT face instead of the photo's -- explicitly guard against this (e.g.
+   "do not replace their face with the character's own face -- this is the
+   person in the photo, styled as the character, not the character
+   themselves").
 
-   Then pack in only concrete, high-signal visual anchors: (a) the character's
-   FULL iconic costume, pulled from the chosen character's "POSTER LOOK" text
-   above (never from "MATCH ON") -- describe it as a complete outfit swap
-   (e.g. for the Professor: the entire red jumpsuit AND the white Dali mask,
-   not just "a red accent"; for Iron Man: the full red-and-gold armor, not
-   just a chest piece). The person's actual clothing should be entirely
-   replaced by the costume, not layered with or peeking through it. List the
-   2-4 most defining pieces/colors of that full costume so the model has
-   enough to fully cover the subject, but never touch hair, facial structure,
-   or anything that would alter the person's actual face,
+   Then pack in only concrete, high-signal visual anchors: (a) the single
+   most iconic, universally-recognized version of the character's FULL
+   costume, pulled from the chosen character's "POSTER LOOK" text above
+   (never from "MATCH ON") -- describe it as a complete outfit swap (e.g.
+   for the Professor: the entire red jumpsuit AND the white Dali mask, not
+   just "a red accent"; for Iron Man: the full red-and-gold armor, not just
+   a chest piece). The person's actual clothing should be entirely replaced
+   by the costume, not layered with or peeking through it. List the 2-4 most
+   defining pieces/colors of that full costume so the model has enough to
+   fully cover the subject, but never touch hair, facial structure, or
+   anything that would alter the person's actual face,
    (b) one lighting/backdrop cue that evokes that character's own film or
    franchise (e.g. Gotham-noir shadows for Batman, a Hogwarts corridor for
    Harry Potter, chakra-burst energy for Naruto) -- the backdrop should feel
@@ -591,6 +599,11 @@ the same 4-5 famous defaults across many different people.
    mention a college, fest, campus, event, or any promotional/booth
    branding anywhere in this prompt -- the poster should read as a genuine
    still from that character's film, not an event souvenir.
+   Close the prompt with a short restatement of the face/pose lock (e.g.
+   "...while keeping the person's exact original face and pose unchanged.")
+   -- stating it again at the end, not just the opening, matters because
+   the costume description sits in between and can otherwise be the last
+   thing the model weighs most heavily.
    A short, dense prompt lets the image model converge faster with the same
    fidelity -- do not pad it with restated synonyms.
 

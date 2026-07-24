@@ -19,6 +19,7 @@ lose. See index.html's runFullPipeline() for the client side of this.
 
 import os
 import io
+import re
 import sys
 import time
 import json
@@ -61,6 +62,59 @@ LOCAL_VLM_MAX_NEW_TOKENS = int(os.environ.get("LOCAL_VLM_MAX_NEW_TOKENS", "500")
 LOCAL_VLM_MAX_DIM = int(os.environ.get("OPENAI_INPUT_MAX_DIM", "1280"))
 
 
+# --------------------------------------------------------------------------
+# Safety net on "diffusion_prompt" -- the ONE field the local model produces
+# that actually leaves this app (sent to OpenAI's images.edit in stage 3;
+# see image_gen.py). reasoning/caption are shown in our own UI only and
+# never reach OpenAI, so they're out of scope here.
+#
+# This exists because of a real "moderation_blocked" 400 seen from OpenAI
+# during this project ("Your request was rejected by the safety system",
+# moderation_stage: "output") -- that block was on the *generated image*,
+# not this text, so stripping words here is a best-effort reduction in how
+# often the local model's phrasing pushes the image model toward risky
+# content, not a guarantee OpenAI's own moderation never fires again.
+#
+# Deliberately narrow: only explicit gore/graphic-violence/self-harm
+# language the local model might volunteer beyond the roster's own POSTER
+# LOOK text. Static, already-fine costume/prop nouns baked into that text
+# (Sasuke's katana, Iron Man's arc reactor, Batman's "moody Gotham-noir
+# shadows", Iron Man's "explosion glow" backdrop, etc.) are deliberately
+# NOT touched -- those already render fine and blanket-filtering common
+# words like "sword" or "explosion" would degrade normal, working prompts
+# for zero safety benefit.
+# --------------------------------------------------------------------------
+_UNSAFE_DIFFUSION_PROMPT_TERMS = [
+    "blood", "bloody", "gore", "gory", "corpse", "corpses", "dead body",
+    "mutilated", "mutilation", "dismembered", "dismemberment",
+    "decapitated", "decapitation", "beheaded", "severed",
+    "tortured", "torture", "execution", "executed", "massacre",
+    "gunfire", "gunshot", "gunshots", "shooting", "stabbing", "stabbed",
+    "slaughtered", "slaughter", "mangled", "self-harm", "self harm",
+    "suicide",
+]
+_UNSAFE_TERMS_PATTERN = re.compile(
+    r"\b(" + "|".join(re.escape(t) for t in _UNSAFE_DIFFUSION_PROMPT_TERMS) + r")\b",
+    re.IGNORECASE,
+)
+
+
+def _sanitize_diffusion_prompt(prompt: str) -> str:
+    """Strips explicit gore/violence/self-harm terms from diffusion_prompt
+    before it's ever passed to image_gen.generate_poster(). See the module
+    comment above for scope/rationale. Non-matches pass through untouched;
+    a match is logged (visible in the terminal, same pattern as image_gen.py's
+    fallback logging) so it's obvious when this actually did something."""
+    if not prompt:
+        return prompt
+    cleaned, n = _UNSAFE_TERMS_PATTERN.subn(" ", prompt)
+    if n:
+        cleaned = re.sub(r"\s{2,}", " ", cleaned).strip()
+        cleaned = re.sub(r"\s+([,.;])", r"\1", cleaned)  # tidy up stray " ," / " ."
+        print(f"[app] sanitized {n} unsafe term(s) out of diffusion_prompt before sending to OpenAI")
+    return cleaned
+
+
 def _analyze_photo(image_bytes: bytes, capture_attention: bool = True) -> dict:
     """Stage 2 entry point, same contract the old
     openai_analysis.analyze_and_match(image_bytes) had: takes the captured
@@ -98,6 +152,7 @@ def _analyze_photo(image_bytes: bytes, capture_attention: bool = True) -> dict:
     if result.get("character") not in shared_prompt.CHARACTERS:
         result["character"] = shared_prompt.CHARACTERS[0]
     result.setdefault("reasoning", "")
+    result["diffusion_prompt"] = _sanitize_diffusion_prompt(result.get("diffusion_prompt", ""))
 
     return result
 
