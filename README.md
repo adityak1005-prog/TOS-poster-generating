@@ -93,6 +93,7 @@ OPENAI_REASONING_EFFORT=minimal
 
 CHARACTER_REF_DIR=static/characters
 OPENAI_REFERENCE_IMAGE_MAX_DIM=400
+OPENAI_EXTENDED_CACHE_RETENTION=24h
 
 OPENAI_IMAGE_MODEL=gpt-image-2
 OPENAI_IMAGE_MODEL_FALLBACK=gpt-image-1
@@ -355,6 +356,16 @@ both of those patterns broke on serverless hosts, and both are gone now.
     now downscales each one to `OPENAI_REFERENCE_IMAGE_MAX_DIM` (default
     `400`px) once at load time -- fine detail isn't needed for visual
     grounding, so this cuts the non-cached request size drastically.
+  - `OPENAI_EXTENDED_CACHE_RETENTION` (default `24h`) asks OpenAI to hold
+    the cached prefix for up to a day instead of its default ~5-10min
+    window. This is only documented for the GPT-5.1/5.4/5.5 model family --
+    it is **not confirmed to work on `gpt-5-mini`**. If the API rejects it,
+    `openai_analysis.py` catches that specific failure once, disables it for
+    the rest of the process, and prints a line starting `EXTENDED CACHE
+    RETENTION NOT SUPPORTED`. Every per-request cache log line also states
+    whether extended retention is currently active or off -- check the
+    terminal to know for certain rather than assuming it's working. Set to
+    an empty string to skip trying it at all.
 - Both models default to PNG output if you don't ask for anything else,
   which is lossless and noticeably bigger than a compressed photo-style
   poster needs to be -- `OPENAI_OUTPUT_FORMAT` (default `jpeg`) and
@@ -396,14 +407,21 @@ both of those patterns broke on serverless hosts, and both are gone now.
   permits for third-party apps, and getting `instagram_content_publish`
   approved for even a single official account takes Meta 2-4 weeks of App
   Review, which usually doesn't fit a college-fest timeline. The QR code
-  now points at `GET /share?img=<poster_url>` (see `app.py`) instead of the
-  raw poster image directly -- that page fetches the image and uses the
-  Web Share API's file-sharing support (`navigator.canShare({files:...})`)
-  to bring up the phone's native share sheet with the poster attached, so
-  Instagram appears as a share target one tap away, rather than the QR just
-  opening/downloading a photo. Falls back to opening the raw image if the
-  browser doesn't support sharing files (mainly a desktop-browser
-  limitation -- this page is meant to be opened from a phone via QR scan).
+  points at `GET /share?img=<poster_url>` (see `app.py`) instead of the raw
+  poster image directly. That page shows the poster with two explicit
+  buttons rather than one do-everything button, since a single "Share"
+  button silently failing on an unsupported browser left visitors with no
+  way to get their poster at all:
+  - **Download as JPEG** -- fetches the image, builds a `Blob`/object URL,
+    and triggers a save via a temporary `<a download>` link. Works on every
+    modern mobile/desktop browser regardless of Web Share API support.
+  - **Share to Instagram Story** -- uses the Web Share API's file-sharing
+    support (`navigator.canShare({files:...})` / `navigator.share`) to bring
+    up the phone's native share sheet with the poster attached, so Instagram
+    appears as a share target one tap away. On browsers without file-sharing
+    support (mainly desktop), it shows a plain-text instruction to use the
+    Download button instead and upload manually, rather than silently doing
+    nothing.
 - **Found and fixed in passing:** `storage.py` was importing
   `from testsupa import create_client` instead of `from supabase import
   create_client`. `testsupa.py` is a standalone script for manually testing

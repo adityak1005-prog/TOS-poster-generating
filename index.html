@@ -217,15 +217,17 @@
   </div>
 
   <!-- ============ REVEAL ============ -->
-  <div class="screen card" id="screen-reveal" style="position: relative;">
-    <div id="timeTakenBadge" style="position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,.55); color: var(--text-dim); font-size: .7rem; padding: .25rem .55rem; border-radius: 999px; letter-spacing: .02em; display: none;"></div>
+  <div class="screen card" id="screen-reveal">
     <img id="resultImage" alt="Your poster">
     <div class="catchphrase" id="catchphrase"></div>
     <div class="reasoning-box" id="reasoningBox"></div>
     <div class="traits-line" id="traitsLine"></div>
     <div class="qr-row">
       <img id="qrImage" alt="QR code">
-      <p>Scan to save your poster to your phone.</p>
+      <div>
+        <p>Scan to download the poster or share it to your Instagram Story.</p>
+        <p id="timeTakenBadge" style="display:none; color: var(--text-dim); font-size: .7rem; margin-top: .3rem;"></p>
+      </div>
     </div>
 
     <div class="ig-share-box">
@@ -544,7 +546,7 @@
     const badge = document.getElementById("timeTakenBadge");
     const totalSecs = data.timings && data.timings.total;
     if (totalSecs) {
-      badge.innerText = `${totalSecs}s`;
+      badge.innerText = `Generated in ${totalSecs}s`;
       badge.style.display = "block";
     } else {
       badge.style.display = "none";

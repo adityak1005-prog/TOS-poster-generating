@@ -107,33 +107,93 @@ _SHARE_PAGE_TEMPLATE = """<!DOCTYPE html>
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     text-align: center;
   }}
-  img {{ max-width: 100%; max-height: 65vh; border-radius: 14px; }}
+  img {{ max-width: 100%; max-height: 60vh; border-radius: 14px; }}
+  .btn-row {{ display: flex; flex-direction: column; gap: .7rem; width: 100%; max-width: 22em; }}
   button {{
     font: inherit; cursor: pointer; border: none; border-radius: 14px;
     padding: 1rem 1.5rem; font-size: 1.05rem; font-weight: 600; color: white;
-    background: linear-gradient(135deg, #8b5cf6, #ec4899);
+    width: 100%;
   }}
+  #downloadBtn {{ background: #26263a; }}
+  #shareBtn {{ background: linear-gradient(135deg, #8b5cf6, #ec4899); }}
+  button:disabled {{ opacity: .6; cursor: default; }}
   p {{ color: #a3a3b0; font-size: .85rem; max-width: 32em; margin: 0; }}
+  #status {{ min-height: 1.1em; }}
 </style>
 </head><body>
   <img id="poster" src="{img_url}" alt="Your AI Movie Booth poster">
-  <button id="shareBtn">Share to Instagram</button>
-  <p>Tap Share, then pick Instagram (Story or Feed). Tag <b>{handle}</b> so we can see it!</p>
+  <div class="btn-row">
+    <button id="downloadBtn">Download as JPEG</button>
+    <button id="shareBtn">Share to Instagram Story</button>
+  </div>
+  <p id="status">Tag <b>{handle}</b> in your story so we can see it!</p>
 <script>
   const IMG_URL = {img_url_json};
-  document.getElementById("shareBtn").addEventListener("click", async () => {{
+  const statusEl = document.getElementById("status");
+  const defaultStatus = statusEl.innerHTML;
+
+  async function fetchPosterBlob() {{
+    const resp = await fetch(IMG_URL);
+    if (!resp.ok) throw new Error("Could not fetch the poster image.");
+    return await resp.blob();
+  }}
+
+  // ---- Download: always works, even on browsers with no Web Share API ----
+  document.getElementById("downloadBtn").addEventListener("click", async () => {{
+    const btn = document.getElementById("downloadBtn");
+    btn.disabled = true;
+    statusEl.innerText = "Preparing download...";
     try {{
-      const resp = await fetch(IMG_URL);
-      const blob = await resp.blob();
+      const blob = await fetchPosterBlob();
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = objectUrl;
+      a.download = "movie-booth-poster.jpg";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      // Give the browser a moment to start the download before revoking.
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 4000);
+      statusEl.innerHTML = "Saved! Check your downloads/photos.";
+    }} catch (e) {{
+      // Last-resort fallback: open the raw image so the visitor can
+      // long-press -> Save Image manually.
+      statusEl.innerText = "Couldn't auto-download -- opening the image, long-press to save.";
+      window.open(IMG_URL, "_blank");
+    }} finally {{
+      btn.disabled = false;
+    }}
+  }});
+
+  // ---- Share: Web Share API with a file, so Instagram shows up as a
+  // native share target on supporting browsers (mainly Android + recent
+  // iOS Safari). Desktop browsers mostly don't support file sharing at
+  // all, so this degrades to a clear instruction instead of silently
+  // doing nothing. ----
+  document.getElementById("shareBtn").addEventListener("click", async () => {{
+    const btn = document.getElementById("shareBtn");
+    btn.disabled = true;
+    statusEl.innerText = "Opening share sheet...";
+    try {{
+      const blob = await fetchPosterBlob();
       const file = new File([blob], "movie-booth-poster.jpg", {{ type: blob.type || "image/jpeg" }});
       if (navigator.canShare && navigator.canShare({{ files: [file] }})) {{
         await navigator.share({{ files: [file], title: "My AI Movie Booth poster" }});
-        return;
+        statusEl.innerHTML = defaultStatus;
+      }} else {{
+        statusEl.innerText = "Sharing isn't supported on this browser -- tap \\"Download as JPEG\\" instead, then upload it to your Instagram Story manually.";
       }}
-    }} catch (e) {{ /* fall through to the plain-open fallback below */ }}
-    // Browser doesn't support file sharing (common on desktop) -- just open
-    // the image so the visitor can long-press/save and share manually.
-    window.location.href = IMG_URL;
+    }} catch (e) {{
+      // AbortError just means the visitor closed the native share sheet --
+      // not a real failure, so don't show an error for that case.
+      if (e && e.name === "AbortError") {{
+        statusEl.innerHTML = defaultStatus;
+      }} else {{
+        statusEl.innerText = "Sharing isn't supported on this browser -- tap \\"Download as JPEG\\" instead, then upload it to your Instagram Story manually.";
+      }}
+    }} finally {{
+      btn.disabled = false;
+    }}
   }});
 </script>
 </body></html>"""

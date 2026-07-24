@@ -17,6 +17,13 @@ CHARACTER_REF_DIR=static/characters
 # images don't dominate request latency. Leave at 400 unless matching
 # quality suffers.
 OPENAI_REFERENCE_IMAGE_MAX_DIM=400
+# Attempts to extend OpenAI's automatic cache retention from its default
+# ~5-10min window to 24h. NOT confirmed supported on gpt-5-mini -- if the
+# API rejects it, openai_analysis.py disables it automatically after the
+# first failure and logs a line starting "EXTENDED CACHE RETENTION NOT
+# SUPPORTED" so you can check the terminal to see whether it's actually in
+# effect. Set to empty to skip trying it at all.
+OPENAI_EXTENDED_CACHE_RETENTION=24h
 
 # Stage 3 (poster generation via images.edit).
 OPENAI_IMAGE_MODEL=gpt-image-2

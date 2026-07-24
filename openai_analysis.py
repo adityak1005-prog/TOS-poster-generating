@@ -65,6 +65,18 @@ ANALYSIS_MAX_DIM = int(os.environ.get("OPENAI_INPUT_MAX_DIM", "1280"))
 # to be recognizable for visual grounding, so downscale hard.
 REFERENCE_IMAGE_MAX_DIM = int(os.environ.get("OPENAI_REFERENCE_IMAGE_MAX_DIM", "400"))
 
+# OpenAI's automatic cache normally evicts a prefix after ~5-10min idle and
+# guarantees eviction within 1hr regardless. This opt-in flag asks OpenAI to
+# hold onto it for up to 24hrs instead -- documented for the GPT-5.1/5.4/5.5
+# family, NOT confirmed for plain gpt-5-mini. Set to "" to disable trying it
+# outright. If the API rejects it, _extended_retention_supported below flips
+# to False after the first failure and every request after that stops
+# sending it -- watch the terminal for a line starting
+# "[openai_analysis] EXTENDED CACHE RETENTION NOT SUPPORTED" to know for
+# certain whether this is actually doing anything on your account/model.
+EXTENDED_CACHE_RETENTION = os.environ.get("OPENAI_EXTENDED_CACHE_RETENTION", "24h")
+_extended_retention_supported = True
+
 _client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
 # Fixed roster the model must choose from. Each entry carries a longer,
@@ -591,7 +603,12 @@ the same 4-5 famous defaults across many different people.
 Respond with JSON matching the required schema only."""
 
 
-def _call_openai(image_bytes: bytes, mime_type: str, include_reference_images: bool = True):
+def _call_openai(
+    image_bytes: bytes,
+    mime_type: str,
+    include_reference_images: bool = True,
+    try_extended_retention: bool = True,
+):
     # Downscale before sending -- previously this call got the full-res
     # original while only the poster-edit call downscaled; a large phone
     # photo was effectively being uploaded twice at full size for no
@@ -617,7 +634,7 @@ def _call_openai(image_bytes: bytes, mime_type: str, include_reference_images: b
         },
     ]
 
-    return _client.chat.completions.create(
+    kwargs = dict(
         model=MODEL_ID,
         messages=[{"role": "user", "content": content}],
         # Stable key (not per-request) so OpenAI is more likely to route
@@ -641,6 +658,12 @@ def _call_openai(image_bytes: bytes, mime_type: str, include_reference_images: b
         reasoning_effort=REASONING_EFFORT,
     )
 
+    global _extended_retention_supported
+    if try_extended_retention and _extended_retention_supported and EXTENDED_CACHE_RETENTION:
+        kwargs["prompt_cache_retention"] = EXTENDED_CACHE_RETENTION
+
+    return _client.chat.completions.create(**kwargs)
+
 
 def _log_cache_usage(response) -> None:
     """Debug: surface how much of this request's prompt was served from
@@ -649,15 +672,21 @@ def _log_cache_usage(response) -> None:
     request after a cold start, prefix changed, or the >~10min idle window
     expired), any nonzero value means the roster prefix (instructions +
     reference images) was reused instead of reprocessed."""
+    retention_status = (
+        f"extended retention: {EXTENDED_CACHE_RETENTION}"
+        if _extended_retention_supported and EXTENDED_CACHE_RETENTION
+        else "extended retention: OFF (not supported or disabled -- using OpenAI's default ~5-10min window)"
+    )
     try:
         usage = response.usage
         cached = usage.prompt_tokens_details.cached_tokens
         total_prompt = usage.prompt_tokens
         print(f"[openai_analysis] prompt cache: {cached}/{total_prompt} "
               f"prompt tokens served from cache"
-              + (" (cache HIT)" if cached > 0 else " (cache MISS)"))
+              + (" (cache HIT)" if cached > 0 else " (cache MISS)")
+              + f" | {retention_status}")
     except Exception as e:
-        print(f"[openai_analysis] could not read cache usage info: {e}")
+        print(f"[openai_analysis] could not read cache usage info: {e} | {retention_status}")
 
 
 def analyze_and_match(image_bytes: bytes, mime_type: str = "image/jpeg") -> dict:
@@ -676,18 +705,44 @@ def analyze_and_match(image_bytes: bytes, mime_type: str = "image/jpeg") -> dict
     text-only roster (no reference images) instead of failing the capture
     outright. Both the failure and the fallback are printed so they're
     visible in the terminal in real time, not just swallowed.
+
+    Extended (24h) cache retention is attempted first if enabled; if this
+    specific request is what's rejected, we've almost certainly found that
+    the account/model doesn't support prompt_cache_retention. That's logged
+    loudly (search terminal for "EXTENDED CACHE RETENTION NOT SUPPORTED")
+    and the global flag flips off, so this exact failure only happens once
+    per process -- every later request goes straight back to OpenAI's
+    default caching window instead of paying for a doomed retry each time.
     """
+    global _extended_retention_supported
     try:
         response = _call_openai(image_bytes, mime_type)
     except Exception as e:
-        print(f"[openai_analysis] full request (with reference images) failed "
-              f"({e}); retrying once with text-only roster, no images")
-        try:
-            response = _call_openai(image_bytes, mime_type, include_reference_images=False)
-        except Exception as e2:
-            print(f"[openai_analysis] text-only retry also failed ({e2}); "
-                  f"giving up on this capture")
-            raise
+        if _extended_retention_supported and "prompt_cache_retention" in str(e).lower():
+            _extended_retention_supported = False
+            print(f"[openai_analysis] EXTENDED CACHE RETENTION NOT SUPPORTED on "
+                  f"{MODEL_ID} ({e}); disabling it for the rest of this process and "
+                  f"falling back to OpenAI's default ~5-10min cache window")
+            try:
+                response = _call_openai(image_bytes, mime_type)
+            except Exception as e2:
+                print(f"[openai_analysis] retry without extended retention also "
+                      f"failed ({e2}); retrying once with text-only roster, no images")
+                try:
+                    response = _call_openai(image_bytes, mime_type, include_reference_images=False)
+                except Exception as e3:
+                    print(f"[openai_analysis] text-only retry also failed ({e3}); "
+                          f"giving up on this capture")
+                    raise
+        else:
+            print(f"[openai_analysis] full request (with reference images) failed "
+                  f"({e}); retrying once with text-only roster, no images")
+            try:
+                response = _call_openai(image_bytes, mime_type, include_reference_images=False)
+            except Exception as e2:
+                print(f"[openai_analysis] text-only retry also failed ({e2}); "
+                      f"giving up on this capture")
+                raise
 
     _log_cache_usage(response)
 
