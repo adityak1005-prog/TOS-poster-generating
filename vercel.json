@@ -1,1 +1,1 @@
-{ "functions": { "app.py": { "runtime": "python3.12", "maxDuration": 120 } } }
+{ "functions": { "app.py": { "maxDuration": 120 } } }
