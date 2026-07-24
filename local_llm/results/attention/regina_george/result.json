@@ -1,0 +1,105 @@
+{
+  "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/regina_george.jpg",
+  "true_character": "regina_george",
+  "predicted_character": "Gwen Stacy",
+  "raw_text": "{\n  \"character\": \"Gwen Stacy\",\n  \"reasoning\": \"You have a one-sided smirk and a tilted head, matching Gwen Stacy's signature playful, mischievous expression.\",\n  \"caption\": \"Your smirk and tilt? Pure Gwen Stacy energy.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; dress her in a pink-and-white hooded Spider suit with a black spider emblem, hood down to show blonde-and-pink-streaked hair, set against comic-book graffiti backdrop, cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"red\",\n    \"pose_description\": \"looking off to the side\",\n    \"glasses\": false,\n    \"standout_trait\": \"expression/pose\"\n  }\n}",
+  "face_box": [
+    139,
+    115,
+    201,
+    201
+  ],
+  "layer_agg": "all",
+  "maps": {
+    "aggregate": {
+      "file": "aggregate.png",
+      "n_steps": 169,
+      "sink_diagnostics": {
+        "top1_fraction": 0.7765,
+        "top3_fraction": 0.7903
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.6909,
+        "area_fraction": 0.2579,
+        "enrichment": 2.679
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.352,
+        "area_fraction": 0.2579,
+        "enrichment": 1.365
+      }
+    },
+    "aggregate_last_layer_only": {
+      "file": "aggregate_last_layer_only.png",
+      "n_steps": 169,
+      "sink_diagnostics": {
+        "top1_fraction": 0.0254,
+        "top3_fraction": 0.0683
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.2268,
+        "area_fraction": 0.2579,
+        "enrichment": 0.88
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.2282,
+        "area_fraction": 0.2579,
+        "enrichment": 0.885
+      }
+    },
+    "character": {
+      "file": "character.png",
+      "n_steps": 3,
+      "sink_diagnostics": {
+        "top1_fraction": 0.5654,
+        "top3_fraction": 0.5876
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.6117,
+        "area_fraction": 0.2579,
+        "enrichment": 2.372
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.3914,
+        "area_fraction": 0.2579,
+        "enrichment": 1.518
+      }
+    },
+    "standout_trait": {
+      "file": "standout_trait.png",
+      "n_steps": 3,
+      "sink_diagnostics": {
+        "top1_fraction": 0.84,
+        "top3_fraction": 0.855
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.738,
+        "area_fraction": 0.2579,
+        "enrichment": 2.862
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.4869,
+        "area_fraction": 0.2579,
+        "enrichment": 1.888
+      }
+    },
+    "reasoning": {
+      "file": "reasoning.png",
+      "n_steps": 23,
+      "sink_diagnostics": {
+        "top1_fraction": 0.7193,
+        "top3_fraction": 0.7461
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.7239,
+        "area_fraction": 0.2579,
+        "enrichment": 2.807
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.5578,
+        "area_fraction": 0.2579,
+        "enrichment": 2.163
+      }
+    }
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/iron_man.jpg",
+  "true_character": "iron_man",
+  "predicted_character": "Iron Man",
+  "raw_text": "{\n  \"character\": \"Iron Man\",\n  \"reasoning\": \"You're wearing a sleek red-and-gold suit with a glowing arc reactor, matching Iron Man's iconic armor design.\",\n  \"caption\": \"You're not just dressed up \u2014 you're armored to the max.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your outfit with Iron Man's full red-and-gold powered armor featuring a glowing blue arc reactor at the chest, repulsor palms raised, set against a bright high-tech backdrop with lab light and explosion glow, cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"red\",\n    \"pose_description\": \"neutral standing pose\",\n    \"glasses\": false,\n    \"standout_trait\": \"clothing color\"\n  }\n}",
+  "face_box": null,
+  "layer_agg": "all",
+  "maps": {
+    "aggregate": {
+      "file": "aggregate.png",
+      "n_steps": 178,
+      "sink_diagnostics": {
+        "top1_fraction": 0.0284,
+        "top3_fraction": 0.0699
+      },
+      "face_stats_raw": null,
+      "face_stats_sink_robust": null
+    },
+    "aggregate_last_layer_only": {
+      "file": "aggregate_last_layer_only.png",
+      "n_steps": 178,
+      "sink_diagnostics": {
+        "top1_fraction": 0.0455,
+        "top3_fraction": 0.1053
+      },
+      "face_stats_raw": null,
+      "face_stats_sink_robust": null
+    },
+    "character": {
+      "file": "character.png",
+      "n_steps": 2,
+      "sink_diagnostics": {
+        "top1_fraction": 0.0676,
+        "top3_fraction": 0.1496
+      },
+      "face_stats_raw": null,
+      "face_stats_sink_robust": null
+    },
+    "standout_trait": {
+      "file": "standout_trait.png",
+      "n_steps": 3,
+      "sink_diagnostics": {
+        "top1_fraction": 0.0395,
+        "top3_fraction": 0.106
+      },
+      "face_stats_raw": null,
+      "face_stats_sink_robust": null
+    },
+    "reasoning": {
+      "file": "reasoning.png",
+      "n_steps": 24,
+      "sink_diagnostics": {
+        "top1_fraction": 0.027,
+        "top3_fraction": 0.0666
+      },
+      "face_stats_raw": null,
+      "face_stats_sink_robust": null
+    }
+  }
+}

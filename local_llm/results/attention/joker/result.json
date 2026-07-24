@@ -1,0 +1,105 @@
+{
+  "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/joker.jpg",
+  "true_character": "joker",
+  "predicted_character": "Joker",
+  "raw_text": "{\n  \"character\": \"Joker\",\n  \"reasoning\": \"You're the Joker \u2014 that manic grin, smeared smile, and wild-eyed chaos are unmistakable.\",\n  \"caption\": \"You\u2019re chaos incarnate, smiling like a broken clown.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your outfit with the Joker\u2019s iconic rumpled purple tailcoat over a green vest, chalk-white face paint, smeared red smile, and chaotic neon-lit city backdrop, rendered in cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"purple\",\n    \"pose_description\": \"standing with head down\",\n    \"glasses\": false,\n    \"standout_trait\": \"vibe/energy\"\n  }\n}",
+  "face_box": [
+    130,
+    66,
+    93,
+    93
+  ],
+  "layer_agg": "all",
+  "maps": {
+    "aggregate": {
+      "file": "aggregate.png",
+      "n_steps": 169,
+      "sink_diagnostics": {
+        "top1_fraction": 0.5529,
+        "top3_fraction": 0.584
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.0712,
+        "area_fraction": 0.0834,
+        "enrichment": 0.854
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.1565,
+        "area_fraction": 0.0834,
+        "enrichment": 1.877
+      }
+    },
+    "aggregate_last_layer_only": {
+      "file": "aggregate_last_layer_only.png",
+      "n_steps": 169,
+      "sink_diagnostics": {
+        "top1_fraction": 0.0524,
+        "top3_fraction": 0.1434
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.0878,
+        "area_fraction": 0.0834,
+        "enrichment": 1.053
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.0866,
+        "area_fraction": 0.0834,
+        "enrichment": 1.039
+      }
+    },
+    "character": {
+      "file": "character.png",
+      "n_steps": 2,
+      "sink_diagnostics": {
+        "top1_fraction": 0.2735,
+        "top3_fraction": 0.4352
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.0669,
+        "area_fraction": 0.0834,
+        "enrichment": 0.803
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.0909,
+        "area_fraction": 0.0834,
+        "enrichment": 1.091
+      }
+    },
+    "standout_trait": {
+      "file": "standout_trait.png",
+      "n_steps": 4,
+      "sink_diagnostics": {
+        "top1_fraction": 0.8202,
+        "top3_fraction": 0.8387
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.0364,
+        "area_fraction": 0.0834,
+        "enrichment": 0.436
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.1931,
+        "area_fraction": 0.0834,
+        "enrichment": 2.317
+      }
+    },
+    "reasoning": {
+      "file": "reasoning.png",
+      "n_steps": 21,
+      "sink_diagnostics": {
+        "top1_fraction": 0.4288,
+        "top3_fraction": 0.4875
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.1904,
+        "area_fraction": 0.0834,
+        "enrichment": 2.284
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.3145,
+        "area_fraction": 0.0834,
+        "enrichment": 3.774
+      }
+    }
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/shinchan.webp",
+  "true_character": "shinchan",
+  "predicted_character": "Shinchan",
+  "raw_text": "{\n  \"character\": \"Shinchan\",\n  \"reasoning\": \"You have thick, low-set eyebrows drawn down close to your eyes, paired with a wide, open-mouthed laugh \u2014 pure Shinchan goofiness, no matter what you're wearing.\",\n  \"caption\": \"Your laugh is so loud, it\u2019s practically cartoonish.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your outfit with Shinchan\u2019s spiky messy black hair, simple bright shirt and shorts, and set against a bold flat colorful cartoon-style backdrop with a vibrant, exaggeratedly cheerful energy, rendered in cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"red\",\n    \"pose_description\": \"arms crossed\",\n    \"glasses\": false,\n    \"standout_trait\": \"vibe/energy\"\n  }\n}",
+  "face_box": null,
+  "layer_agg": "all",
+  "maps": {
+    "aggregate": {
+      "file": "aggregate.png",
+      "n_steps": 187,
+      "sink_diagnostics": {
+        "top1_fraction": 0.6508,
+        "top3_fraction": 0.7515
+      },
+      "face_stats_raw": null,
+      "face_stats_sink_robust": null
+    },
+    "aggregate_last_layer_only": {
+      "file": "aggregate_last_layer_only.png",
+      "n_steps": 187,
+      "sink_diagnostics": {
+        "top1_fraction": 0.0588,
+        "top3_fraction": 0.1383
+      },
+      "face_stats_raw": null,
+      "face_stats_sink_robust": null
+    },
+    "character": {
+      "file": "character.png",
+      "n_steps": 3,
+      "sink_diagnostics": {
+        "top1_fraction": 0.4343,
+        "top3_fraction": 0.5296
+      },
+      "face_stats_raw": null,
+      "face_stats_sink_robust": null
+    },
+    "standout_trait": {
+      "file": "standout_trait.png",
+      "n_steps": 4,
+      "sink_diagnostics": {
+        "top1_fraction": 0.8075,
+        "top3_fraction": 0.9256
+      },
+      "face_stats_raw": null,
+      "face_stats_sink_robust": null
+    },
+    "reasoning": {
+      "file": "reasoning.png",
+      "n_steps": 37,
+      "sink_diagnostics": {
+        "top1_fraction": 0.6513,
+        "top3_fraction": 0.7562
+      },
+      "face_stats_raw": null,
+      "face_stats_sink_robust": null
+    }
+  }
+}

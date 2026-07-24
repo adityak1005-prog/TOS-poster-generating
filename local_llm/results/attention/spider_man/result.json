@@ -1,0 +1,60 @@
+{
+  "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/spider_man.jpg",
+  "true_character": "spider_man",
+  "predicted_character": "Spider-Man",
+  "raw_text": "{\n  \"character\": \"Spider-Man\",\n  \"reasoning\": \"You have a youthful, boyish face with a lopsided grin and mischievous eyes \u2014 pure Spider-Man energy, no costume needed.\",\n  \"caption\": \"You\u2019re the web-slinger with a grin that\u2019s 100% on point.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your outfit with the iconic red-and-blue spandex suit featuring black web patterning, large white reflective eye lenses, and city skyline backdrop with web-lines, rendered in cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"red\",\n    \"pose_description\": \"neutral standing pose\",\n    \"glasses\": false,\n    \"standout_trait\": \"vibe/energy\"\n  }\n}",
+  "face_box": null,
+  "layer_agg": "all",
+  "maps": {
+    "aggregate": {
+      "file": "aggregate.png",
+      "n_steps": 179,
+      "sink_diagnostics": {
+        "top1_fraction": 0.6171,
+        "top3_fraction": 0.6646
+      },
+      "face_stats_raw": null,
+      "face_stats_sink_robust": null
+    },
+    "aggregate_last_layer_only": {
+      "file": "aggregate_last_layer_only.png",
+      "n_steps": 179,
+      "sink_diagnostics": {
+        "top1_fraction": 0.0287,
+        "top3_fraction": 0.0754
+      },
+      "face_stats_raw": null,
+      "face_stats_sink_robust": null
+    },
+    "character": {
+      "file": "character.png",
+      "n_steps": 2,
+      "sink_diagnostics": {
+        "top1_fraction": 0.286,
+        "top3_fraction": 0.3645
+      },
+      "face_stats_raw": null,
+      "face_stats_sink_robust": null
+    },
+    "standout_trait": {
+      "file": "standout_trait.png",
+      "n_steps": 4,
+      "sink_diagnostics": {
+        "top1_fraction": 0.8402,
+        "top3_fraction": 0.9021
+      },
+      "face_stats_raw": null,
+      "face_stats_sink_robust": null
+    },
+    "reasoning": {
+      "file": "reasoning.png",
+      "n_steps": 29,
+      "sink_diagnostics": {
+        "top1_fraction": 0.6121,
+        "top3_fraction": 0.6613
+      },
+      "face_stats_raw": null,
+      "face_stats_sink_robust": null
+    }
+  }
+}

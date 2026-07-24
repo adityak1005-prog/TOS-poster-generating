@@ -1,0 +1,105 @@
+{
+  "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/jon_snow.jpg",
+  "true_character": "jon_snow",
+  "predicted_character": "Jon Snow",
+  "raw_text": "{\n  \"character\": \"Jon Snow\",\n  \"reasoning\": \"You have a thick beard and weary expression, matching Jon Snow's iconic look.\",\n  \"caption\": \"Snowfall and steel: you're the North's last trueborn.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your outfit with dark tousled shoulder-length hair, thick black furs and leather armor, set against a snow-covered northern landscape backdrop, rendered in cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"black\",\n    \"pose_description\": \"neutral standing pose\",\n    \"glasses\": false,\n    \"standout_trait\": \"facial hair\"\n  }\n}",
+  "face_box": [
+    50,
+    43,
+    65,
+    65
+  ],
+  "layer_agg": "all",
+  "maps": {
+    "aggregate": {
+      "file": "aggregate.png",
+      "n_steps": 156,
+      "sink_diagnostics": {
+        "top1_fraction": 0.0435,
+        "top3_fraction": 0.1032
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.1797,
+        "area_fraction": 0.1646,
+        "enrichment": 1.091
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.181,
+        "area_fraction": 0.1646,
+        "enrichment": 1.099
+      }
+    },
+    "aggregate_last_layer_only": {
+      "file": "aggregate_last_layer_only.png",
+      "n_steps": 156,
+      "sink_diagnostics": {
+        "top1_fraction": 0.0919,
+        "top3_fraction": 0.225
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.1725,
+        "area_fraction": 0.1646,
+        "enrichment": 1.048
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.1745,
+        "area_fraction": 0.1646,
+        "enrichment": 1.06
+      }
+    },
+    "character": {
+      "file": "character.png",
+      "n_steps": 2,
+      "sink_diagnostics": {
+        "top1_fraction": 0.101,
+        "top3_fraction": 0.237
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.3725,
+        "area_fraction": 0.1646,
+        "enrichment": 2.263
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.3679,
+        "area_fraction": 0.1646,
+        "enrichment": 2.235
+      }
+    },
+    "standout_trait": {
+      "file": "standout_trait.png",
+      "n_steps": 3,
+      "sink_diagnostics": {
+        "top1_fraction": 0.1851,
+        "top3_fraction": 0.3204
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.4326,
+        "area_fraction": 0.1646,
+        "enrichment": 2.628
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.3935,
+        "area_fraction": 0.1646,
+        "enrichment": 2.39
+      }
+    },
+    "reasoning": {
+      "file": "reasoning.png",
+      "n_steps": 16,
+      "sink_diagnostics": {
+        "top1_fraction": 0.0978,
+        "top3_fraction": 0.2284
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.3609,
+        "area_fraction": 0.1646,
+        "enrichment": 2.192
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.3507,
+        "area_fraction": 0.1646,
+        "enrichment": 2.13
+      }
+    }
+  }
+}

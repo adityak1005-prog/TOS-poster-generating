@@ -1,0 +1,105 @@
+{
+  "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/sheldon_cooper.webp",
+  "true_character": "sheldon_cooper",
+  "predicted_character": "Sheldon Cooper",
+  "raw_text": "{\n  \"character\": \"Sheldon Cooper\",\n  \"reasoning\": \"You have a clean-shaven face with a thin, prim closed-mouth smirk where one corner is slightly higher \u2014 a classic Sheldon expression.\",\n  \"caption\": \"Your smirk\u2019s asymmetry? Pure Sheldon energy, no doubt.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your red t-shirt with a side-swept hair, layered graphic tee under a collared shirt, and cinematic movie-poster quality, set against a cluttered apartment with an equation-covered whiteboard backdrop.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"red\",\n    \"pose_description\": \"neutral standing pose\",\n    \"glasses\": false,\n    \"standout_trait\": \"facial expression\"\n  }\n}",
+  "face_box": [
+    58,
+    35,
+    124,
+    124
+  ],
+  "layer_agg": "all",
+  "maps": {
+    "aggregate": {
+      "file": "aggregate.png",
+      "n_steps": 174,
+      "sink_diagnostics": {
+        "top1_fraction": 0.7997,
+        "top3_fraction": 0.8169
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.4985,
+        "area_fraction": 0.3251,
+        "enrichment": 1.533
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.4294,
+        "area_fraction": 0.3251,
+        "enrichment": 1.321
+      }
+    },
+    "aggregate_last_layer_only": {
+      "file": "aggregate_last_layer_only.png",
+      "n_steps": 174,
+      "sink_diagnostics": {
+        "top1_fraction": 0.0423,
+        "top3_fraction": 0.1107
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.3086,
+        "area_fraction": 0.3251,
+        "enrichment": 0.949
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.3071,
+        "area_fraction": 0.3251,
+        "enrichment": 0.945
+      }
+    },
+    "character": {
+      "file": "character.png",
+      "n_steps": 3,
+      "sink_diagnostics": {
+        "top1_fraction": 0.4185,
+        "top3_fraction": 0.4783
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.5734,
+        "area_fraction": 0.3251,
+        "enrichment": 1.764
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.5953,
+        "area_fraction": 0.3251,
+        "enrichment": 1.831
+      }
+    },
+    "standout_trait": {
+      "file": "standout_trait.png",
+      "n_steps": 3,
+      "sink_diagnostics": {
+        "top1_fraction": 0.8687,
+        "top3_fraction": 0.8989
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.5405,
+        "area_fraction": 0.3251,
+        "enrichment": 1.662
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.5713,
+        "area_fraction": 0.3251,
+        "enrichment": 1.757
+      }
+    },
+    "reasoning": {
+      "file": "reasoning.png",
+      "n_steps": 27,
+      "sink_diagnostics": {
+        "top1_fraction": 0.7833,
+        "top3_fraction": 0.8354
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.5589,
+        "area_fraction": 0.3251,
+        "enrichment": 1.719
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.6139,
+        "area_fraction": 0.3251,
+        "enrichment": 1.888
+      }
+    }
+  }
+}

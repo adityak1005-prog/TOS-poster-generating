@@ -1,0 +1,105 @@
+{
+  "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/thomas_shelby.jpg",
+  "true_character": "thomas_shelby",
+  "predicted_character": "Thomas Shelby",
+  "raw_text": "{\n  \"character\": \"Thomas Shelby\",\n  \"reasoning\": \"You have a lean, sharply defined face with high cheekbones and a calm, composed expression \u2014 exactly like Thomas Shelby's still, controlled demeanor.\",\n  \"caption\": \"You're the quiet storm in a 1920s suit.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your current outfit with a fitted 1920s tweed three-piece suit, flat cap pulled low, slicked-back undercut hair, and muted sepia Birmingham streets backdrop, rendered in cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"black\",\n    \"pose_description\": \"neutral standing pose\",\n    \"glasses\": false,\n    \"standout_trait\": \"facial features and expression\"\n  }\n}",
+  "face_box": [
+    58,
+    32,
+    50,
+    50
+  ],
+  "layer_agg": "all",
+  "maps": {
+    "aggregate": {
+      "file": "aggregate.png",
+      "n_steps": 182,
+      "sink_diagnostics": {
+        "top1_fraction": 0.0466,
+        "top3_fraction": 0.1135
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.1168,
+        "area_fraction": 0.0974,
+        "enrichment": 1.2
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.1172,
+        "area_fraction": 0.0974,
+        "enrichment": 1.203
+      }
+    },
+    "aggregate_last_layer_only": {
+      "file": "aggregate_last_layer_only.png",
+      "n_steps": 182,
+      "sink_diagnostics": {
+        "top1_fraction": 0.0796,
+        "top3_fraction": 0.1796
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.0914,
+        "area_fraction": 0.0974,
+        "enrichment": 0.939
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.0931,
+        "area_fraction": 0.0974,
+        "enrichment": 0.956
+      }
+    },
+    "character": {
+      "file": "character.png",
+      "n_steps": 2,
+      "sink_diagnostics": {
+        "top1_fraction": 0.0965,
+        "top3_fraction": 0.25
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.173,
+        "area_fraction": 0.0974,
+        "enrichment": 1.777
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.1726,
+        "area_fraction": 0.0974,
+        "enrichment": 1.772
+      }
+    },
+    "standout_trait": {
+      "file": "standout_trait.png",
+      "n_steps": 5,
+      "sink_diagnostics": {
+        "top1_fraction": 0.1171,
+        "top3_fraction": 0.2371
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.2245,
+        "area_fraction": 0.0974,
+        "enrichment": 2.306
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.1969,
+        "area_fraction": 0.0974,
+        "enrichment": 2.022
+      }
+    },
+    "reasoning": {
+      "file": "reasoning.png",
+      "n_steps": 29,
+      "sink_diagnostics": {
+        "top1_fraction": 0.1388,
+        "top3_fraction": 0.3138
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.2685,
+        "area_fraction": 0.0974,
+        "enrichment": 2.757
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.2518,
+        "area_fraction": 0.0974,
+        "enrichment": 2.587
+      }
+    }
+  }
+}

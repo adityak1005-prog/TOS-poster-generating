@@ -1,0 +1,105 @@
+{
+  "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/batman.jpg",
+  "true_character": "batman",
+  "predicted_character": "Batman",
+  "raw_text": "{\n  \"character\": \"Batman\",\n  \"reasoning\": \"You have a clean-shaven, serious face with a flat, unsmiling mouth \u2014 exactly like Batman's stoic, neutral expression.\",\n  \"caption\": \"You're the dark knight in a black suit, no beard, no smirk.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your outfit with Batman's matte-black armored suit, flowing cape, cowl with pointed ears, and gold utility belt, set against Gotham-noir lighting with deep shadows and cold blue-grey highlights, cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"black\",\n    \"pose_description\": \"neutral standing pose\",\n    \"glasses\": false,\n    \"standout_trait\": \"facial expression\"\n  }\n}",
+  "face_box": [
+    593,
+    458,
+    146,
+    146
+  ],
+  "layer_agg": "all",
+  "maps": {
+    "aggregate": {
+      "file": "aggregate.png",
+      "n_steps": 179,
+      "sink_diagnostics": {
+        "top1_fraction": 0.4611,
+        "top3_fraction": 0.6286
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.0167,
+        "area_fraction": 0.0215,
+        "enrichment": 0.776
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.0448,
+        "area_fraction": 0.0215,
+        "enrichment": 2.081
+      }
+    },
+    "aggregate_last_layer_only": {
+      "file": "aggregate_last_layer_only.png",
+      "n_steps": 179,
+      "sink_diagnostics": {
+        "top1_fraction": 0.017,
+        "top3_fraction": 0.0352
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.0326,
+        "area_fraction": 0.0215,
+        "enrichment": 1.515
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.0343,
+        "area_fraction": 0.0215,
+        "enrichment": 1.596
+      }
+    },
+    "character": {
+      "file": "character.png",
+      "n_steps": 1,
+      "sink_diagnostics": {
+        "top1_fraction": 0.2549,
+        "top3_fraction": 0.3556
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.0108,
+        "area_fraction": 0.0215,
+        "enrichment": 0.504
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.0177,
+        "area_fraction": 0.0215,
+        "enrichment": 0.824
+      }
+    },
+    "standout_trait": {
+      "file": "standout_trait.png",
+      "n_steps": 3,
+      "sink_diagnostics": {
+        "top1_fraction": 0.5821,
+        "top3_fraction": 0.7867
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.0078,
+        "area_fraction": 0.0215,
+        "enrichment": 0.36
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.0389,
+        "area_fraction": 0.0215,
+        "enrichment": 1.808
+      }
+    },
+    "reasoning": {
+      "file": "reasoning.png",
+      "n_steps": 28,
+      "sink_diagnostics": {
+        "top1_fraction": 0.45,
+        "top3_fraction": 0.6132
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.0106,
+        "area_fraction": 0.0215,
+        "enrichment": 0.492
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.0296,
+        "area_fraction": 0.0215,
+        "enrichment": 1.378
+      }
+    }
+  }
+}

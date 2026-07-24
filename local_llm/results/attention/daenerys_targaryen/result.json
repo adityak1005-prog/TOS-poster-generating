@@ -1,0 +1,105 @@
+{
+  "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/daenerys_targaryen.jpg",
+  "true_character": "daenerys_targaryen",
+  "predicted_character": "Daenerys Targaryen",
+  "raw_text": "{\n  \"character\": \"Daenerys Targaryen\",\n  \"reasoning\": \"You have softly rounded cheeks and a calm, regal expression with light blonde hair, matching Daenerys's iconic look.\",\n  \"caption\": \"Queen of the Storms, draped in silver and power.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; dress them in a long silver-platinum braided hair, flowing pale ivory or deep-blue gown, set against a sunbaked desert city or grand throne-hall backdrop, cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"black\",\n    \"pose_description\": \"neutral standing pose\",\n    \"glasses\": false,\n    \"standout_trait\": \"facial features\"\n  }\n}",
+  "face_box": [
+    134,
+    40,
+    110,
+    110
+  ],
+  "layer_agg": "all",
+  "maps": {
+    "aggregate": {
+      "file": "aggregate.png",
+      "n_steps": 173,
+      "sink_diagnostics": {
+        "top1_fraction": 0.5472,
+        "top3_fraction": 0.5765
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.1126,
+        "area_fraction": 0.1187,
+        "enrichment": 0.949
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.2399,
+        "area_fraction": 0.1187,
+        "enrichment": 2.021
+      }
+    },
+    "aggregate_last_layer_only": {
+      "file": "aggregate_last_layer_only.png",
+      "n_steps": 173,
+      "sink_diagnostics": {
+        "top1_fraction": 0.0291,
+        "top3_fraction": 0.0805
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.168,
+        "area_fraction": 0.1187,
+        "enrichment": 1.415
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.1689,
+        "area_fraction": 0.1187,
+        "enrichment": 1.423
+      }
+    },
+    "character": {
+      "file": "character.png",
+      "n_steps": 7,
+      "sink_diagnostics": {
+        "top1_fraction": 0.3279,
+        "top3_fraction": 0.3864
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.2137,
+        "area_fraction": 0.1187,
+        "enrichment": 1.8
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.3034,
+        "area_fraction": 0.1187,
+        "enrichment": 2.556
+      }
+    },
+    "standout_trait": {
+      "file": "standout_trait.png",
+      "n_steps": 3,
+      "sink_diagnostics": {
+        "top1_fraction": 0.7074,
+        "top3_fraction": 0.7426
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.1123,
+        "area_fraction": 0.1187,
+        "enrichment": 0.946
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.3632,
+        "area_fraction": 0.1187,
+        "enrichment": 3.06
+      }
+    },
+    "reasoning": {
+      "file": "reasoning.png",
+      "n_steps": 25,
+      "sink_diagnostics": {
+        "top1_fraction": 0.3741,
+        "top3_fraction": 0.4779
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.2726,
+        "area_fraction": 0.1187,
+        "enrichment": 2.297
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.4078,
+        "area_fraction": 0.1187,
+        "enrichment": 3.436
+      }
+    }
+  }
+}

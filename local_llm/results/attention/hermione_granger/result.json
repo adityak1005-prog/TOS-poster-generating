@@ -1,0 +1,105 @@
+{
+  "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/hermione_granger.jpg",
+  "true_character": "hermione_granger",
+  "predicted_character": "Hermione Granger",
+  "raw_text": "{\n  \"character\": \"Hermione Granger\",\n  \"reasoning\": \"You have furrowed brows and wide, alert eyes looking forward \u2014 a clear match for Hermione's intense, studious focus.\",\n  \"caption\": \"Brains on display, robes in place, and eyes locked on the textbook.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your current outfit with bushy brown hair, black Gryffindor robes with a maroon-and-gold tie, and set against a candlelit castle library backdrop, rendered in cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"black\",\n    \"pose_description\": \"pointing finger forward\",\n    \"glasses\": false,\n    \"standout_trait\": \"furrowed brows\"\n  }\n}",
+  "face_box": [
+    59,
+    4,
+    52,
+    52
+  ],
+  "layer_agg": "all",
+  "maps": {
+    "aggregate": {
+      "file": "aggregate.png",
+      "n_steps": 179,
+      "sink_diagnostics": {
+        "top1_fraction": 0.112,
+        "top3_fraction": 0.1841
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.0734,
+        "area_fraction": 0.0942,
+        "enrichment": 0.779
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.0773,
+        "area_fraction": 0.0942,
+        "enrichment": 0.821
+      }
+    },
+    "aggregate_last_layer_only": {
+      "file": "aggregate_last_layer_only.png",
+      "n_steps": 179,
+      "sink_diagnostics": {
+        "top1_fraction": 0.0599,
+        "top3_fraction": 0.1657
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.0594,
+        "area_fraction": 0.0942,
+        "enrichment": 0.631
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.0595,
+        "area_fraction": 0.0942,
+        "enrichment": 0.631
+      }
+    },
+    "character": {
+      "file": "character.png",
+      "n_steps": 5,
+      "sink_diagnostics": {
+        "top1_fraction": 0.0945,
+        "top3_fraction": 0.2418
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.1745,
+        "area_fraction": 0.0942,
+        "enrichment": 1.852
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.1743,
+        "area_fraction": 0.0942,
+        "enrichment": 1.85
+      }
+    },
+    "standout_trait": {
+      "file": "standout_trait.png",
+      "n_steps": 4,
+      "sink_diagnostics": {
+        "top1_fraction": 0.0881,
+        "top3_fraction": 0.2068
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.178,
+        "area_fraction": 0.0942,
+        "enrichment": 1.889
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.1712,
+        "area_fraction": 0.0942,
+        "enrichment": 1.817
+      }
+    },
+    "reasoning": {
+      "file": "reasoning.png",
+      "n_steps": 26,
+      "sink_diagnostics": {
+        "top1_fraction": 0.1196,
+        "top3_fraction": 0.2233
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.1526,
+        "area_fraction": 0.0942,
+        "enrichment": 1.619
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.1342,
+        "area_fraction": 0.0942,
+        "enrichment": 1.425
+      }
+    }
+  }
+}

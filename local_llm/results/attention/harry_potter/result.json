@@ -1,0 +1,105 @@
+{
+  "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/harry_potter.webp",
+  "true_character": "harry_potter",
+  "predicted_character": "Harry Potter",
+  "raw_text": "{\n  \"character\": \"Harry Potter\",\n  \"reasoning\": \"You have round glasses and messy hair, which perfectly match Harry Potter's iconic look.\",\n  \"caption\": \"Wearing round glasses, you're pure Harry Potter vibes.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your outfit with round glasses, lightning-bolt scar, messy black hair, Gryffindor robes with a red-and-gold scarf, Hogwarts castle backdrop, cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"maroon\",\n    \"pose_description\": \"pointing forward\",\n    \"glasses\": true,\n    \"standout_trait\": \"glasses\"\n  }\n}",
+  "face_box": [
+    62,
+    29,
+    58,
+    58
+  ],
+  "layer_agg": "all",
+  "maps": {
+    "aggregate": {
+      "file": "aggregate.png",
+      "n_steps": 158,
+      "sink_diagnostics": {
+        "top1_fraction": 0.0865,
+        "top3_fraction": 0.1834
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.173,
+        "area_fraction": 0.2565,
+        "enrichment": 0.675
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.1763,
+        "area_fraction": 0.2565,
+        "enrichment": 0.687
+      }
+    },
+    "aggregate_last_layer_only": {
+      "file": "aggregate_last_layer_only.png",
+      "n_steps": 158,
+      "sink_diagnostics": {
+        "top1_fraction": 0.0442,
+        "top3_fraction": 0.1322
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.1367,
+        "area_fraction": 0.2565,
+        "enrichment": 0.533
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.1367,
+        "area_fraction": 0.2565,
+        "enrichment": 0.533
+      }
+    },
+    "character": {
+      "file": "character.png",
+      "n_steps": 2,
+      "sink_diagnostics": {
+        "top1_fraction": 0.1309,
+        "top3_fraction": 0.2746
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.2696,
+        "area_fraction": 0.2565,
+        "enrichment": 1.051
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.2726,
+        "area_fraction": 0.2565,
+        "enrichment": 1.063
+      }
+    },
+    "standout_trait": {
+      "file": "standout_trait.png",
+      "n_steps": 1,
+      "sink_diagnostics": {
+        "top1_fraction": 0.1577,
+        "top3_fraction": 0.3332
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.3816,
+        "area_fraction": 0.2565,
+        "enrichment": 1.488
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.4009,
+        "area_fraction": 0.2565,
+        "enrichment": 1.563
+      }
+    },
+    "reasoning": {
+      "file": "reasoning.png",
+      "n_steps": 17,
+      "sink_diagnostics": {
+        "top1_fraction": 0.0557,
+        "top3_fraction": 0.1371
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.2713,
+        "area_fraction": 0.2565,
+        "enrichment": 1.058
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.2741,
+        "area_fraction": 0.2565,
+        "enrichment": 1.069
+      }
+    }
+  }
+}

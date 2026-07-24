@@ -1,0 +1,105 @@
+{
+  "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/sasuke_uchiha.webp",
+  "true_character": "sasuke_uchiha",
+  "predicted_character": "Sasuke Uchiha",
+  "raw_text": "{\n  \"character\": \"Sasuke Uchiha\",\n  \"reasoning\": \"You have a young, narrow, angular face with a hard, direct stare and flat mouth \u2014 exactly like Sasuke's iconic look.\",\n  \"caption\": \"You're the quiet storm of anime intensity.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your outfit with Sasuke Uchiha's navy-and-white high-collared ninja outfit, katana on the back, and Sharingan eye detail, set against a crackling blue lightning backdrop, rendered in cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"gray\",\n    \"pose_description\": \"arms outstretched, mid-action\",\n    \"glasses\": false,\n    \"standout_trait\": \"facial shape and expression\"\n  }\n}",
+  "face_box": [
+    143,
+    220,
+    45,
+    45
+  ],
+  "layer_agg": "all",
+  "maps": {
+    "aggregate": {
+      "file": "aggregate.png",
+      "n_steps": 185,
+      "sink_diagnostics": {
+        "top1_fraction": 0.0329,
+        "top3_fraction": 0.0889
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.037,
+        "area_fraction": 0.0505,
+        "enrichment": 0.733
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.0371,
+        "area_fraction": 0.0505,
+        "enrichment": 0.735
+      }
+    },
+    "aggregate_last_layer_only": {
+      "file": "aggregate_last_layer_only.png",
+      "n_steps": 185,
+      "sink_diagnostics": {
+        "top1_fraction": 0.0561,
+        "top3_fraction": 0.1467
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.0515,
+        "area_fraction": 0.0505,
+        "enrichment": 1.021
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.0519,
+        "area_fraction": 0.0505,
+        "enrichment": 1.028
+      }
+    },
+    "character": {
+      "file": "character.png",
+      "n_steps": 6,
+      "sink_diagnostics": {
+        "top1_fraction": 0.1707,
+        "top3_fraction": 0.2836
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.0508,
+        "area_fraction": 0.0505,
+        "enrichment": 1.007
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.0557,
+        "area_fraction": 0.0505,
+        "enrichment": 1.104
+      }
+    },
+    "standout_trait": {
+      "file": "standout_trait.png",
+      "n_steps": 5,
+      "sink_diagnostics": {
+        "top1_fraction": 0.1171,
+        "top3_fraction": 0.2713
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.0246,
+        "area_fraction": 0.0505,
+        "enrichment": 0.487
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.0248,
+        "area_fraction": 0.0505,
+        "enrichment": 0.492
+      }
+    },
+    "reasoning": {
+      "file": "reasoning.png",
+      "n_steps": 27,
+      "sink_diagnostics": {
+        "top1_fraction": 0.1486,
+        "top3_fraction": 0.2989
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.0273,
+        "area_fraction": 0.0505,
+        "enrichment": 0.54
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.0285,
+        "area_fraction": 0.0505,
+        "enrichment": 0.564
+      }
+    }
+  }
+}

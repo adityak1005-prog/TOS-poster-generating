@@ -1,0 +1,60 @@
+{
+  "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/naruto.webp",
+  "true_character": "naruto",
+  "predicted_character": "Naruto",
+  "raw_text": "{\n  \"character\": \"Naruto\",\n  \"reasoning\": \"You have a round, full-cheeked face with a wide, open, genuinely happy grin showing top teeth \u2014 pure Naruto energy, no facial hair, and relaxed eyebrows.\",\n  \"caption\": \"You\u2019re the cheerful ninja with whisker marks and spiky hair.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your outfit with orange-and-black jumpsuit, blue forehead protector, spiky blonde hair, and whisker cheek markings, set against a chakra-burst energy backdrop, rendered in cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"white\",\n    \"pose_description\": \"neutral standing pose\",\n    \"glasses\": false,\n    \"standout_trait\": \"facial resemblance/features\"\n  }\n}",
+  "face_box": null,
+  "layer_agg": "all",
+  "maps": {
+    "aggregate": {
+      "file": "aggregate.png",
+      "n_steps": 186,
+      "sink_diagnostics": {
+        "top1_fraction": 0.6336,
+        "top3_fraction": 0.6527
+      },
+      "face_stats_raw": null,
+      "face_stats_sink_robust": null
+    },
+    "aggregate_last_layer_only": {
+      "file": "aggregate_last_layer_only.png",
+      "n_steps": 186,
+      "sink_diagnostics": {
+        "top1_fraction": 0.0386,
+        "top3_fraction": 0.103
+      },
+      "face_stats_raw": null,
+      "face_stats_sink_robust": null
+    },
+    "character": {
+      "file": "character.png",
+      "n_steps": 3,
+      "sink_diagnostics": {
+        "top1_fraction": 0.3194,
+        "top3_fraction": 0.4298
+      },
+      "face_stats_raw": null,
+      "face_stats_sink_robust": null
+    },
+    "standout_trait": {
+      "file": "standout_trait.png",
+      "n_steps": 4,
+      "sink_diagnostics": {
+        "top1_fraction": 0.7712,
+        "top3_fraction": 0.7907
+      },
+      "face_stats_raw": null,
+      "face_stats_sink_robust": null
+    },
+    "reasoning": {
+      "file": "reasoning.png",
+      "n_steps": 35,
+      "sink_diagnostics": {
+        "top1_fraction": 0.6002,
+        "top3_fraction": 0.6291
+      },
+      "face_stats_raw": null,
+      "face_stats_sink_robust": null
+    }
+  }
+}

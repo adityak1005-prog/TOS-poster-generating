@@ -1,0 +1,105 @@
+{
+  "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/wednesday_addams.jpg",
+  "true_character": "wednesday_addams",
+  "predicted_character": "Wednesday Addams",
+  "raw_text": "{\n  \"character\": \"Wednesday Addams\",\n  \"reasoning\": \"You have flat, passive eyebrows and a completely unbothered expression, matching Wednesday's disengaged vibe perfectly.\",\n  \"caption\": \"You're not bored... you're just quietly existential.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your outfit with a jet-black Victorian-collared dress featuring white floral patterns, set against a foggy graveyard backdrop with gothic-academy architecture, rendered in cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"black\",\n    \"pose_description\": \"arms crossed\",\n    \"glasses\": false,\n    \"standout_trait\": \"expression/vibe\"\n  }\n}",
+  "face_box": [
+    151,
+    98,
+    65,
+    65
+  ],
+  "layer_agg": "all",
+  "maps": {
+    "aggregate": {
+      "file": "aggregate.png",
+      "n_steps": 165,
+      "sink_diagnostics": {
+        "top1_fraction": 0.2724,
+        "top3_fraction": 0.5523
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.0264,
+        "area_fraction": 0.0415,
+        "enrichment": 0.636
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.0476,
+        "area_fraction": 0.0415,
+        "enrichment": 1.147
+      }
+    },
+    "aggregate_last_layer_only": {
+      "file": "aggregate_last_layer_only.png",
+      "n_steps": 165,
+      "sink_diagnostics": {
+        "top1_fraction": 0.0417,
+        "top3_fraction": 0.1017
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.0473,
+        "area_fraction": 0.0415,
+        "enrichment": 1.14
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.0487,
+        "area_fraction": 0.0415,
+        "enrichment": 1.175
+      }
+    },
+    "character": {
+      "file": "character.png",
+      "n_steps": 3,
+      "sink_diagnostics": {
+        "top1_fraction": 0.186,
+        "top3_fraction": 0.3949
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.0374,
+        "area_fraction": 0.0415,
+        "enrichment": 0.901
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.0511,
+        "area_fraction": 0.0415,
+        "enrichment": 1.233
+      }
+    },
+    "standout_trait": {
+      "file": "standout_trait.png",
+      "n_steps": 3,
+      "sink_diagnostics": {
+        "top1_fraction": 0.3618,
+        "top3_fraction": 0.7331
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.0532,
+        "area_fraction": 0.0415,
+        "enrichment": 1.283
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.1263,
+        "area_fraction": 0.0415,
+        "enrichment": 3.046
+      }
+    },
+    "reasoning": {
+      "file": "reasoning.png",
+      "n_steps": 24,
+      "sink_diagnostics": {
+        "top1_fraction": 0.2639,
+        "top3_fraction": 0.5489
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.0968,
+        "area_fraction": 0.0415,
+        "enrichment": 2.333
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.1515,
+        "area_fraction": 0.0415,
+        "enrichment": 3.653
+      }
+    }
+  }
+}

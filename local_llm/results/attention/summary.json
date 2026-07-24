@@ -1,0 +1,2026 @@
+{
+  "per_image": [
+    {
+      "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/iron_man.jpg",
+      "true_character": "iron_man",
+      "predicted_character": "Iron Man",
+      "raw_text": "{\n  \"character\": \"Iron Man\",\n  \"reasoning\": \"You're wearing a sleek red-and-gold suit with a glowing arc reactor, matching Iron Man's iconic armor design.\",\n  \"caption\": \"You're not just dressed up \u2014 you're armored to the max.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your outfit with Iron Man's full red-and-gold powered armor featuring a glowing blue arc reactor at the chest, repulsor palms raised, set against a bright high-tech backdrop with lab light and explosion glow, cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"red\",\n    \"pose_description\": \"neutral standing pose\",\n    \"glasses\": false,\n    \"standout_trait\": \"clothing color\"\n  }\n}",
+      "face_box": null,
+      "layer_agg": "all",
+      "maps": {
+        "aggregate": {
+          "file": "aggregate.png",
+          "n_steps": 178,
+          "sink_diagnostics": {
+            "top1_fraction": 0.0284,
+            "top3_fraction": 0.0699
+          },
+          "face_stats_raw": null,
+          "face_stats_sink_robust": null
+        },
+        "aggregate_last_layer_only": {
+          "file": "aggregate_last_layer_only.png",
+          "n_steps": 178,
+          "sink_diagnostics": {
+            "top1_fraction": 0.0455,
+            "top3_fraction": 0.1053
+          },
+          "face_stats_raw": null,
+          "face_stats_sink_robust": null
+        },
+        "character": {
+          "file": "character.png",
+          "n_steps": 2,
+          "sink_diagnostics": {
+            "top1_fraction": 0.0676,
+            "top3_fraction": 0.1496
+          },
+          "face_stats_raw": null,
+          "face_stats_sink_robust": null
+        },
+        "standout_trait": {
+          "file": "standout_trait.png",
+          "n_steps": 3,
+          "sink_diagnostics": {
+            "top1_fraction": 0.0395,
+            "top3_fraction": 0.106
+          },
+          "face_stats_raw": null,
+          "face_stats_sink_robust": null
+        },
+        "reasoning": {
+          "file": "reasoning.png",
+          "n_steps": 24,
+          "sink_diagnostics": {
+            "top1_fraction": 0.027,
+            "top3_fraction": 0.0666
+          },
+          "face_stats_raw": null,
+          "face_stats_sink_robust": null
+        }
+      }
+    },
+    {
+      "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/batman.jpg",
+      "true_character": "batman",
+      "predicted_character": "Batman",
+      "raw_text": "{\n  \"character\": \"Batman\",\n  \"reasoning\": \"You have a clean-shaven, serious face with a flat, unsmiling mouth \u2014 exactly like Batman's stoic, neutral expression.\",\n  \"caption\": \"You're the dark knight in a black suit, no beard, no smirk.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your outfit with Batman's matte-black armored suit, flowing cape, cowl with pointed ears, and gold utility belt, set against Gotham-noir lighting with deep shadows and cold blue-grey highlights, cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"black\",\n    \"pose_description\": \"neutral standing pose\",\n    \"glasses\": false,\n    \"standout_trait\": \"facial expression\"\n  }\n}",
+      "face_box": [
+        593,
+        458,
+        146,
+        146
+      ],
+      "layer_agg": "all",
+      "maps": {
+        "aggregate": {
+          "file": "aggregate.png",
+          "n_steps": 179,
+          "sink_diagnostics": {
+            "top1_fraction": 0.4611,
+            "top3_fraction": 0.6286
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0167,
+            "area_fraction": 0.0215,
+            "enrichment": 0.776
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.0448,
+            "area_fraction": 0.0215,
+            "enrichment": 2.081
+          }
+        },
+        "aggregate_last_layer_only": {
+          "file": "aggregate_last_layer_only.png",
+          "n_steps": 179,
+          "sink_diagnostics": {
+            "top1_fraction": 0.017,
+            "top3_fraction": 0.0352
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0326,
+            "area_fraction": 0.0215,
+            "enrichment": 1.515
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.0343,
+            "area_fraction": 0.0215,
+            "enrichment": 1.596
+          }
+        },
+        "character": {
+          "file": "character.png",
+          "n_steps": 1,
+          "sink_diagnostics": {
+            "top1_fraction": 0.2549,
+            "top3_fraction": 0.3556
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0108,
+            "area_fraction": 0.0215,
+            "enrichment": 0.504
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.0177,
+            "area_fraction": 0.0215,
+            "enrichment": 0.824
+          }
+        },
+        "standout_trait": {
+          "file": "standout_trait.png",
+          "n_steps": 3,
+          "sink_diagnostics": {
+            "top1_fraction": 0.5821,
+            "top3_fraction": 0.7867
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0078,
+            "area_fraction": 0.0215,
+            "enrichment": 0.36
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.0389,
+            "area_fraction": 0.0215,
+            "enrichment": 1.808
+          }
+        },
+        "reasoning": {
+          "file": "reasoning.png",
+          "n_steps": 28,
+          "sink_diagnostics": {
+            "top1_fraction": 0.45,
+            "top3_fraction": 0.6132
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0106,
+            "area_fraction": 0.0215,
+            "enrichment": 0.492
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.0296,
+            "area_fraction": 0.0215,
+            "enrichment": 1.378
+          }
+        }
+      }
+    },
+    {
+      "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/spider_man.jpg",
+      "true_character": "spider_man",
+      "predicted_character": "Spider-Man",
+      "raw_text": "{\n  \"character\": \"Spider-Man\",\n  \"reasoning\": \"You have a youthful, boyish face with a lopsided grin and mischievous eyes \u2014 pure Spider-Man energy, no costume needed.\",\n  \"caption\": \"You\u2019re the web-slinger with a grin that\u2019s 100% on point.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your outfit with the iconic red-and-blue spandex suit featuring black web patterning, large white reflective eye lenses, and city skyline backdrop with web-lines, rendered in cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"red\",\n    \"pose_description\": \"neutral standing pose\",\n    \"glasses\": false,\n    \"standout_trait\": \"vibe/energy\"\n  }\n}",
+      "face_box": null,
+      "layer_agg": "all",
+      "maps": {
+        "aggregate": {
+          "file": "aggregate.png",
+          "n_steps": 179,
+          "sink_diagnostics": {
+            "top1_fraction": 0.6171,
+            "top3_fraction": 0.6646
+          },
+          "face_stats_raw": null,
+          "face_stats_sink_robust": null
+        },
+        "aggregate_last_layer_only": {
+          "file": "aggregate_last_layer_only.png",
+          "n_steps": 179,
+          "sink_diagnostics": {
+            "top1_fraction": 0.0287,
+            "top3_fraction": 0.0754
+          },
+          "face_stats_raw": null,
+          "face_stats_sink_robust": null
+        },
+        "character": {
+          "file": "character.png",
+          "n_steps": 2,
+          "sink_diagnostics": {
+            "top1_fraction": 0.286,
+            "top3_fraction": 0.3645
+          },
+          "face_stats_raw": null,
+          "face_stats_sink_robust": null
+        },
+        "standout_trait": {
+          "file": "standout_trait.png",
+          "n_steps": 4,
+          "sink_diagnostics": {
+            "top1_fraction": 0.8402,
+            "top3_fraction": 0.9021
+          },
+          "face_stats_raw": null,
+          "face_stats_sink_robust": null
+        },
+        "reasoning": {
+          "file": "reasoning.png",
+          "n_steps": 29,
+          "sink_diagnostics": {
+            "top1_fraction": 0.6121,
+            "top3_fraction": 0.6613
+          },
+          "face_stats_raw": null,
+          "face_stats_sink_robust": null
+        }
+      }
+    },
+    {
+      "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/thomas_shelby.jpg",
+      "true_character": "thomas_shelby",
+      "predicted_character": "Thomas Shelby",
+      "raw_text": "{\n  \"character\": \"Thomas Shelby\",\n  \"reasoning\": \"You have a lean, sharply defined face with high cheekbones and a calm, composed expression \u2014 exactly like Thomas Shelby's still, controlled demeanor.\",\n  \"caption\": \"You're the quiet storm in a 1920s suit.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your current outfit with a fitted 1920s tweed three-piece suit, flat cap pulled low, slicked-back undercut hair, and muted sepia Birmingham streets backdrop, rendered in cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"black\",\n    \"pose_description\": \"neutral standing pose\",\n    \"glasses\": false,\n    \"standout_trait\": \"facial features and expression\"\n  }\n}",
+      "face_box": [
+        58,
+        32,
+        50,
+        50
+      ],
+      "layer_agg": "all",
+      "maps": {
+        "aggregate": {
+          "file": "aggregate.png",
+          "n_steps": 182,
+          "sink_diagnostics": {
+            "top1_fraction": 0.0466,
+            "top3_fraction": 0.1135
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.1168,
+            "area_fraction": 0.0974,
+            "enrichment": 1.2
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.1172,
+            "area_fraction": 0.0974,
+            "enrichment": 1.203
+          }
+        },
+        "aggregate_last_layer_only": {
+          "file": "aggregate_last_layer_only.png",
+          "n_steps": 182,
+          "sink_diagnostics": {
+            "top1_fraction": 0.0796,
+            "top3_fraction": 0.1796
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0914,
+            "area_fraction": 0.0974,
+            "enrichment": 0.939
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.0931,
+            "area_fraction": 0.0974,
+            "enrichment": 0.956
+          }
+        },
+        "character": {
+          "file": "character.png",
+          "n_steps": 2,
+          "sink_diagnostics": {
+            "top1_fraction": 0.0965,
+            "top3_fraction": 0.25
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.173,
+            "area_fraction": 0.0974,
+            "enrichment": 1.777
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.1726,
+            "area_fraction": 0.0974,
+            "enrichment": 1.772
+          }
+        },
+        "standout_trait": {
+          "file": "standout_trait.png",
+          "n_steps": 5,
+          "sink_diagnostics": {
+            "top1_fraction": 0.1171,
+            "top3_fraction": 0.2371
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.2245,
+            "area_fraction": 0.0974,
+            "enrichment": 2.306
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.1969,
+            "area_fraction": 0.0974,
+            "enrichment": 2.022
+          }
+        },
+        "reasoning": {
+          "file": "reasoning.png",
+          "n_steps": 29,
+          "sink_diagnostics": {
+            "top1_fraction": 0.1388,
+            "top3_fraction": 0.3138
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.2685,
+            "area_fraction": 0.0974,
+            "enrichment": 2.757
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.2518,
+            "area_fraction": 0.0974,
+            "enrichment": 2.587
+          }
+        }
+      }
+    },
+    {
+      "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/naruto.webp",
+      "true_character": "naruto",
+      "predicted_character": "Naruto",
+      "raw_text": "{\n  \"character\": \"Naruto\",\n  \"reasoning\": \"You have a round, full-cheeked face with a wide, open, genuinely happy grin showing top teeth \u2014 pure Naruto energy, no facial hair, and relaxed eyebrows.\",\n  \"caption\": \"You\u2019re the cheerful ninja with whisker marks and spiky hair.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your outfit with orange-and-black jumpsuit, blue forehead protector, spiky blonde hair, and whisker cheek markings, set against a chakra-burst energy backdrop, rendered in cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"white\",\n    \"pose_description\": \"neutral standing pose\",\n    \"glasses\": false,\n    \"standout_trait\": \"facial resemblance/features\"\n  }\n}",
+      "face_box": null,
+      "layer_agg": "all",
+      "maps": {
+        "aggregate": {
+          "file": "aggregate.png",
+          "n_steps": 186,
+          "sink_diagnostics": {
+            "top1_fraction": 0.6336,
+            "top3_fraction": 0.6527
+          },
+          "face_stats_raw": null,
+          "face_stats_sink_robust": null
+        },
+        "aggregate_last_layer_only": {
+          "file": "aggregate_last_layer_only.png",
+          "n_steps": 186,
+          "sink_diagnostics": {
+            "top1_fraction": 0.0386,
+            "top3_fraction": 0.103
+          },
+          "face_stats_raw": null,
+          "face_stats_sink_robust": null
+        },
+        "character": {
+          "file": "character.png",
+          "n_steps": 3,
+          "sink_diagnostics": {
+            "top1_fraction": 0.3194,
+            "top3_fraction": 0.4298
+          },
+          "face_stats_raw": null,
+          "face_stats_sink_robust": null
+        },
+        "standout_trait": {
+          "file": "standout_trait.png",
+          "n_steps": 4,
+          "sink_diagnostics": {
+            "top1_fraction": 0.7712,
+            "top3_fraction": 0.7907
+          },
+          "face_stats_raw": null,
+          "face_stats_sink_robust": null
+        },
+        "reasoning": {
+          "file": "reasoning.png",
+          "n_steps": 35,
+          "sink_diagnostics": {
+            "top1_fraction": 0.6002,
+            "top3_fraction": 0.6291
+          },
+          "face_stats_raw": null,
+          "face_stats_sink_robust": null
+        }
+      }
+    },
+    {
+      "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/professor_from_money_heist.webp",
+      "true_character": "professor_from_money_heist",
+      "predicted_character": "Professor from Money Heist",
+      "raw_text": "{\n  \"character\": \"Professor from Money Heist\",\n  \"reasoning\": \"You exude calm, composed authority with a steady gaze and closed mouth \u2014 a mature, intellectual vibe that matches the Professor's academic demeanor.\",\n  \"caption\": \"You're the quiet genius behind the heist, not the hero.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your outfit with the iconic red jumpsuit and white Salvador Dali mask, set against a sunbaked Spanish plaza backdrop with cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"black\",\n    \"pose_description\": \"arms crossed\",\n    \"glasses\": true,\n    \"standout_trait\": \"vibe/energy\"\n  }\n}",
+      "face_box": [
+        74,
+        25,
+        59,
+        59
+      ],
+      "layer_agg": "all",
+      "maps": {
+        "aggregate": {
+          "file": "aggregate.png",
+          "n_steps": 167,
+          "sink_diagnostics": {
+            "top1_fraction": 0.7976,
+            "top3_fraction": 0.8152
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0235,
+            "area_fraction": 0.1109,
+            "enrichment": 0.212
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.0515,
+            "area_fraction": 0.1109,
+            "enrichment": 0.465
+          }
+        },
+        "aggregate_last_layer_only": {
+          "file": "aggregate_last_layer_only.png",
+          "n_steps": 167,
+          "sink_diagnostics": {
+            "top1_fraction": 0.0555,
+            "top3_fraction": 0.1402
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0559,
+            "area_fraction": 0.1109,
+            "enrichment": 0.504
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.0562,
+            "area_fraction": 0.1109,
+            "enrichment": 0.507
+          }
+        },
+        "character": {
+          "file": "character.png",
+          "n_steps": 5,
+          "sink_diagnostics": {
+            "top1_fraction": 0.6599,
+            "top3_fraction": 0.702
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0681,
+            "area_fraction": 0.1109,
+            "enrichment": 0.614
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.1214,
+            "area_fraction": 0.1109,
+            "enrichment": 1.095
+          }
+        },
+        "standout_trait": {
+          "file": "standout_trait.png",
+          "n_steps": 4,
+          "sink_diagnostics": {
+            "top1_fraction": 0.9337,
+            "top3_fraction": 0.9422
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0096,
+            "area_fraction": 0.1109,
+            "enrichment": 0.087
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.0268,
+            "area_fraction": 0.1109,
+            "enrichment": 0.241
+          }
+        },
+        "reasoning": {
+          "file": "reasoning.png",
+          "n_steps": 28,
+          "sink_diagnostics": {
+            "top1_fraction": 0.7912,
+            "top3_fraction": 0.8132
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0386,
+            "area_fraction": 0.1109,
+            "enrichment": 0.348
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.0835,
+            "area_fraction": 0.1109,
+            "enrichment": 0.753
+          }
+        }
+      }
+    },
+    {
+      "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/gwen_stacy.jpg",
+      "true_character": "gwen_stacy",
+      "predicted_character": "Gwen Stacy",
+      "raw_text": "{\n  \"character\": \"Gwen Stacy\",\n  \"reasoning\": \"You have a one-sided smirk and tilted head, matching Gwen Stacy's signature playful, mischievous expression.\",\n  \"caption\": \"Your smirk and tilt? Pure Gwen Stacy energy.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your outfit with Gwen Stacy's pink-and-white hooded Spider suit featuring a black spider emblem and hood down to show blonde-and-pink-streaked hair, set against a comic-book graffiti backdrop with cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"pink\",\n    \"pose_description\": \"sitting casually\",\n    \"glasses\": false,\n    \"standout_trait\": \"expression/pose\"\n  }\n}",
+      "face_box": [
+        95,
+        101,
+        173,
+        173
+      ],
+      "layer_agg": "all",
+      "maps": {
+        "aggregate": {
+          "file": "aggregate.png",
+          "n_steps": 170,
+          "sink_diagnostics": {
+            "top1_fraction": 0.4984,
+            "top3_fraction": 0.6525
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.7163,
+            "area_fraction": 0.1895,
+            "enrichment": 3.78
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.2342,
+            "area_fraction": 0.1895,
+            "enrichment": 1.236
+          }
+        },
+        "aggregate_last_layer_only": {
+          "file": "aggregate_last_layer_only.png",
+          "n_steps": 170,
+          "sink_diagnostics": {
+            "top1_fraction": 0.0352,
+            "top3_fraction": 0.0898
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.2012,
+            "area_fraction": 0.1895,
+            "enrichment": 1.062
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.2037,
+            "area_fraction": 0.1895,
+            "enrichment": 1.075
+          }
+        },
+        "character": {
+          "file": "character.png",
+          "n_steps": 3,
+          "sink_diagnostics": {
+            "top1_fraction": 0.3219,
+            "top3_fraction": 0.4491
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.6258,
+            "area_fraction": 0.1895,
+            "enrichment": 3.303
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.4019,
+            "area_fraction": 0.1895,
+            "enrichment": 2.121
+          }
+        },
+        "standout_trait": {
+          "file": "standout_trait.png",
+          "n_steps": 3,
+          "sink_diagnostics": {
+            "top1_fraction": 0.6507,
+            "top3_fraction": 0.8401
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.905,
+            "area_fraction": 0.1895,
+            "enrichment": 4.776
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.4738,
+            "area_fraction": 0.1895,
+            "enrichment": 2.5
+          }
+        },
+        "reasoning": {
+          "file": "reasoning.png",
+          "n_steps": 22,
+          "sink_diagnostics": {
+            "top1_fraction": 0.5077,
+            "top3_fraction": 0.6652
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.8052,
+            "area_fraction": 0.1895,
+            "enrichment": 4.249
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.4733,
+            "area_fraction": 0.1895,
+            "enrichment": 2.498
+          }
+        }
+      }
+    },
+    {
+      "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/black_widow.jpg",
+      "true_character": "black_widow",
+      "predicted_character": "Black Widow",
+      "raw_text": "{\n  \"character\": \"Black Widow\",\n  \"reasoning\": \"You have sharp angular cheekbones and a straight, level head with no tilt \u2014 a deadpan, composed look that perfectly matches Black Widow's iconic stance.\",\n  \"caption\": \"You're the silent assassin with a deadly, unsmiling stare.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your outfit with a fitted black tactical bodysuit, utility straps, and a pistol holstered at your thigh, set against a cool steel-blue tactical backdrop with cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"black\",\n    \"pose_description\": \"neutral standing pose\",\n    \"glasses\": false,\n    \"standout_trait\": \"facial features and pose\"\n  }\n}",
+      "face_box": null,
+      "layer_agg": "all",
+      "maps": {
+        "aggregate": {
+          "file": "aggregate.png",
+          "n_steps": 176,
+          "sink_diagnostics": {
+            "top1_fraction": 0.6389,
+            "top3_fraction": 0.6569
+          },
+          "face_stats_raw": null,
+          "face_stats_sink_robust": null
+        },
+        "aggregate_last_layer_only": {
+          "file": "aggregate_last_layer_only.png",
+          "n_steps": 176,
+          "sink_diagnostics": {
+            "top1_fraction": 0.0347,
+            "top3_fraction": 0.0828
+          },
+          "face_stats_raw": null,
+          "face_stats_sink_robust": null
+        },
+        "character": {
+          "file": "character.png",
+          "n_steps": 2,
+          "sink_diagnostics": {
+            "top1_fraction": 0.3806,
+            "top3_fraction": 0.4426
+          },
+          "face_stats_raw": null,
+          "face_stats_sink_robust": null
+        },
+        "standout_trait": {
+          "file": "standout_trait.png",
+          "n_steps": 5,
+          "sink_diagnostics": {
+            "top1_fraction": 0.8451,
+            "top3_fraction": 0.864
+          },
+          "face_stats_raw": null,
+          "face_stats_sink_robust": null
+        },
+        "reasoning": {
+          "file": "reasoning.png",
+          "n_steps": 31,
+          "sink_diagnostics": {
+            "top1_fraction": 0.6885,
+            "top3_fraction": 0.7301
+          },
+          "face_stats_raw": null,
+          "face_stats_sink_robust": null
+        }
+      }
+    },
+    {
+      "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/daenerys_targaryen.jpg",
+      "true_character": "daenerys_targaryen",
+      "predicted_character": "Daenerys Targaryen",
+      "raw_text": "{\n  \"character\": \"Daenerys Targaryen\",\n  \"reasoning\": \"You have softly rounded cheeks and a calm, regal expression with light blonde hair, matching Daenerys's iconic look.\",\n  \"caption\": \"Queen of the Storms, draped in silver and power.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; dress them in a long silver-platinum braided hair, flowing pale ivory or deep-blue gown, set against a sunbaked desert city or grand throne-hall backdrop, cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"black\",\n    \"pose_description\": \"neutral standing pose\",\n    \"glasses\": false,\n    \"standout_trait\": \"facial features\"\n  }\n}",
+      "face_box": [
+        134,
+        40,
+        110,
+        110
+      ],
+      "layer_agg": "all",
+      "maps": {
+        "aggregate": {
+          "file": "aggregate.png",
+          "n_steps": 173,
+          "sink_diagnostics": {
+            "top1_fraction": 0.5472,
+            "top3_fraction": 0.5765
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.1126,
+            "area_fraction": 0.1187,
+            "enrichment": 0.949
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.2399,
+            "area_fraction": 0.1187,
+            "enrichment": 2.021
+          }
+        },
+        "aggregate_last_layer_only": {
+          "file": "aggregate_last_layer_only.png",
+          "n_steps": 173,
+          "sink_diagnostics": {
+            "top1_fraction": 0.0291,
+            "top3_fraction": 0.0805
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.168,
+            "area_fraction": 0.1187,
+            "enrichment": 1.415
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.1689,
+            "area_fraction": 0.1187,
+            "enrichment": 1.423
+          }
+        },
+        "character": {
+          "file": "character.png",
+          "n_steps": 7,
+          "sink_diagnostics": {
+            "top1_fraction": 0.3279,
+            "top3_fraction": 0.3864
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.2137,
+            "area_fraction": 0.1187,
+            "enrichment": 1.8
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.3034,
+            "area_fraction": 0.1187,
+            "enrichment": 2.556
+          }
+        },
+        "standout_trait": {
+          "file": "standout_trait.png",
+          "n_steps": 3,
+          "sink_diagnostics": {
+            "top1_fraction": 0.7074,
+            "top3_fraction": 0.7426
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.1123,
+            "area_fraction": 0.1187,
+            "enrichment": 0.946
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.3632,
+            "area_fraction": 0.1187,
+            "enrichment": 3.06
+          }
+        },
+        "reasoning": {
+          "file": "reasoning.png",
+          "n_steps": 25,
+          "sink_diagnostics": {
+            "top1_fraction": 0.3741,
+            "top3_fraction": 0.4779
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.2726,
+            "area_fraction": 0.1187,
+            "enrichment": 2.297
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.4078,
+            "area_fraction": 0.1187,
+            "enrichment": 3.436
+          }
+        }
+      }
+    },
+    {
+      "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/hermione_granger.jpg",
+      "true_character": "hermione_granger",
+      "predicted_character": "Hermione Granger",
+      "raw_text": "{\n  \"character\": \"Hermione Granger\",\n  \"reasoning\": \"You have furrowed brows and wide, alert eyes looking forward \u2014 a clear match for Hermione's intense, studious focus.\",\n  \"caption\": \"Brains on display, robes in place, and eyes locked on the textbook.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your current outfit with bushy brown hair, black Gryffindor robes with a maroon-and-gold tie, and set against a candlelit castle library backdrop, rendered in cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"black\",\n    \"pose_description\": \"pointing finger forward\",\n    \"glasses\": false,\n    \"standout_trait\": \"furrowed brows\"\n  }\n}",
+      "face_box": [
+        59,
+        4,
+        52,
+        52
+      ],
+      "layer_agg": "all",
+      "maps": {
+        "aggregate": {
+          "file": "aggregate.png",
+          "n_steps": 179,
+          "sink_diagnostics": {
+            "top1_fraction": 0.112,
+            "top3_fraction": 0.1841
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0734,
+            "area_fraction": 0.0942,
+            "enrichment": 0.779
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.0773,
+            "area_fraction": 0.0942,
+            "enrichment": 0.821
+          }
+        },
+        "aggregate_last_layer_only": {
+          "file": "aggregate_last_layer_only.png",
+          "n_steps": 179,
+          "sink_diagnostics": {
+            "top1_fraction": 0.0599,
+            "top3_fraction": 0.1657
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0594,
+            "area_fraction": 0.0942,
+            "enrichment": 0.631
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.0595,
+            "area_fraction": 0.0942,
+            "enrichment": 0.631
+          }
+        },
+        "character": {
+          "file": "character.png",
+          "n_steps": 5,
+          "sink_diagnostics": {
+            "top1_fraction": 0.0945,
+            "top3_fraction": 0.2418
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.1745,
+            "area_fraction": 0.0942,
+            "enrichment": 1.852
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.1743,
+            "area_fraction": 0.0942,
+            "enrichment": 1.85
+          }
+        },
+        "standout_trait": {
+          "file": "standout_trait.png",
+          "n_steps": 4,
+          "sink_diagnostics": {
+            "top1_fraction": 0.0881,
+            "top3_fraction": 0.2068
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.178,
+            "area_fraction": 0.0942,
+            "enrichment": 1.889
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.1712,
+            "area_fraction": 0.0942,
+            "enrichment": 1.817
+          }
+        },
+        "reasoning": {
+          "file": "reasoning.png",
+          "n_steps": 26,
+          "sink_diagnostics": {
+            "top1_fraction": 0.1196,
+            "top3_fraction": 0.2233
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.1526,
+            "area_fraction": 0.0942,
+            "enrichment": 1.619
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.1342,
+            "area_fraction": 0.0942,
+            "enrichment": 1.425
+          }
+        }
+      }
+    },
+    {
+      "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/wednesday_addams.jpg",
+      "true_character": "wednesday_addams",
+      "predicted_character": "Wednesday Addams",
+      "raw_text": "{\n  \"character\": \"Wednesday Addams\",\n  \"reasoning\": \"You have flat, passive eyebrows and a completely unbothered expression, matching Wednesday's disengaged vibe perfectly.\",\n  \"caption\": \"You're not bored... you're just quietly existential.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your outfit with a jet-black Victorian-collared dress featuring white floral patterns, set against a foggy graveyard backdrop with gothic-academy architecture, rendered in cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"black\",\n    \"pose_description\": \"arms crossed\",\n    \"glasses\": false,\n    \"standout_trait\": \"expression/vibe\"\n  }\n}",
+      "face_box": [
+        151,
+        98,
+        65,
+        65
+      ],
+      "layer_agg": "all",
+      "maps": {
+        "aggregate": {
+          "file": "aggregate.png",
+          "n_steps": 165,
+          "sink_diagnostics": {
+            "top1_fraction": 0.2724,
+            "top3_fraction": 0.5523
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0264,
+            "area_fraction": 0.0415,
+            "enrichment": 0.636
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.0476,
+            "area_fraction": 0.0415,
+            "enrichment": 1.147
+          }
+        },
+        "aggregate_last_layer_only": {
+          "file": "aggregate_last_layer_only.png",
+          "n_steps": 165,
+          "sink_diagnostics": {
+            "top1_fraction": 0.0417,
+            "top3_fraction": 0.1017
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0473,
+            "area_fraction": 0.0415,
+            "enrichment": 1.14
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.0487,
+            "area_fraction": 0.0415,
+            "enrichment": 1.175
+          }
+        },
+        "character": {
+          "file": "character.png",
+          "n_steps": 3,
+          "sink_diagnostics": {
+            "top1_fraction": 0.186,
+            "top3_fraction": 0.3949
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0374,
+            "area_fraction": 0.0415,
+            "enrichment": 0.901
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.0511,
+            "area_fraction": 0.0415,
+            "enrichment": 1.233
+          }
+        },
+        "standout_trait": {
+          "file": "standout_trait.png",
+          "n_steps": 3,
+          "sink_diagnostics": {
+            "top1_fraction": 0.3618,
+            "top3_fraction": 0.7331
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0532,
+            "area_fraction": 0.0415,
+            "enrichment": 1.283
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.1263,
+            "area_fraction": 0.0415,
+            "enrichment": 3.046
+          }
+        },
+        "reasoning": {
+          "file": "reasoning.png",
+          "n_steps": 24,
+          "sink_diagnostics": {
+            "top1_fraction": 0.2639,
+            "top3_fraction": 0.5489
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0968,
+            "area_fraction": 0.0415,
+            "enrichment": 2.333
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.1515,
+            "area_fraction": 0.0415,
+            "enrichment": 3.653
+          }
+        }
+      }
+    },
+    {
+      "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/kakashi_hatake.jpg",
+      "true_character": "kakashi_hatake",
+      "predicted_character": "Kakashi Hatake",
+      "raw_text": "{\n  \"character\": \"Kakashi Hatake\",\n  \"reasoning\": \"You have sleepy, half-lidded eyes and a relaxed, closed-mouth expression that perfectly matches Kakashi's laid-back demeanor.\",\n  \"caption\": \"Sleepy ninja vibes, mask on, eyes half-closed.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your outfit with Kakashi's iconic navy flak vest, Leaf Village forehead protector tilted over one eye, and fabric mask over nose and mouth, set against a misty forest backdrop with cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"green\",\n    \"pose_description\": \"holding a kunai\",\n    \"glasses\": false,\n    \"standout_trait\": \"eyes/energy\"\n  }\n}",
+      "face_box": [
+        21,
+        405,
+        90,
+        90
+      ],
+      "layer_agg": "all",
+      "maps": {
+        "aggregate": {
+          "file": "aggregate.png",
+          "n_steps": 178,
+          "sink_diagnostics": {
+            "top1_fraction": 0.5722,
+            "top3_fraction": 0.6759
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0168,
+            "area_fraction": 0.0518,
+            "enrichment": 0.325
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.0498,
+            "area_fraction": 0.0518,
+            "enrichment": 0.96
+          }
+        },
+        "aggregate_last_layer_only": {
+          "file": "aggregate_last_layer_only.png",
+          "n_steps": 178,
+          "sink_diagnostics": {
+            "top1_fraction": 0.0305,
+            "top3_fraction": 0.0694
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0395,
+            "area_fraction": 0.0518,
+            "enrichment": 0.762
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.0401,
+            "area_fraction": 0.0518,
+            "enrichment": 0.773
+          }
+        },
+        "character": {
+          "file": "character.png",
+          "n_steps": 6,
+          "sink_diagnostics": {
+            "top1_fraction": 0.3413,
+            "top3_fraction": 0.4254
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0111,
+            "area_fraction": 0.0518,
+            "enrichment": 0.214
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.0172,
+            "area_fraction": 0.0518,
+            "enrichment": 0.331
+          }
+        },
+        "standout_trait": {
+          "file": "standout_trait.png",
+          "n_steps": 3,
+          "sink_diagnostics": {
+            "top1_fraction": 0.7346,
+            "top3_fraction": 0.8707
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0018,
+            "area_fraction": 0.0518,
+            "enrichment": 0.034
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.0117,
+            "area_fraction": 0.0518,
+            "enrichment": 0.226
+          }
+        },
+        "reasoning": {
+          "file": "reasoning.png",
+          "n_steps": 26,
+          "sink_diagnostics": {
+            "top1_fraction": 0.6026,
+            "top3_fraction": 0.7153
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0057,
+            "area_fraction": 0.0518,
+            "enrichment": 0.11
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.0185,
+            "area_fraction": 0.0518,
+            "enrichment": 0.356
+          }
+        }
+      }
+    },
+    {
+      "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/sasuke_uchiha.webp",
+      "true_character": "sasuke_uchiha",
+      "predicted_character": "Sasuke Uchiha",
+      "raw_text": "{\n  \"character\": \"Sasuke Uchiha\",\n  \"reasoning\": \"You have a young, narrow, angular face with a hard, direct stare and flat mouth \u2014 exactly like Sasuke's iconic look.\",\n  \"caption\": \"You're the quiet storm of anime intensity.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your outfit with Sasuke Uchiha's navy-and-white high-collared ninja outfit, katana on the back, and Sharingan eye detail, set against a crackling blue lightning backdrop, rendered in cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"gray\",\n    \"pose_description\": \"arms outstretched, mid-action\",\n    \"glasses\": false,\n    \"standout_trait\": \"facial shape and expression\"\n  }\n}",
+      "face_box": [
+        143,
+        220,
+        45,
+        45
+      ],
+      "layer_agg": "all",
+      "maps": {
+        "aggregate": {
+          "file": "aggregate.png",
+          "n_steps": 185,
+          "sink_diagnostics": {
+            "top1_fraction": 0.0329,
+            "top3_fraction": 0.0889
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.037,
+            "area_fraction": 0.0505,
+            "enrichment": 0.733
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.0371,
+            "area_fraction": 0.0505,
+            "enrichment": 0.735
+          }
+        },
+        "aggregate_last_layer_only": {
+          "file": "aggregate_last_layer_only.png",
+          "n_steps": 185,
+          "sink_diagnostics": {
+            "top1_fraction": 0.0561,
+            "top3_fraction": 0.1467
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0515,
+            "area_fraction": 0.0505,
+            "enrichment": 1.021
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.0519,
+            "area_fraction": 0.0505,
+            "enrichment": 1.028
+          }
+        },
+        "character": {
+          "file": "character.png",
+          "n_steps": 6,
+          "sink_diagnostics": {
+            "top1_fraction": 0.1707,
+            "top3_fraction": 0.2836
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0508,
+            "area_fraction": 0.0505,
+            "enrichment": 1.007
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.0557,
+            "area_fraction": 0.0505,
+            "enrichment": 1.104
+          }
+        },
+        "standout_trait": {
+          "file": "standout_trait.png",
+          "n_steps": 5,
+          "sink_diagnostics": {
+            "top1_fraction": 0.1171,
+            "top3_fraction": 0.2713
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0246,
+            "area_fraction": 0.0505,
+            "enrichment": 0.487
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.0248,
+            "area_fraction": 0.0505,
+            "enrichment": 0.492
+          }
+        },
+        "reasoning": {
+          "file": "reasoning.png",
+          "n_steps": 27,
+          "sink_diagnostics": {
+            "top1_fraction": 0.1486,
+            "top3_fraction": 0.2989
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0273,
+            "area_fraction": 0.0505,
+            "enrichment": 0.54
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.0285,
+            "area_fraction": 0.0505,
+            "enrichment": 0.564
+          }
+        }
+      }
+    },
+    {
+      "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/joker.jpg",
+      "true_character": "joker",
+      "predicted_character": "Joker",
+      "raw_text": "{\n  \"character\": \"Joker\",\n  \"reasoning\": \"You're the Joker \u2014 that manic grin, smeared smile, and wild-eyed chaos are unmistakable.\",\n  \"caption\": \"You\u2019re chaos incarnate, smiling like a broken clown.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your outfit with the Joker\u2019s iconic rumpled purple tailcoat over a green vest, chalk-white face paint, smeared red smile, and chaotic neon-lit city backdrop, rendered in cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"purple\",\n    \"pose_description\": \"standing with head down\",\n    \"glasses\": false,\n    \"standout_trait\": \"vibe/energy\"\n  }\n}",
+      "face_box": [
+        130,
+        66,
+        93,
+        93
+      ],
+      "layer_agg": "all",
+      "maps": {
+        "aggregate": {
+          "file": "aggregate.png",
+          "n_steps": 169,
+          "sink_diagnostics": {
+            "top1_fraction": 0.5529,
+            "top3_fraction": 0.584
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0712,
+            "area_fraction": 0.0834,
+            "enrichment": 0.854
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.1565,
+            "area_fraction": 0.0834,
+            "enrichment": 1.877
+          }
+        },
+        "aggregate_last_layer_only": {
+          "file": "aggregate_last_layer_only.png",
+          "n_steps": 169,
+          "sink_diagnostics": {
+            "top1_fraction": 0.0524,
+            "top3_fraction": 0.1434
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0878,
+            "area_fraction": 0.0834,
+            "enrichment": 1.053
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.0866,
+            "area_fraction": 0.0834,
+            "enrichment": 1.039
+          }
+        },
+        "character": {
+          "file": "character.png",
+          "n_steps": 2,
+          "sink_diagnostics": {
+            "top1_fraction": 0.2735,
+            "top3_fraction": 0.4352
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0669,
+            "area_fraction": 0.0834,
+            "enrichment": 0.803
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.0909,
+            "area_fraction": 0.0834,
+            "enrichment": 1.091
+          }
+        },
+        "standout_trait": {
+          "file": "standout_trait.png",
+          "n_steps": 4,
+          "sink_diagnostics": {
+            "top1_fraction": 0.8202,
+            "top3_fraction": 0.8387
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0364,
+            "area_fraction": 0.0834,
+            "enrichment": 0.436
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.1931,
+            "area_fraction": 0.0834,
+            "enrichment": 2.317
+          }
+        },
+        "reasoning": {
+          "file": "reasoning.png",
+          "n_steps": 21,
+          "sink_diagnostics": {
+            "top1_fraction": 0.4288,
+            "top3_fraction": 0.4875
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.1904,
+            "area_fraction": 0.0834,
+            "enrichment": 2.284
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.3145,
+            "area_fraction": 0.0834,
+            "enrichment": 3.774
+          }
+        }
+      }
+    },
+    {
+      "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/jon_snow.jpg",
+      "true_character": "jon_snow",
+      "predicted_character": "Jon Snow",
+      "raw_text": "{\n  \"character\": \"Jon Snow\",\n  \"reasoning\": \"You have a thick beard and weary expression, matching Jon Snow's iconic look.\",\n  \"caption\": \"Snowfall and steel: you're the North's last trueborn.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your outfit with dark tousled shoulder-length hair, thick black furs and leather armor, set against a snow-covered northern landscape backdrop, rendered in cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"black\",\n    \"pose_description\": \"neutral standing pose\",\n    \"glasses\": false,\n    \"standout_trait\": \"facial hair\"\n  }\n}",
+      "face_box": [
+        50,
+        43,
+        65,
+        65
+      ],
+      "layer_agg": "all",
+      "maps": {
+        "aggregate": {
+          "file": "aggregate.png",
+          "n_steps": 156,
+          "sink_diagnostics": {
+            "top1_fraction": 0.0435,
+            "top3_fraction": 0.1032
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.1797,
+            "area_fraction": 0.1646,
+            "enrichment": 1.091
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.181,
+            "area_fraction": 0.1646,
+            "enrichment": 1.099
+          }
+        },
+        "aggregate_last_layer_only": {
+          "file": "aggregate_last_layer_only.png",
+          "n_steps": 156,
+          "sink_diagnostics": {
+            "top1_fraction": 0.0919,
+            "top3_fraction": 0.225
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.1725,
+            "area_fraction": 0.1646,
+            "enrichment": 1.048
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.1745,
+            "area_fraction": 0.1646,
+            "enrichment": 1.06
+          }
+        },
+        "character": {
+          "file": "character.png",
+          "n_steps": 2,
+          "sink_diagnostics": {
+            "top1_fraction": 0.101,
+            "top3_fraction": 0.237
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.3725,
+            "area_fraction": 0.1646,
+            "enrichment": 2.263
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.3679,
+            "area_fraction": 0.1646,
+            "enrichment": 2.235
+          }
+        },
+        "standout_trait": {
+          "file": "standout_trait.png",
+          "n_steps": 3,
+          "sink_diagnostics": {
+            "top1_fraction": 0.1851,
+            "top3_fraction": 0.3204
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.4326,
+            "area_fraction": 0.1646,
+            "enrichment": 2.628
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.3935,
+            "area_fraction": 0.1646,
+            "enrichment": 2.39
+          }
+        },
+        "reasoning": {
+          "file": "reasoning.png",
+          "n_steps": 16,
+          "sink_diagnostics": {
+            "top1_fraction": 0.0978,
+            "top3_fraction": 0.2284
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.3609,
+            "area_fraction": 0.1646,
+            "enrichment": 2.192
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.3507,
+            "area_fraction": 0.1646,
+            "enrichment": 2.13
+          }
+        }
+      }
+    },
+    {
+      "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/shinchan.webp",
+      "true_character": "shinchan",
+      "predicted_character": "Shinchan",
+      "raw_text": "{\n  \"character\": \"Shinchan\",\n  \"reasoning\": \"You have thick, low-set eyebrows drawn down close to your eyes, paired with a wide, open-mouthed laugh \u2014 pure Shinchan goofiness, no matter what you're wearing.\",\n  \"caption\": \"Your laugh is so loud, it\u2019s practically cartoonish.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your outfit with Shinchan\u2019s spiky messy black hair, simple bright shirt and shorts, and set against a bold flat colorful cartoon-style backdrop with a vibrant, exaggeratedly cheerful energy, rendered in cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"red\",\n    \"pose_description\": \"arms crossed\",\n    \"glasses\": false,\n    \"standout_trait\": \"vibe/energy\"\n  }\n}",
+      "face_box": null,
+      "layer_agg": "all",
+      "maps": {
+        "aggregate": {
+          "file": "aggregate.png",
+          "n_steps": 187,
+          "sink_diagnostics": {
+            "top1_fraction": 0.6508,
+            "top3_fraction": 0.7515
+          },
+          "face_stats_raw": null,
+          "face_stats_sink_robust": null
+        },
+        "aggregate_last_layer_only": {
+          "file": "aggregate_last_layer_only.png",
+          "n_steps": 187,
+          "sink_diagnostics": {
+            "top1_fraction": 0.0588,
+            "top3_fraction": 0.1383
+          },
+          "face_stats_raw": null,
+          "face_stats_sink_robust": null
+        },
+        "character": {
+          "file": "character.png",
+          "n_steps": 3,
+          "sink_diagnostics": {
+            "top1_fraction": 0.4343,
+            "top3_fraction": 0.5296
+          },
+          "face_stats_raw": null,
+          "face_stats_sink_robust": null
+        },
+        "standout_trait": {
+          "file": "standout_trait.png",
+          "n_steps": 4,
+          "sink_diagnostics": {
+            "top1_fraction": 0.8075,
+            "top3_fraction": 0.9256
+          },
+          "face_stats_raw": null,
+          "face_stats_sink_robust": null
+        },
+        "reasoning": {
+          "file": "reasoning.png",
+          "n_steps": 37,
+          "sink_diagnostics": {
+            "top1_fraction": 0.6513,
+            "top3_fraction": 0.7562
+          },
+          "face_stats_raw": null,
+          "face_stats_sink_robust": null
+        }
+      }
+    },
+    {
+      "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/harry_potter.webp",
+      "true_character": "harry_potter",
+      "predicted_character": "Harry Potter",
+      "raw_text": "{\n  \"character\": \"Harry Potter\",\n  \"reasoning\": \"You have round glasses and messy hair, which perfectly match Harry Potter's iconic look.\",\n  \"caption\": \"Wearing round glasses, you're pure Harry Potter vibes.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your outfit with round glasses, lightning-bolt scar, messy black hair, Gryffindor robes with a red-and-gold scarf, Hogwarts castle backdrop, cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"maroon\",\n    \"pose_description\": \"pointing forward\",\n    \"glasses\": true,\n    \"standout_trait\": \"glasses\"\n  }\n}",
+      "face_box": [
+        62,
+        29,
+        58,
+        58
+      ],
+      "layer_agg": "all",
+      "maps": {
+        "aggregate": {
+          "file": "aggregate.png",
+          "n_steps": 158,
+          "sink_diagnostics": {
+            "top1_fraction": 0.0865,
+            "top3_fraction": 0.1834
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.173,
+            "area_fraction": 0.2565,
+            "enrichment": 0.675
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.1763,
+            "area_fraction": 0.2565,
+            "enrichment": 0.687
+          }
+        },
+        "aggregate_last_layer_only": {
+          "file": "aggregate_last_layer_only.png",
+          "n_steps": 158,
+          "sink_diagnostics": {
+            "top1_fraction": 0.0442,
+            "top3_fraction": 0.1322
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.1367,
+            "area_fraction": 0.2565,
+            "enrichment": 0.533
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.1367,
+            "area_fraction": 0.2565,
+            "enrichment": 0.533
+          }
+        },
+        "character": {
+          "file": "character.png",
+          "n_steps": 2,
+          "sink_diagnostics": {
+            "top1_fraction": 0.1309,
+            "top3_fraction": 0.2746
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.2696,
+            "area_fraction": 0.2565,
+            "enrichment": 1.051
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.2726,
+            "area_fraction": 0.2565,
+            "enrichment": 1.063
+          }
+        },
+        "standout_trait": {
+          "file": "standout_trait.png",
+          "n_steps": 1,
+          "sink_diagnostics": {
+            "top1_fraction": 0.1577,
+            "top3_fraction": 0.3332
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.3816,
+            "area_fraction": 0.2565,
+            "enrichment": 1.488
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.4009,
+            "area_fraction": 0.2565,
+            "enrichment": 1.563
+          }
+        },
+        "reasoning": {
+          "file": "reasoning.png",
+          "n_steps": 17,
+          "sink_diagnostics": {
+            "top1_fraction": 0.0557,
+            "top3_fraction": 0.1371
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.2713,
+            "area_fraction": 0.2565,
+            "enrichment": 1.058
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.2741,
+            "area_fraction": 0.2565,
+            "enrichment": 1.069
+          }
+        }
+      }
+    },
+    {
+      "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/dr_doom.jpg",
+      "true_character": "dr_doom",
+      "predicted_character": "Dr. Doom",
+      "raw_text": "{\n  \"character\": \"Dr. Doom\",\n  \"reasoning\": \"Your stern, narrowed-eyed expression and broad jawline perfectly mirror Dr. Doom's intimidating, superior demeanor.\",\n  \"caption\": \"You're not just powerful \u2014 you're the villain with a cape and a cold stare.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace with full green-and-metal armor, flowing green hooded cloak, gothic stone castle backdrop, cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"green\",\n    \"pose_description\": \"standing with clenched fist\",\n    \"glasses\": false,\n    \"standout_trait\": \"facial expression\"\n  }\n}",
+      "face_box": null,
+      "layer_agg": "all",
+      "maps": {
+        "aggregate": {
+          "file": "aggregate.png",
+          "n_steps": 158,
+          "sink_diagnostics": {
+            "top1_fraction": 0.6171,
+            "top3_fraction": 0.6292
+          },
+          "face_stats_raw": null,
+          "face_stats_sink_robust": null
+        },
+        "aggregate_last_layer_only": {
+          "file": "aggregate_last_layer_only.png",
+          "n_steps": 158,
+          "sink_diagnostics": {
+            "top1_fraction": 0.0224,
+            "top3_fraction": 0.0653
+          },
+          "face_stats_raw": null,
+          "face_stats_sink_robust": null
+        },
+        "character": {
+          "file": "character.png",
+          "n_steps": 3,
+          "sink_diagnostics": {
+            "top1_fraction": 0.3951,
+            "top3_fraction": 0.4546
+          },
+          "face_stats_raw": null,
+          "face_stats_sink_robust": null
+        },
+        "standout_trait": {
+          "file": "standout_trait.png",
+          "n_steps": 3,
+          "sink_diagnostics": {
+            "top1_fraction": 0.7647,
+            "top3_fraction": 0.8032
+          },
+          "face_stats_raw": null,
+          "face_stats_sink_robust": null
+        },
+        "reasoning": {
+          "file": "reasoning.png",
+          "n_steps": 21,
+          "sink_diagnostics": {
+            "top1_fraction": 0.5715,
+            "top3_fraction": 0.6021
+          },
+          "face_stats_raw": null,
+          "face_stats_sink_robust": null
+        }
+      }
+    },
+    {
+      "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/regina_george.jpg",
+      "true_character": "regina_george",
+      "predicted_character": "Gwen Stacy",
+      "raw_text": "{\n  \"character\": \"Gwen Stacy\",\n  \"reasoning\": \"You have a one-sided smirk and a tilted head, matching Gwen Stacy's signature playful, mischievous expression.\",\n  \"caption\": \"Your smirk and tilt? Pure Gwen Stacy energy.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; dress her in a pink-and-white hooded Spider suit with a black spider emblem, hood down to show blonde-and-pink-streaked hair, set against comic-book graffiti backdrop, cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"red\",\n    \"pose_description\": \"looking off to the side\",\n    \"glasses\": false,\n    \"standout_trait\": \"expression/pose\"\n  }\n}",
+      "face_box": [
+        139,
+        115,
+        201,
+        201
+      ],
+      "layer_agg": "all",
+      "maps": {
+        "aggregate": {
+          "file": "aggregate.png",
+          "n_steps": 169,
+          "sink_diagnostics": {
+            "top1_fraction": 0.7765,
+            "top3_fraction": 0.7903
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.6909,
+            "area_fraction": 0.2579,
+            "enrichment": 2.679
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.352,
+            "area_fraction": 0.2579,
+            "enrichment": 1.365
+          }
+        },
+        "aggregate_last_layer_only": {
+          "file": "aggregate_last_layer_only.png",
+          "n_steps": 169,
+          "sink_diagnostics": {
+            "top1_fraction": 0.0254,
+            "top3_fraction": 0.0683
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.2268,
+            "area_fraction": 0.2579,
+            "enrichment": 0.88
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.2282,
+            "area_fraction": 0.2579,
+            "enrichment": 0.885
+          }
+        },
+        "character": {
+          "file": "character.png",
+          "n_steps": 3,
+          "sink_diagnostics": {
+            "top1_fraction": 0.5654,
+            "top3_fraction": 0.5876
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.6117,
+            "area_fraction": 0.2579,
+            "enrichment": 2.372
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.3914,
+            "area_fraction": 0.2579,
+            "enrichment": 1.518
+          }
+        },
+        "standout_trait": {
+          "file": "standout_trait.png",
+          "n_steps": 3,
+          "sink_diagnostics": {
+            "top1_fraction": 0.84,
+            "top3_fraction": 0.855
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.738,
+            "area_fraction": 0.2579,
+            "enrichment": 2.862
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.4869,
+            "area_fraction": 0.2579,
+            "enrichment": 1.888
+          }
+        },
+        "reasoning": {
+          "file": "reasoning.png",
+          "n_steps": 23,
+          "sink_diagnostics": {
+            "top1_fraction": 0.7193,
+            "top3_fraction": 0.7461
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.7239,
+            "area_fraction": 0.2579,
+            "enrichment": 2.807
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.5578,
+            "area_fraction": 0.2579,
+            "enrichment": 2.163
+          }
+        }
+      }
+    },
+    {
+      "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/elle_woods.jpg",
+      "true_character": "elle_woods",
+      "predicted_character": "Elle Woods",
+      "raw_text": "{\n  \"character\": \"Elle Woods\",\n  \"reasoning\": \"You radiate upbeat, bouncy energy with a full, open-mouthed smile and soft, rounded face \u2014 pure Elle Woods vibes.\",\n  \"caption\": \"Pink power in full bloom, with a pup in tow.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your outfit with a voluminous blonde hair, bold pink blazer and dress, cinematic pastel-campus backdrop, and sunny, cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"pink\",\n    \"pose_description\": \"holding a dog, smiling broadly\",\n    \"glasses\": false,\n    \"standout_trait\": \"vibe/energy\"\n  }\n}",
+      "face_box": [
+        255,
+        79,
+        101,
+        101
+      ],
+      "layer_agg": "all",
+      "maps": {
+        "aggregate": {
+          "file": "aggregate.png",
+          "n_steps": 166,
+          "sink_diagnostics": {
+            "top1_fraction": 0.6631,
+            "top3_fraction": 0.6771
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0329,
+            "area_fraction": 0.0648,
+            "enrichment": 0.508
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.0956,
+            "area_fraction": 0.0648,
+            "enrichment": 1.476
+          }
+        },
+        "aggregate_last_layer_only": {
+          "file": "aggregate_last_layer_only.png",
+          "n_steps": 166,
+          "sink_diagnostics": {
+            "top1_fraction": 0.0393,
+            "top3_fraction": 0.0876
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0468,
+            "area_fraction": 0.0648,
+            "enrichment": 0.723
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.048,
+            "area_fraction": 0.0648,
+            "enrichment": 0.741
+          }
+        },
+        "character": {
+          "file": "character.png",
+          "n_steps": 3,
+          "sink_diagnostics": {
+            "top1_fraction": 0.5837,
+            "top3_fraction": 0.6099
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0707,
+            "area_fraction": 0.0648,
+            "enrichment": 1.092
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.159,
+            "area_fraction": 0.0648,
+            "enrichment": 2.455
+          }
+        },
+        "standout_trait": {
+          "file": "standout_trait.png",
+          "n_steps": 4,
+          "sink_diagnostics": {
+            "top1_fraction": 0.9243,
+            "top3_fraction": 0.9312
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0093,
+            "area_fraction": 0.0648,
+            "enrichment": 0.144
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.1184,
+            "area_fraction": 0.0648,
+            "enrichment": 1.828
+          }
+        },
+        "reasoning": {
+          "file": "reasoning.png",
+          "n_steps": 27,
+          "sink_diagnostics": {
+            "top1_fraction": 0.7172,
+            "top3_fraction": 0.756
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.0678,
+            "area_fraction": 0.0648,
+            "enrichment": 1.047
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.2182,
+            "area_fraction": 0.0648,
+            "enrichment": 3.369
+          }
+        }
+      }
+    },
+    {
+      "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/sheldon_cooper.webp",
+      "true_character": "sheldon_cooper",
+      "predicted_character": "Sheldon Cooper",
+      "raw_text": "{\n  \"character\": \"Sheldon Cooper\",\n  \"reasoning\": \"You have a clean-shaven face with a thin, prim closed-mouth smirk where one corner is slightly higher \u2014 a classic Sheldon expression.\",\n  \"caption\": \"Your smirk\u2019s asymmetry? Pure Sheldon energy, no doubt.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your red t-shirt with a side-swept hair, layered graphic tee under a collared shirt, and cinematic movie-poster quality, set against a cluttered apartment with an equation-covered whiteboard backdrop.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"red\",\n    \"pose_description\": \"neutral standing pose\",\n    \"glasses\": false,\n    \"standout_trait\": \"facial expression\"\n  }\n}",
+      "face_box": [
+        58,
+        35,
+        124,
+        124
+      ],
+      "layer_agg": "all",
+      "maps": {
+        "aggregate": {
+          "file": "aggregate.png",
+          "n_steps": 174,
+          "sink_diagnostics": {
+            "top1_fraction": 0.7997,
+            "top3_fraction": 0.8169
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.4985,
+            "area_fraction": 0.3251,
+            "enrichment": 1.533
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.4294,
+            "area_fraction": 0.3251,
+            "enrichment": 1.321
+          }
+        },
+        "aggregate_last_layer_only": {
+          "file": "aggregate_last_layer_only.png",
+          "n_steps": 174,
+          "sink_diagnostics": {
+            "top1_fraction": 0.0423,
+            "top3_fraction": 0.1107
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.3086,
+            "area_fraction": 0.3251,
+            "enrichment": 0.949
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.3071,
+            "area_fraction": 0.3251,
+            "enrichment": 0.945
+          }
+        },
+        "character": {
+          "file": "character.png",
+          "n_steps": 3,
+          "sink_diagnostics": {
+            "top1_fraction": 0.4185,
+            "top3_fraction": 0.4783
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.5734,
+            "area_fraction": 0.3251,
+            "enrichment": 1.764
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.5953,
+            "area_fraction": 0.3251,
+            "enrichment": 1.831
+          }
+        },
+        "standout_trait": {
+          "file": "standout_trait.png",
+          "n_steps": 3,
+          "sink_diagnostics": {
+            "top1_fraction": 0.8687,
+            "top3_fraction": 0.8989
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.5405,
+            "area_fraction": 0.3251,
+            "enrichment": 1.662
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.5713,
+            "area_fraction": 0.3251,
+            "enrichment": 1.757
+          }
+        },
+        "reasoning": {
+          "file": "reasoning.png",
+          "n_steps": 27,
+          "sink_diagnostics": {
+            "top1_fraction": 0.7833,
+            "top3_fraction": 0.8354
+          },
+          "face_stats_raw": {
+            "mass_fraction": 0.5589,
+            "area_fraction": 0.3251,
+            "enrichment": 1.719
+          },
+          "face_stats_sink_robust": {
+            "mass_fraction": 0.6139,
+            "area_fraction": 0.3251,
+            "enrichment": 1.888
+          }
+        }
+      }
+    }
+  ],
+  "enrichment_summary": {
+    "aggregate": [
+      2.081,
+      1.203,
+      0.465,
+      1.236,
+      2.021,
+      0.821,
+      1.147,
+      0.96,
+      0.735,
+      1.877,
+      1.099,
+      0.687,
+      1.365,
+      1.476,
+      1.321
+    ],
+    "aggregate_last_layer_only": [
+      1.596,
+      0.956,
+      0.507,
+      1.075,
+      1.423,
+      0.631,
+      1.175,
+      0.773,
+      1.028,
+      1.039,
+      1.06,
+      0.533,
+      0.885,
+      0.741,
+      0.945
+    ],
+    "character": [
+      0.824,
+      1.772,
+      1.095,
+      2.121,
+      2.556,
+      1.85,
+      1.233,
+      0.331,
+      1.104,
+      1.091,
+      2.235,
+      1.063,
+      1.518,
+      2.455,
+      1.831
+    ],
+    "standout_trait": [
+      1.808,
+      2.022,
+      0.241,
+      2.5,
+      3.06,
+      1.817,
+      3.046,
+      0.226,
+      0.492,
+      2.317,
+      2.39,
+      1.563,
+      1.888,
+      1.828,
+      1.757
+    ],
+    "reasoning": [
+      1.378,
+      2.587,
+      0.753,
+      2.498,
+      3.436,
+      1.425,
+      3.653,
+      0.356,
+      0.564,
+      3.774,
+      2.13,
+      1.069,
+      2.163,
+      3.369,
+      1.888
+    ]
+  }
+}

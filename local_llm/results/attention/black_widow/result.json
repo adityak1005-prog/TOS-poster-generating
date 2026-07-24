@@ -1,0 +1,60 @@
+{
+  "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/black_widow.jpg",
+  "true_character": "black_widow",
+  "predicted_character": "Black Widow",
+  "raw_text": "{\n  \"character\": \"Black Widow\",\n  \"reasoning\": \"You have sharp angular cheekbones and a straight, level head with no tilt \u2014 a deadpan, composed look that perfectly matches Black Widow's iconic stance.\",\n  \"caption\": \"You're the silent assassin with a deadly, unsmiling stare.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your outfit with a fitted black tactical bodysuit, utility straps, and a pistol holstered at your thigh, set against a cool steel-blue tactical backdrop with cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"black\",\n    \"pose_description\": \"neutral standing pose\",\n    \"glasses\": false,\n    \"standout_trait\": \"facial features and pose\"\n  }\n}",
+  "face_box": null,
+  "layer_agg": "all",
+  "maps": {
+    "aggregate": {
+      "file": "aggregate.png",
+      "n_steps": 176,
+      "sink_diagnostics": {
+        "top1_fraction": 0.6389,
+        "top3_fraction": 0.6569
+      },
+      "face_stats_raw": null,
+      "face_stats_sink_robust": null
+    },
+    "aggregate_last_layer_only": {
+      "file": "aggregate_last_layer_only.png",
+      "n_steps": 176,
+      "sink_diagnostics": {
+        "top1_fraction": 0.0347,
+        "top3_fraction": 0.0828
+      },
+      "face_stats_raw": null,
+      "face_stats_sink_robust": null
+    },
+    "character": {
+      "file": "character.png",
+      "n_steps": 2,
+      "sink_diagnostics": {
+        "top1_fraction": 0.3806,
+        "top3_fraction": 0.4426
+      },
+      "face_stats_raw": null,
+      "face_stats_sink_robust": null
+    },
+    "standout_trait": {
+      "file": "standout_trait.png",
+      "n_steps": 5,
+      "sink_diagnostics": {
+        "top1_fraction": 0.8451,
+        "top3_fraction": 0.864
+      },
+      "face_stats_raw": null,
+      "face_stats_sink_robust": null
+    },
+    "reasoning": {
+      "file": "reasoning.png",
+      "n_steps": 31,
+      "sink_diagnostics": {
+        "top1_fraction": 0.6885,
+        "top3_fraction": 0.7301
+      },
+      "face_stats_raw": null,
+      "face_stats_sink_robust": null
+    }
+  }
+}

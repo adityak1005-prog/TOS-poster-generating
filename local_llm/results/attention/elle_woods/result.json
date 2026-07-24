@@ -1,0 +1,105 @@
+{
+  "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/elle_woods.jpg",
+  "true_character": "elle_woods",
+  "predicted_character": "Elle Woods",
+  "raw_text": "{\n  \"character\": \"Elle Woods\",\n  \"reasoning\": \"You radiate upbeat, bouncy energy with a full, open-mouthed smile and soft, rounded face \u2014 pure Elle Woods vibes.\",\n  \"caption\": \"Pink power in full bloom, with a pup in tow.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your outfit with a voluminous blonde hair, bold pink blazer and dress, cinematic pastel-campus backdrop, and sunny, cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"pink\",\n    \"pose_description\": \"holding a dog, smiling broadly\",\n    \"glasses\": false,\n    \"standout_trait\": \"vibe/energy\"\n  }\n}",
+  "face_box": [
+    255,
+    79,
+    101,
+    101
+  ],
+  "layer_agg": "all",
+  "maps": {
+    "aggregate": {
+      "file": "aggregate.png",
+      "n_steps": 166,
+      "sink_diagnostics": {
+        "top1_fraction": 0.6631,
+        "top3_fraction": 0.6771
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.0329,
+        "area_fraction": 0.0648,
+        "enrichment": 0.508
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.0956,
+        "area_fraction": 0.0648,
+        "enrichment": 1.476
+      }
+    },
+    "aggregate_last_layer_only": {
+      "file": "aggregate_last_layer_only.png",
+      "n_steps": 166,
+      "sink_diagnostics": {
+        "top1_fraction": 0.0393,
+        "top3_fraction": 0.0876
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.0468,
+        "area_fraction": 0.0648,
+        "enrichment": 0.723
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.048,
+        "area_fraction": 0.0648,
+        "enrichment": 0.741
+      }
+    },
+    "character": {
+      "file": "character.png",
+      "n_steps": 3,
+      "sink_diagnostics": {
+        "top1_fraction": 0.5837,
+        "top3_fraction": 0.6099
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.0707,
+        "area_fraction": 0.0648,
+        "enrichment": 1.092
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.159,
+        "area_fraction": 0.0648,
+        "enrichment": 2.455
+      }
+    },
+    "standout_trait": {
+      "file": "standout_trait.png",
+      "n_steps": 4,
+      "sink_diagnostics": {
+        "top1_fraction": 0.9243,
+        "top3_fraction": 0.9312
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.0093,
+        "area_fraction": 0.0648,
+        "enrichment": 0.144
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.1184,
+        "area_fraction": 0.0648,
+        "enrichment": 1.828
+      }
+    },
+    "reasoning": {
+      "file": "reasoning.png",
+      "n_steps": 27,
+      "sink_diagnostics": {
+        "top1_fraction": 0.7172,
+        "top3_fraction": 0.756
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.0678,
+        "area_fraction": 0.0648,
+        "enrichment": 1.047
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.2182,
+        "area_fraction": 0.0648,
+        "enrichment": 3.369
+      }
+    }
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/professor_from_money_heist.webp",
+  "true_character": "professor_from_money_heist",
+  "predicted_character": "Professor from Money Heist",
+  "raw_text": "{\n  \"character\": \"Professor from Money Heist\",\n  \"reasoning\": \"You exude calm, composed authority with a steady gaze and closed mouth \u2014 a mature, intellectual vibe that matches the Professor's academic demeanor.\",\n  \"caption\": \"You're the quiet genius behind the heist, not the hero.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace your outfit with the iconic red jumpsuit and white Salvador Dali mask, set against a sunbaked Spanish plaza backdrop with cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"black\",\n    \"pose_description\": \"arms crossed\",\n    \"glasses\": true,\n    \"standout_trait\": \"vibe/energy\"\n  }\n}",
+  "face_box": [
+    74,
+    25,
+    59,
+    59
+  ],
+  "layer_agg": "all",
+  "maps": {
+    "aggregate": {
+      "file": "aggregate.png",
+      "n_steps": 167,
+      "sink_diagnostics": {
+        "top1_fraction": 0.7976,
+        "top3_fraction": 0.8152
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.0235,
+        "area_fraction": 0.1109,
+        "enrichment": 0.212
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.0515,
+        "area_fraction": 0.1109,
+        "enrichment": 0.465
+      }
+    },
+    "aggregate_last_layer_only": {
+      "file": "aggregate_last_layer_only.png",
+      "n_steps": 167,
+      "sink_diagnostics": {
+        "top1_fraction": 0.0555,
+        "top3_fraction": 0.1402
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.0559,
+        "area_fraction": 0.1109,
+        "enrichment": 0.504
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.0562,
+        "area_fraction": 0.1109,
+        "enrichment": 0.507
+      }
+    },
+    "character": {
+      "file": "character.png",
+      "n_steps": 5,
+      "sink_diagnostics": {
+        "top1_fraction": 0.6599,
+        "top3_fraction": 0.702
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.0681,
+        "area_fraction": 0.1109,
+        "enrichment": 0.614
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.1214,
+        "area_fraction": 0.1109,
+        "enrichment": 1.095
+      }
+    },
+    "standout_trait": {
+      "file": "standout_trait.png",
+      "n_steps": 4,
+      "sink_diagnostics": {
+        "top1_fraction": 0.9337,
+        "top3_fraction": 0.9422
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.0096,
+        "area_fraction": 0.1109,
+        "enrichment": 0.087
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.0268,
+        "area_fraction": 0.1109,
+        "enrichment": 0.241
+      }
+    },
+    "reasoning": {
+      "file": "reasoning.png",
+      "n_steps": 28,
+      "sink_diagnostics": {
+        "top1_fraction": 0.7912,
+        "top3_fraction": 0.8132
+      },
+      "face_stats_raw": {
+        "mass_fraction": 0.0386,
+        "area_fraction": 0.1109,
+        "enrichment": 0.348
+      },
+      "face_stats_sink_robust": {
+        "mass_fraction": 0.0835,
+        "area_fraction": 0.1109,
+        "enrichment": 0.753
+      }
+    }
+  }
+}

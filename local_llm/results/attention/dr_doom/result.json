@@ -1,0 +1,60 @@
+{
+  "image": "/DATA1/scratch1/samyak/TOS-poster-generating/static/characters/dr_doom.jpg",
+  "true_character": "dr_doom",
+  "predicted_character": "Dr. Doom",
+  "raw_text": "{\n  \"character\": \"Dr. Doom\",\n  \"reasoning\": \"Your stern, narrowed-eyed expression and broad jawline perfectly mirror Dr. Doom's intimidating, superior demeanor.\",\n  \"caption\": \"You're not just powerful \u2014 you're the villain with a cape and a cold stare.\",\n  \"diffusion_prompt\": \"Keep the exact same person, face, and pose from the photo unchanged; replace with full green-and-metal armor, flowing green hooded cloak, gothic stone castle backdrop, cinematic movie-poster quality.\",\n  \"detected_traits\": {\n    \"outfit_color\": \"green\",\n    \"pose_description\": \"standing with clenched fist\",\n    \"glasses\": false,\n    \"standout_trait\": \"facial expression\"\n  }\n}",
+  "face_box": null,
+  "layer_agg": "all",
+  "maps": {
+    "aggregate": {
+      "file": "aggregate.png",
+      "n_steps": 158,
+      "sink_diagnostics": {
+        "top1_fraction": 0.6171,
+        "top3_fraction": 0.6292
+      },
+      "face_stats_raw": null,
+      "face_stats_sink_robust": null
+    },
+    "aggregate_last_layer_only": {
+      "file": "aggregate_last_layer_only.png",
+      "n_steps": 158,
+      "sink_diagnostics": {
+        "top1_fraction": 0.0224,
+        "top3_fraction": 0.0653
+      },
+      "face_stats_raw": null,
+      "face_stats_sink_robust": null
+    },
+    "character": {
+      "file": "character.png",
+      "n_steps": 3,
+      "sink_diagnostics": {
+        "top1_fraction": 0.3951,
+        "top3_fraction": 0.4546
+      },
+      "face_stats_raw": null,
+      "face_stats_sink_robust": null
+    },
+    "standout_trait": {
+      "file": "standout_trait.png",
+      "n_steps": 3,
+      "sink_diagnostics": {
+        "top1_fraction": 0.7647,
+        "top3_fraction": 0.8032
+      },
+      "face_stats_raw": null,
+      "face_stats_sink_robust": null
+    },
+    "reasoning": {
+      "file": "reasoning.png",
+      "n_steps": 21,
+      "sink_diagnostics": {
+        "top1_fraction": 0.5715,
+        "top3_fraction": 0.6021
+      },
+      "face_stats_raw": null,
+      "face_stats_sink_robust": null
+    }
+  }
+}
