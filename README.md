@@ -89,8 +89,10 @@ authoritative, commented version):
 ```env
 OPENAI_API_KEY=your_openai_api_key
 OPENAI_ANALYSIS_MODEL=gpt-5-mini
+OPENAI_REASONING_EFFORT=minimal
 
 CHARACTER_REF_DIR=static/characters
+OPENAI_REFERENCE_IMAGE_MAX_DIM=400
 
 OPENAI_IMAGE_MODEL=gpt-image-2
 OPENAI_IMAGE_MODEL_FALLBACK=gpt-image-1
@@ -336,6 +338,23 @@ both of those patterns broke on serverless hosts, and both are gone now.
   GPT-5-series models support it). This is a real speed/cost trade rather
   than a strict upgrade -- override back to `gpt-4o` if match/reasoning
   quality seems to suffer.
+  - `gpt-5-mini` is a **reasoning model**: it burns invisible "thinking"
+    tokens before producing the visible JSON answer, and that thinking time
+    doesn't show up in token counts, only in wall-clock latency. Left at its
+    default effort this actually made analysis calls slower than `gpt-4o`
+    (30+s). `OPENAI_REASONING_EFFORT` (default `minimal`) caps that -- raise
+    to `low`/`medium` only if match/reasoning quality seems to need more
+    deliberation. It also does not accept a custom `temperature` (only its
+    default of `1`), so match variety comes entirely from the tie-break
+    prompt language in `_build_instruction()`, not sampling temperature.
+  - The bigger latency cost, independent of reasoning effort, was the 21
+    character reference images sent inline on every analysis call that
+    misses OpenAI's prompt cache (the cache window is only ~5-10min, so gaps
+    between booth visitors mean most calls miss it). Those were previously
+    read straight off disk at full source resolution. `openai_analysis.py`
+    now downscales each one to `OPENAI_REFERENCE_IMAGE_MAX_DIM` (default
+    `400`px) once at load time -- fine detail isn't needed for visual
+    grounding, so this cuts the non-cached request size drastically.
 - Both models default to PNG output if you don't ask for anything else,
   which is lossless and noticeably bigger than a compressed photo-style
   poster needs to be -- `OPENAI_OUTPUT_FORMAT` (default `jpeg`) and

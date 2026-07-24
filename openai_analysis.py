@@ -36,12 +36,34 @@ import image_utils
 
 MODEL_ID = os.environ.get("OPENAI_ANALYSIS_MODEL", "gpt-5-mini")
 
+# gpt-5-mini is a reasoning model -- it spends time on internal "thinking"
+# tokens before producing the visible JSON answer, and that thinking time is
+# what was actually driving the 35+s analysis latency reported live (not the
+# vision/JSON-generation work itself). reasoning_effort controls how much of
+# that invisible thinking it does: minimal/low/medium/high. This task is a
+# single-pass classification + short text generation against a fixed
+# schema -- it doesn't need multi-step deliberation, so "minimal" is the
+# right default. Override via OPENAI_REASONING_EFFORT if match quality ever
+# seems to need more deliberation.
+REASONING_EFFORT = os.environ.get("OPENAI_REASONING_EFFORT", "minimal")
+
 # Shared with image_gen.py's OPENAI_INPUT_MAX_DIM so both calls downscale to
 # the same size -- the captured photo was previously sent full-resolution
 # to this analysis call (only the poster-edit call downscaled), so a large
 # phone photo was effectively being uploaded twice at full size for no
 # benefit; gpt-4o downsamples large images internally anyway.
 ANALYSIS_MAX_DIM = int(os.environ.get("OPENAI_INPUT_MAX_DIM", "1280"))
+
+# Much smaller than ANALYSIS_MAX_DIM on purpose. The 21 character reference
+# images are sent inline on EVERY analysis call whenever OpenAI's automatic
+# cache doesn't hit (the cache window is only ~5-10min, so at a booth with
+# gaps between visitors most calls miss it) -- they were previously read
+# straight off disk at whatever resolution the source file happened to be,
+# which for 21 images stacked together is very likely the single biggest
+# contributor to slow, non-cached analysis calls (much bigger than the
+# reasoning-effort overhead). Fine detail isn't needed here, these just need
+# to be recognizable for visual grounding, so downscale hard.
+REFERENCE_IMAGE_MAX_DIM = int(os.environ.get("OPENAI_REFERENCE_IMAGE_MAX_DIM", "400"))
 
 _client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
@@ -330,7 +352,15 @@ def _load_reference_images() -> dict:
     Characters without a file are simply skipped. Sorted by character name
     on the way out (see _build_roster_content) so the byte order is
     deterministic across requests/restarts -- required for the prefix to
-    match and actually hit OpenAI's cache."""
+    match and actually hit OpenAI's cache.
+
+    Each image is downscaled to REFERENCE_IMAGE_MAX_DIM and re-encoded as
+    JPEG via image_utils -- these files were previously read raw off disk at
+    whatever size they happened to be saved at (often full-resolution
+    showcase/poster art), and with 21 of them stacked into every non-cached
+    analysis call, that was very likely the biggest single latency cost in
+    the whole pipeline. Downscaling happens once here at load/rebuild time,
+    not per-request, so it costs nothing on the hot path."""
     found = {}
     ext_mime = {"jpg": "image/jpeg", "jpeg": "image/jpeg", "png": "image/png", "webp": "image/webp"}
     for name in CHARACTERS:
@@ -339,7 +369,9 @@ def _load_reference_images() -> dict:
             path = os.path.join(CHARACTER_REF_DIR, f"{slug}.{ext}")
             if os.path.exists(path):
                 with open(path, "rb") as f:
-                    found[name] = (f.read(), mime)
+                    raw_bytes = f.read()
+                small_bytes = image_utils.prepare_image_bytes(raw_bytes, max_dim=REFERENCE_IMAGE_MAX_DIM)
+                found[name] = (small_bytes, "image/jpeg")
                 break
     return found
 
@@ -606,6 +638,7 @@ def _call_openai(image_bytes: bytes, mime_type: str, include_reference_images: b
         # support 0.95 with this model"). Match variety for close ties is
         # instead handled entirely via the tie-break prompt language in
         # _build_instruction() rather than a sampling-temperature knob.
+        reasoning_effort=REASONING_EFFORT,
     )
 
 

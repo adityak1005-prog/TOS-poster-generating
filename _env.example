@@ -6,8 +6,17 @@ OPENAI_API_KEY=your_openai_api_key
 # explicit (and free-tier-blocked) context caching -- no code-side cache
 # object to manage, it's automatic based on repeated identical prefixes.
 OPENAI_ANALYSIS_MODEL=gpt-5-mini
+# gpt-5-mini is a reasoning model -- "minimal" skips most of its internal
+# thinking time, which is what was causing 35+s analysis latency. Raise to
+# "low"/"medium" only if match quality suffers.
+OPENAI_REASONING_EFFORT=minimal
 
 CHARACTER_REF_DIR=static/characters
+# Reference images are re-sent inline on every analysis call that misses
+# OpenAI's cache -- downscaled to this size at load time so 21 stacked
+# images don't dominate request latency. Leave at 400 unless matching
+# quality suffers.
+OPENAI_REFERENCE_IMAGE_MAX_DIM=400
 
 # Stage 3 (poster generation via images.edit).
 OPENAI_IMAGE_MODEL=gpt-image-2

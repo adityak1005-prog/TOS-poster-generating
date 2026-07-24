@@ -217,7 +217,8 @@
   </div>
 
   <!-- ============ REVEAL ============ -->
-  <div class="screen card" id="screen-reveal">
+  <div class="screen card" id="screen-reveal" style="position: relative;">
+    <div id="timeTakenBadge" style="position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,.55); color: var(--text-dim); font-size: .7rem; padding: .25rem .55rem; border-radius: 999px; letter-spacing: .02em; display: none;"></div>
     <img id="resultImage" alt="Your poster">
     <div class="catchphrase" id="catchphrase"></div>
     <div class="reasoning-box" id="reasoningBox"></div>
@@ -539,6 +540,15 @@
     if (t.glasses) traitsText += ", glasses";
     document.getElementById("traitsLine").innerText = traitsText;
     document.getElementById("qrImage").src = data.qr_url;
+
+    const badge = document.getElementById("timeTakenBadge");
+    const totalSecs = data.timings && data.timings.total;
+    if (totalSecs) {
+      badge.innerText = `${totalSecs}s`;
+      badge.style.display = "block";
+    } else {
+      badge.style.display = "none";
+    }
 
     showScreen("screen-reveal");
   }
