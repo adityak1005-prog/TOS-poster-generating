@@ -109,32 +109,12 @@ _client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 # trigger, specifically so the roster doesn't collapse onto a few "safe"
 # names.
 CHARACTER_STYLE_GUIDE = {
-    "Batman": (
-        "MATCH ON: a broad, square-ish jaw held with a completely flat, "
-        "unsmiling mouth -- neutral, not a smirk, not a frown. "
-        "Male-presenting, clean-shaven. This is the 'plain serious face, "
-        "no beard, no smirk' bucket -- if there's a beard, that's Jon "
-        "Snow; if there's a one-sided smirk, that's Sheldon's territory. "
-        "IMPORTANT: 'not smiling' is the single most common default photo "
-        "expression there is -- do not let this become the new automatic "
-        "fallback the way Professor/Sheldon used to be. This means "
-        "checking the alternatives before committing, not avoiding Batman "
-        "altogether -- when the jaw genuinely reads as broad/square AND "
-        "the flatness is notably intense/watchful, Batman is exactly the "
-        "right pick and should be used with full confidence. Only weigh it "
-        "against Thomas Shelby, Sasuke, or Dr. Doom when the face is a "
-        "plainer, less distinctive non-smile with no other standout "
-        "feature. POSTER LOOK: "
-        "matte-black armored bat-suit, flowing cape, cowl with pointed "
-        "ears, utility belt, moody Gotham-noir lighting (deep shadows, "
-        "cold blue-grey highlights, rain-slicked rooftops)."
-    ),
     "Thomas Shelby": (
         "MATCH ON: a lean face with high, sharp cheekbones, held in a "
-        "genuinely still, barely-moving closed mouth -- calmer and more "
-        "composed than Batman's flat-but-ordinary neutral. Male-presenting, "
-        "clean-shaven, neat hair. The lean/sharp cheekbone shape is what "
-        "separates this from Batman's broader square jaw. POSTER LOOK: "
+        "genuinely still, barely-moving closed mouth -- calm, composed, "
+        "and controlled rather than merely blank. Male-presenting, "
+        "clean-shaven, neat hair. The lean/sharp cheekbones plus "
+        "closed-off composure is the deciding combo. POSTER LOOK: "
         "fitted 1920s tweed three-piece suit, flat cap pulled low, "
         "slicked-back undercut hair, muted sepia Birmingham streets or a "
         "dim pub."
@@ -143,8 +123,7 @@ CHARACTER_STYLE_GUIDE = {
         "MATCH ON: a round, full-cheeked young face with a wide, open, "
         "genuinely happy grin showing the top teeth, eyebrows relaxed "
         "(not raised, not low/thick). Male-presenting, young, no facial "
-        "hair. Against Joker: eyebrows stay neutral, not arched dramatically "
-        "high. Against Shinchan: eyebrows are relaxed, not thick and low. "
+        "hair. Against Shinchan: eyebrows are relaxed, not thick and low. "
         "POSTER LOOK: orange-and-black jumpsuit, blue forehead protector, "
         "spiky blonde hair, whisker cheek markings, anime-style "
         "chakra-burst backdrop."
@@ -171,15 +150,6 @@ CHARACTER_STYLE_GUIDE = {
         "look (thick-rimmed glasses, tousled hair, rumpled cardigan) if "
         "the person's own glasses/cardigan were themselves the standout "
         "match reason."
-    ),
-    "Gwen Stacy": (
-        "MATCH ON: one eyebrow cocked distinctly higher than the other, "
-        "paired with a one-sided smirk and a loose, casual head tilt. "
-        "Female-presenting. The head tilt is what separates this from "
-        "Regina George, whose smirk is even on both sides with the head "
-        "held straight. POSTER LOOK: pink-and-white hooded Spider suit "
-        "with a black spider emblem, hood down to show "
-        "blonde-and-pink-streaked hair, comic-book graffiti backdrop."
     ),
     "Daenerys Targaryen": (
         "MATCH ON: softly rounded cheeks (not sharp/angular) on a wide "
@@ -217,37 +187,26 @@ CHARACTER_STYLE_GUIDE = {
         "tousled/messy hair if visible. This should be a distinct "
         "'sleepy-eyed' look, not just any relaxed face -- if the eyes are "
         "fully open and alert, this isn't the match; consider Thomas "
-        "Shelby or Batman instead. POSTER LOOK: messy silver hair, Leaf "
+        "Shelby instead. POSTER LOOK: messy silver hair, Leaf "
         "Village forehead protector tilted over one eye, fabric mask over "
         "nose and mouth, navy flak vest, misty forest or rooftop-at-dusk "
         "backdrop."
     ),
     "Sasuke Uchiha": (
-        "MATCH ON: a young, narrow/angular face (not broad like Batman) "
-        "with thin, straight eyebrows and a hard, direct stare, mouth "
-        "flat. Male-presenting, young, no facial hair, dark hair if "
-        "visible. The narrow face shape is the deciding cue against "
-        "Batman's broader jaw. POSTER LOOK: navy-and-white high-collared "
+        "MATCH ON: a young, narrow/angular face with thin, straight "
+        "eyebrows and a hard, direct stare, mouth flat. Male-presenting, "
+        "young, no facial hair, dark hair if visible. The narrow face "
+        "shape plus intense stare, on someone youthful, is the deciding "
+        "combo. POSTER LOOK: navy-and-white high-collared "
         "ninja outfit, a sheathed katana worn stylistically across the "
         "back (never drawn or wielded), Sharingan eye detail, crackling "
         "blue lightning backdrop."
-    ),
-    "Joker": (
-        "MATCH ON: a wide, open-mouthed grin/laugh combined with "
-        "eyebrows raised dramatically high and wide, energetic eyes -- "
-        "reads as manic/theatrical rather than simply happy. "
-        "Male-presenting. The high-arched raised eyebrows are what "
-        "separate this from Naruto (neutral brows) and Shinchan (low, "
-        "thick brows). POSTER LOOK: rumpled purple tailcoat over a green "
-        "vest, neat chalk-white face paint with a clean red-painted smile "
-        "(stylized theatrical makeup, not smeared or wound-like), chaotic "
-        "neon-lit city backdrop."
     ),
     "Jon Snow": (
         "MATCH ON: visible beard or heavy stubble covering the jaw, on a "
         "long face with a weary or serious expression. Male-presenting. "
         "The beard is close to a requirement -- do not pick this "
-        "clean-shaven, that's Batman's or Sasuke's territory. POSTER "
+        "clean-shaven, that's Sasuke's or Thomas Shelby's territory. POSTER "
         "LOOK: dark tousled shoulder-length hair, thick black furs and "
         "leather armor, snow-covered northern landscape or icy-wall "
         "backdrop."
@@ -256,38 +215,26 @@ CHARACTER_STYLE_GUIDE = {
         "MATCH ON: thick, low-set eyebrows drawn down close to the eyes, "
         "combined with a wide, open-mouthed laugh -- reads as goofy/silly "
         "rather than warm. Distinct from Naruto (neutral brows, warmer "
-        "grin) and Joker (high raised brows, manic energy) by the low, "
-        "thick brow position specifically. POSTER LOOK: spiky messy "
+        "grin) by the low, thick brow position specifically. POSTER LOOK: spiky messy "
         "black hair, simple bright shirt and shorts, bold flat colorful "
         "cartoon-style backdrop."
     ),
     "Harry Potter": (
-        "MATCH ON: round/circular-shaped glasses specifically (not "
-        "rectangular), combined with messy, unstyled hair and a "
-        "wide-eyed, slightly startled or eager look. Male-presenting, "
-        "young. Round glasses shape plus messy hair is what separates "
-        "this from Sheldon (rectangular glasses, neat hair). If hair is "
-        "neat/styled, this is not the match even with round glasses. "
+        "MATCH ON: round/circular-shaped glasses specifically, combined "
+        "with messy, unstyled hair and a wide-eyed, slightly startled or "
+        "eager look. Male-presenting, young. The round glasses plus "
+        "messy hair plus wide-eyed earnestness is the deciding combo -- "
+        "if hair is neat/styled instead of messy, this is not the match "
+        "even with round glasses; consider Sheldon Cooper instead. "
         "POSTER LOOK: round glasses, lightning-bolt scar, messy black "
         "hair, Gryffindor robes with a red-and-gold scarf, Hogwarts "
         "castle or starry quidditch-pitch backdrop."
     ),
-    "Dr. Doom": (
-        "MATCH ON: match from the face, not a pose -- a strong, broad jaw "
-        "with narrowed, hard-set eyes and mouth corners turned slightly "
-        "down, reading as stern/superior rather than merely neutral. "
-        "Works for either gender presentation. The slight downturn and "
-        "narrowed glare separate this from Batman's totally flat, "
-        "unreadable neutral. POSTER LOOK: full green-and-metal armor, "
-        "smooth expressionless mask, flowing green hooded cloak, gothic "
-        "stone castle or arcane-green-energy backdrop."
-    ),
     "Regina George": (
         "MATCH ON: sleek, smoothed-down hair with a closed-mouth smirk "
         "that is even on BOTH sides (not one-sided), chin held level or "
-        "slightly down. Female-presenting. The even two-sided smirk with "
-        "no head tilt separates this from Gwen Stacy's one-sided "
-        "smirk-plus-tilt. POSTER LOOK: sleek blonde hair, trendy pink or "
+        "slightly down, cool and composed. Female-presenting. The even, "
+        "level smirk with no head tilt is the deciding cue. POSTER LOOK: sleek blonde hair, trendy pink or "
         "designer outfit, glossy high-school-hallway or pastel-pink "
         "backdrop."
     ),
@@ -300,19 +247,62 @@ CHARACTER_STYLE_GUIDE = {
         "accessories), sunny pastel-campus or courtroom backdrop."
     ),
     "Sheldon Cooper": (
-        "MATCH ON: rectangular or thick-rimmed glasses (not round) with "
-        "neat, styled hair, and a thin, prim closed-mouth line where one "
-        "corner sits very slightly higher than the other. Male-presenting, "
-        "clean-shaven. The rectangular glasses plus neat hair is the "
-        "deciding combo against Harry Potter's round glasses and messy "
-        "hair -- if hair is messy, go there instead. Glasses alone "
-        "shouldn't default here without the neat/prim mouth and tidy hair "
-        "too, but when that fuller combination is genuinely present, pick "
-        "it confidently -- this is a real, correct match, not just a "
-        "fallback. POSTER LOOK: "
+        "MATCH ON: neat, tidy, side-swept/styled hair combined with a "
+        "thin, prim, closed-mouth line where one corner sits very "
+        "slightly higher than the other -- reads as rigid, exact, and a "
+        "little condescending, not merely quiet or nervous. "
+        "Male-presenting, clean-shaven, no glasses required (glasses are "
+        "NOT a defining trait of this character -- do not use them as a "
+        "cue at all). IMPORTANT: a generally nervous, awkward, or "
+        "reserved vibe alone is common among people meeting an AI photo "
+        "booth for the first time and is NOT enough on its own -- this "
+        "needs the specific rigid/prim posture and faintly-superior mouth "
+        "shape, not just shyness or nerves. Do not default here just "
+        "because someone looks a little tense or unsmiling; weigh "
+        "Thomas Shelby, Wednesday Addams, or Sasuke instead if the only "
+        "signal is general nervousness with no rigid/prim quality to it. "
+        "POSTER LOOK: "
         "side-swept hair, layered graphic tee under a collared shirt, "
         "cluttered apartment with an equation-covered whiteboard "
         "backdrop."
+    ),
+    "Jack Sparrow": (
+        "MATCH ON: a loose, lopsided, sly grin with droopy, half-lidded "
+        "'tipsy' eyes and an unbothered, swaggering ease -- reads as "
+        "roguish and unpredictable, more theatrical/staggering than "
+        "Kakashi's laid-back sleepiness. Male-presenting; light stubble "
+        "or a scruffy, unkempt look is a bonus cue if present. Energy is "
+        "mischievous and carefree, closer to chaotic charm than calm. "
+        "POSTER LOOK: weathered pirate coat, tricorn hat, beaded braided "
+        "hair and beard, an ornate cutlass worn sheathed at the hip "
+        "purely as a stylized costume piece (never drawn or wielded), a "
+        "ship's deck or stormy sea backdrop."
+    ),
+    "Rancho": (
+        "MATCH ON: a warm, genuine, easygoing smile paired with bright, "
+        "curious, mischievous eyes -- reads as free-spirited and "
+        "quietly confident, the effortlessly clever friend rather than "
+        "loudly energetic. Male-presenting. Distinct from Naruto's loud "
+        "open-mouthed enthusiasm (this is more understated and "
+        "knowing) and from Elle Woods' bubbliness (this reads more "
+        "dry-witted and thoughtful underneath the warmth). POSTER LOOK: "
+        "simple casual college wear (a comfortable sweater or checked "
+        "shirt), an engineering-campus or hostel-room backdrop with "
+        "sketches and gadgets, warm golden collegiate lighting, "
+        "cinematic Bollywood-poster quality."
+    ),
+    "Chandler Bing": (
+        "MATCH ON: a dry, deadpan half-smile or smirk mid-quip, "
+        "eyebrows slightly raised in a sarcastic, self-aware way -- "
+        "reads as nervous energy channeled into humor, awkward and "
+        "self-deprecating rather than confident. Male-presenting. This "
+        "is a good home for genuine social awkwardness/nervousness "
+        "specifically because it's paired with a dry, joking half-smile -- "
+        "distinct from Sheldon's rigid superiority (Chandler deflects "
+        "with self-deprecating humor, never condescension). POSTER "
+        "LOOK: a smart-casual button-down shirt, a cozy New York "
+        "apartment or coffee-shop backdrop with warm sitcom-style "
+        "lighting, cinematic quality."
     ),
 }
 
@@ -361,6 +351,45 @@ _DISABLED_CHARACTERS = {
         "what separates this from Gwen Stacy's tilted head. POSTER LOOK: "
         "fitted black tactical bodysuit, utility straps, wavy red hair, "
         "cool steel-blue or shadowed tactical backdrop."
+    ),
+    # Removed as a deliberate policy choice (Marvel/DC IP), not a
+    # moderation failure like the three above -- same restore process.
+    "Batman": (
+        "MATCH ON: a broad, square-ish jaw held with a completely flat, "
+        "unsmiling mouth -- neutral, not a smirk, not a frown. "
+        "Male-presenting, clean-shaven. IMPORTANT: 'not smiling' is the "
+        "single most common default photo expression there is -- do not "
+        "let this become an automatic fallback; only pick this when the "
+        "jaw genuinely reads as broad/square AND the flatness is notably "
+        "intense/watchful. POSTER LOOK: matte-black armored bat-suit, "
+        "flowing cape, cowl with pointed ears, utility belt, moody "
+        "Gotham-noir lighting (deep shadows, cold blue-grey highlights, "
+        "rain-slicked rooftops)."
+    ),
+    "Dr. Doom": (
+        "MATCH ON: match from the face, not a pose -- a strong, broad jaw "
+        "with narrowed, hard-set eyes and mouth corners turned slightly "
+        "down, reading as stern/superior rather than merely neutral. "
+        "Works for either gender presentation. POSTER LOOK: full "
+        "green-and-metal armor, smooth expressionless mask, flowing "
+        "green hooded cloak, gothic stone castle or arcane-green-energy "
+        "backdrop."
+    ),
+    "Gwen Stacy": (
+        "MATCH ON: one eyebrow cocked distinctly higher than the other, "
+        "paired with a one-sided smirk and a loose, casual head tilt. "
+        "Female-presenting. POSTER LOOK: pink-and-white hooded Spider "
+        "suit with a black spider emblem, hood down to show "
+        "blonde-and-pink-streaked hair, comic-book graffiti backdrop."
+    ),
+    "Joker": (
+        "MATCH ON: a wide, open-mouthed grin/laugh combined with "
+        "eyebrows raised dramatically high and wide, energetic eyes -- "
+        "reads as manic/theatrical rather than simply happy. "
+        "Male-presenting. POSTER LOOK: rumpled purple tailcoat over a "
+        "green vest, neat chalk-white face paint with a clean "
+        "red-painted smile (stylized theatrical makeup, not smeared or "
+        "wound-like), chaotic neon-lit city backdrop."
     ),
 }
 # --------------------------------------------------------------------------
@@ -580,13 +609,14 @@ people -- avoid converging on the same handful of "safe" characters just
 because their descriptions mention easy-to-spot items like glasses or a
 graphic tee; check the other dimensions (especially facial hair and gender
 presentation) before committing to a match like that. Several roster entries
-(Professor from Money Heist, Sheldon Cooper, Harry Potter) explicitly warn
-that glasses plus a neutral/calm expression is common and weak evidence on
-its own, and Batman explicitly warns that an ordinary non-smiling face is
-common and weak evidence on its own too -- respect those warnings rather
-than defaulting to those names. These warnings exist to stop lazy,
-one-cue-only matching, NOT to exclude these characters -- they are common,
-correct, fully valid picks whenever their fuller combination of cues
+explicitly warn against single-cue defaults: Professor from Money Heist and
+Harry Potter warn that glasses plus a neutral/calm expression is common and
+weak evidence on its own, and Sheldon Cooper warns that a generally nervous
+or reserved vibe alone (common among people meeting an AI photo booth) is
+not enough without the specific rigid/prim posture too -- respect those
+warnings rather than defaulting to those names. These warnings exist to stop
+lazy, one-cue-only matching, NOT to exclude these characters -- they are
+common, correct, fully valid picks whenever their fuller combination of cues
 genuinely fits best. Never avoid a character just because it was recently
 over-picked or because a warning exists on its entry; the goal is accuracy
 per photo, not enforcing a quota across visitors.
@@ -626,15 +656,16 @@ the same 4-5 famous defaults across many different people.
    FULL iconic costume, pulled from the chosen character's "POSTER LOOK" text
    above (never from "MATCH ON") -- describe it as a complete outfit swap
    (e.g. for the Professor: the entire red jumpsuit AND the white Dali mask,
-   not just "a red accent"; for Dr. Doom: the full green-and-metal armor
-   and cloak, not just a chest piece). The person's actual clothing should be entirely
+   not just "a red accent"; for Jon Snow: the full furs and leather armor,
+   not just a cloak clasp). The person's actual clothing should be entirely
    replaced by the costume, not layered with or peeking through it. List the
    2-4 most defining pieces/colors of that full costume so the model has
    enough to fully cover the subject, but never touch hair, facial structure,
    or anything that would alter the person's actual face,
    (b) one lighting/backdrop cue that evokes that character's own film or
-   franchise (e.g. Gotham-noir shadows for Batman, a Hogwarts corridor for
-   Harry Potter, chakra-burst energy for Naruto) -- the backdrop should feel
+   franchise (e.g. a Hogwarts corridor for Harry Potter, chakra-burst
+   energy for Naruto, sepia Birmingham streets for Thomas Shelby) -- the
+   backdrop should feel
    like it belongs to their world, not a generic photo-booth setting,
    (c) "cinematic movie-poster quality" as a closing style tag. Never
    mention a college, fest, campus, event, or any promotional/booth
