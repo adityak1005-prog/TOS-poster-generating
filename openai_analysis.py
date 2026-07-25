@@ -210,10 +210,11 @@ CHARACTER_STYLE_GUIDE = {
     "Shinchan": (
         "MATCH ON: thick, low-set eyebrows drawn down close to the eyes, "
         "combined with a wide, open-mouthed laugh -- reads as goofy/silly "
-        "rather than warm. Distinct from Naruto (neutral brows, warmer "
-        "grin) by the low, thick brow position specifically. POSTER "
-        "LOOK: spiky messy black hair, simple bright shirt and shorts, "
-        "bold flat colorful cartoon-style backdrop."
+        "rather than warm. Male-presenting. Distinct from Naruto (neutral "
+        "brows, warmer grin) by the low, thick brow position "
+        "specifically. POSTER LOOK: spiky messy black hair, simple "
+        "bright shirt and shorts, bold flat colorful cartoon-style "
+        "backdrop."
     ),
     "Harry Potter": (
         "MATCH ON: round/circular-shaped glasses specifically (not "
@@ -253,8 +254,11 @@ CHARACTER_STYLE_GUIDE = {
         "clear standout observation on its own, not just because a face is "
         "calm and wears glasses; a face with other distinctive features "
         "(strong jaw, notable brow shape, a distinctive smile, etc.) "
-        "belongs to a more specific character instead. Should be one of "
-        "the rarer matches, not a common default. The rectangular glasses "
+        "belongs to a more specific character instead. A nervous, "
+        "camera-shy stiffness (very common at this booth) is NOT the same "
+        "thing as this prim composure -- do not read simple nervousness as "
+        "this cue. Should be one of the rarer matches, not a common "
+        "default. The rectangular glasses "
         "plus neat hair is the deciding combo against Harry Potter's round "
         "glasses and messy hair -- if hair is messy, go there instead. "
         "POSTER LOOK: side-swept hair, layered graphic tee under a "
@@ -280,10 +284,11 @@ CHARACTER_STYLE_GUIDE = {
         "composed confidence. Male-presenting, young, casual energy. "
         "Distinct from Barney Stinson's more composed showman grin and "
         "Rancho's calmer curiosity -- this is the most restless/eager of "
-        "the three. POSTER LOOK: a casual layered jacket and travel gear, "
-        "tousled windswept hair, a mountain trekking trail or hillside "
-        "backdrop at golden hour, a sense of movement and open-road "
-        "freedom."
+        "the three. POSTER LOOK: a warm woolen beanie and a layered "
+        "trekking jacket with a backpack, tousled windswept hair, "
+        "snow-capped Himalayan peaks and prayer flags in a Manali-style "
+        "mountain backdrop, golden-hour trekking light with a sense of "
+        "movement and open-road freedom."
     ),
     "Rancho from 3 Idiots": (
         "MATCH ON: a relaxed, knowing half-smile with calm, curious eyes "
@@ -291,9 +296,11 @@ CHARACTER_STYLE_GUIDE = {
         "restless. Male-presenting, casual/unpretentious look. This is "
         "the calmest of the confident-male cluster -- distinct from "
         "Barney Stinson's showman grin and Bunny's eager, restless "
-        "energy. POSTER LOOK: simple casual college wear with a "
-        "backpack, relaxed windswept hair, an open scenic road or "
-        "college-campus backdrop, warm optimistic sunlit lighting."
+        "energy. POSTER LOOK: a simple, humble kurta or plain shirt with "
+        "a well-worn engineering-college satchel, relaxed windswept "
+        "hair, a vast turquoise high-altitude lake ringed by barren "
+        "mountains (a Ladakh/Pangong-style backdrop), warm optimistic "
+        "sunlit lighting with a sense of quiet triumph."
     ),
     "Chulbul Pandey": (
         "MATCH ON: a smug, one-sided smirk paired with an intense, "
@@ -302,9 +309,11 @@ CHARACTER_STYLE_GUIDE = {
         "mustache is a strong supporting cue if present, not required. "
         "The challenging/defiant edge to the stare is what separates "
         "this from Barney Stinson's warmer showman grin. POSTER LOOK: a "
-        "khaki police uniform with sunglasses tucked into the pocket, a "
-        "thick mustache, a confident stance, a sunlit small-town Indian "
-        "street backdrop with a dramatic, larger-than-life glow."
+        "khaki police uniform with a name badge, aviator sunglasses "
+        "tucked into the shirt pocket, a thick twirled mustache, a "
+        "swaggering hands-on-belt stance, a sunlit small-town Indian "
+        "street or police-station backdrop with a dramatic, "
+        "larger-than-life action-movie glow."
     ),
     "Geet from Jab We Met": (
         "MATCH ON: wide, animated eyes and an open, mid-expression mouth "
@@ -313,9 +322,10 @@ CHARACTER_STYLE_GUIDE = {
         "Female-presenting. This is the most hyper/expressive of the "
         "roster's warm female energies -- distinct from Elle Woods' "
         "bouncy-but-composed big smile and Naina's much quieter warmth. "
-        "POSTER LOOK: a bright Punjabi-inspired kurti with bold colors "
-        "and jhumka earrings, an energetic train-journey or bustling "
-        "market backdrop, sunlit and full of motion."
+        "POSTER LOOK: a bright salwar kameez with a fluttering dupatta "
+        "and jhumka earrings, an Indian train compartment or platform "
+        "backdrop mid-journey, sunlit and full of motion, an "
+        "unstoppable-chatterbox energy."
     ),
     "Penny from The Big Bang Theory": (
         "MATCH ON: a relaxed, easy half-smile and an unpretentious, "
@@ -335,9 +345,11 @@ CHARACTER_STYLE_GUIDE = {
         "than outwardly bouncy or hyper. Female-presenting. The quieter, "
         "more reflective warmth is what separates this from Elle Woods' "
         "big open-mouthed bounce and Geet's non-stop expressive energy. "
-        "POSTER LOOK: a flowy bohemian dress with a flower crown, wavy "
-        "open hair, a sunlit hillside or festival backdrop, warm golden "
-        "cinematic light."
+        "POSTER LOOK: a flowing white outfit joyfully splashed with "
+        "vibrant Holi colors (pinks, yellows, blues), wavy open hair "
+        "dusted with color powder, a sun-drenched Holi festival crowd "
+        "backdrop, warm golden cinematic light capturing a quiet person "
+        "finally letting loose."
     ),
     "Chandler Bing": (
         "MATCH ON: a wry, one-sided smirk that reads as deflecting or "
@@ -589,10 +601,22 @@ this decision ONLY on the "MATCH ON" text -- ignore "POSTER LOOK" details
 entirely when deciding who someone resembles, since nobody at the booth is
 actually wearing a costume.
 
-Weigh ALL of these dimensions together when deciding, with NO fixed priority
-order between them: facial resemblance/features, face complexity, general
-vibe or energy, complexion, gender presentation, facial hair (or the lack of
-it), pose, type of clothing, and clothing color. Do not default to the same
+Step 1a -- HARD gender gate (do this first, before anything else): determine
+this person's gender presentation from the photo -- male-presenting or
+female-presenting. Every single roster entry above is written for one
+specific gender presentation (stated in its own "MATCH ON" text) -- this is
+a hard requirement, not one factor to weigh alongside the others. Only
+consider characters whose stated gender presentation matches this person's.
+Never match a male-presenting person to a female-presenting character's
+entry, or vice versa, no matter how strong the resemblance is on
+expression, vibe, clothing, or any other trait -- this filtering happens
+BEFORE any of the dimensions below are weighed, not as a tiebreaker after.
+
+Step 1b -- within that gender-filtered set, weigh ALL of these dimensions
+together when deciding, with NO fixed priority order between them: facial
+resemblance/features, face complexity, general vibe or energy, complexion,
+facial hair (or the lack of it), pose, type of clothing, and clothing
+color. Do not default to the same
 one or two dimensions on every photo (e.g. always leaning on outfit color or
 glasses just because they're easy to see) -- look at THIS specific photo and
 decide which single dimension is the strongest, most distinctive match to a
@@ -622,6 +646,18 @@ Sheldon Cooper's "prim, one-corner-higher" mouth is an extremely subtle,
 easy-to-imagine-anywhere cue -- do not use it as a tiebreaker or a fallback
 just because a face is calm and wears glasses; only pick it when that
 specific mouth shape is a genuinely clear, standout observation on its own.
+
+This booth's crowd skews toward first-year students (freshers), many of
+whom will look visibly nervous or camera-shy: a stiff posture, a tight or
+held-back smile, tense shoulders, eyes unsure where to look. That nervous
+energy is extremely common and is NOT the same thing as a character's
+calm, composed, or prim energy (Sheldon Cooper's precision, Thomas
+Shelby's stillness, a Professor-style steady gaze) -- camera-shyness is a
+baseline state almost anyone can show up with, not evidence of a specific
+character's vibe. Don't read "looks stiff/nervous" as "looks calm and
+composed" -- look past the nervousness for what's actually distinctive
+underneath it (their real facial features, build, energy, clothing)
+before defaulting to one of the roster's composed/reserved entries.
 
 If more than one character is a genuinely close, plausible match, do not
 always resolve the tie toward the most famous or most "obvious" name --
