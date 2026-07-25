@@ -100,32 +100,22 @@ _client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 # Never used for matching.
 #
 # This split exists because most of the roster's old descriptions were
-# written costume-first -- e.g. Daenerys's "silver-platinum braided hair",
-# Joker's "chalk-white face paint" -- which are things a real photo can
-# essentially never have. A handful of characters with "everyday" traits
+# written costume-first -- e.g. Daenerys's "silver-platinum braided hair" --
+# things a real photo can essentially never have. A handful of characters with "everyday" traits
 # (glasses, dark clothing, a calm expression) were soaking up most matches
 # by default, simply because they were the only ones an ordinary photo
 # COULD match. Every character below now has its own realistic, reachable
 # trigger, specifically so the roster doesn't collapse onto a few "safe"
 # names.
 CHARACTER_STYLE_GUIDE = {
-    "Batman": (
-        "MATCH ON: a broad, square-ish jaw held with a completely flat, "
-        "unsmiling mouth -- neutral, not a smirk, not a frown. "
-        "Male-presenting, clean-shaven. This is the 'plain serious face, "
-        "no beard, no smirk' bucket -- if there's a beard, that's Jon "
-        "Snow; if there's a one-sided smirk, that's Sheldon instead. "
-        "POSTER LOOK: matte-black armored bat-suit, flowing cape, cowl "
-        "with pointed ears, utility belt, moody Gotham-noir lighting "
-        "(deep shadows, cold blue-grey highlights, rain-slicked "
-        "rooftops)."
-    ),
     "Thomas Shelby": (
         "MATCH ON: a lean face with high, sharp cheekbones, held in a "
         "genuinely still, barely-moving closed mouth -- calmer and more "
-        "composed than Batman's flat-but-ordinary neutral. Male-presenting, "
-        "clean-shaven, neat hair. The lean/sharp cheekbone shape is what "
-        "separates this from Batman's broader square jaw. POSTER LOOK: "
+        "composed than an ordinary flat/neutral face. Male-presenting, "
+        "clean-shaven, neat hair. The lean/sharp cheekbone shape plus that "
+        "genuine stillness is the deciding combination -- a broader, more "
+        "ordinary jaw with a plain flat expression points elsewhere "
+        "instead. POSTER LOOK: "
         "fitted 1920s tweed three-piece suit, flat cap pulled low, "
         "slicked-back undercut hair, muted sepia Birmingham streets or a "
         "dim pub."
@@ -134,8 +124,7 @@ CHARACTER_STYLE_GUIDE = {
         "MATCH ON: a round, full-cheeked young face with a wide, open, "
         "genuinely happy grin showing the top teeth, eyebrows relaxed "
         "(not raised, not low/thick). Male-presenting, young, no facial "
-        "hair. Against Joker: eyebrows stay neutral, not arched dramatically "
-        "high. Against Shinchan: eyebrows are relaxed, not thick and low. "
+        "hair. Against Shinchan: eyebrows are relaxed, not thick and low. "
         "POSTER LOOK: orange-and-black jumpsuit, blue forehead protector, "
         "spiky blonde hair, whisker cheek markings, anime-style "
         "chakra-burst backdrop."
@@ -157,23 +146,15 @@ CHARACTER_STYLE_GUIDE = {
         "the person's own glasses/cardigan were themselves the standout "
         "match reason."
     ),
-    "Gwen Stacy": (
-        "MATCH ON: one eyebrow cocked distinctly higher than the other, "
-        "paired with a one-sided smirk and a loose, casual head tilt. "
-        "Female-presenting. The head tilt is what separates this from "
-        "Regina George, whose smirk is even on both sides with the head "
-        "held straight. POSTER LOOK: pink-and-white hooded Spider suit "
-        "with a black spider emblem, hood down to show "
-        "blonde-and-pink-streaked hair, comic-book graffiti backdrop."
-    ),
     "Daenerys Targaryen": (
         "MATCH ON: softly rounded cheeks (not sharp/angular) on a wide "
-        "forehead, with a calm expression and chin held level or very "
-        "slightly raised. Female-presenting; light/blonde hair is a bonus "
-        "cue if visible. The soft roundness separates this from Black "
-        "Widow's sharper cheekbones. POSTER LOOK: long silver-platinum "
-        "braided hair, flowing pale ivory or deep-blue gown, sunbaked "
-        "desert city or grand throne-hall backdrop."
+        "forehead, with a calm, regal expression and chin held level or "
+        "very slightly raised. Female-presenting; light/blonde hair is a "
+        "bonus cue if visible. The soft roundness plus that poised, calm "
+        "steadiness is the deciding combination -- sharper/angular "
+        "cheekbones point elsewhere instead. POSTER LOOK: long "
+        "silver-platinum braided hair, flowing pale ivory or deep-blue "
+        "gown, sunbaked desert city or grand throne-hall backdrop."
     ),
     "Hermione Granger": (
         "MATCH ON: visibly furrowed or knit-together eyebrows (active "
@@ -201,35 +182,27 @@ CHARACTER_STYLE_GUIDE = {
         "tousled/messy hair if visible. This should be a distinct "
         "'sleepy-eyed' look, not just any relaxed face -- if the eyes are "
         "fully open and alert, this isn't the match; consider Thomas "
-        "Shelby or Batman instead. POSTER LOOK: messy silver hair, Leaf "
+        "Shelby instead. POSTER LOOK: messy silver hair, Leaf "
         "Village forehead protector tilted over one eye, fabric mask over "
         "nose and mouth, navy flak vest, misty forest or rooftop-at-dusk "
         "backdrop."
     ),
     "Sasuke Uchiha": (
-        "MATCH ON: a young, narrow/angular face (not broad like Batman) "
-        "with thin, straight eyebrows and a hard, direct stare, mouth "
-        "flat. Male-presenting, young, no facial hair, dark hair if "
-        "visible. The narrow face shape is the deciding cue against "
-        "Batman's broader jaw. POSTER LOOK: navy-and-white high-collared "
+        "MATCH ON: a young, narrow/angular face (not broad or ordinary) "
+        "with thin, straight eyebrows and a hard, direct, cold stare, "
+        "mouth flat. Male-presenting, young, no facial hair, dark hair if "
+        "visible. The narrow face shape plus that cold, detached "
+        "flatness is the deciding cue -- a broader jaw, or a stare that "
+        "reads as conflicted/emotional rather than cold, points elsewhere "
+        "instead. POSTER LOOK: navy-and-white high-collared "
         "ninja outfit, katana on the back, Sharingan eye detail, crackling "
         "blue lightning backdrop."
-    ),
-    "Joker": (
-        "MATCH ON: a wide, open-mouthed grin/laugh combined with "
-        "eyebrows raised dramatically high and wide, energetic eyes -- "
-        "reads as manic/theatrical rather than simply happy. "
-        "Male-presenting. The high-arched raised eyebrows are what "
-        "separate this from Naruto (neutral brows) and Shinchan (low, "
-        "thick brows). POSTER LOOK: rumpled purple tailcoat over a green "
-        "vest, chalk-white face paint, smeared red smile, chaotic "
-        "neon-lit city backdrop."
     ),
     "Jon Snow": (
         "MATCH ON: visible beard or heavy stubble covering the jaw, on a "
         "long face with a weary or serious expression. Male-presenting. "
         "The beard is close to a requirement -- do not pick this "
-        "clean-shaven, that's Batman's or Sasuke's territory. POSTER "
+        "clean-shaven, that's Sasuke's territory instead. POSTER "
         "LOOK: dark tousled shoulder-length hair, thick black furs and "
         "leather armor, snow-covered northern landscape or icy-wall "
         "backdrop."
@@ -238,10 +211,9 @@ CHARACTER_STYLE_GUIDE = {
         "MATCH ON: thick, low-set eyebrows drawn down close to the eyes, "
         "combined with a wide, open-mouthed laugh -- reads as goofy/silly "
         "rather than warm. Distinct from Naruto (neutral brows, warmer "
-        "grin) and Joker (high raised brows, manic energy) by the low, "
-        "thick brow position specifically. POSTER LOOK: spiky messy "
-        "black hair, simple bright shirt and shorts, bold flat colorful "
-        "cartoon-style backdrop."
+        "grin) by the low, thick brow position specifically. POSTER "
+        "LOOK: spiky messy black hair, simple bright shirt and shorts, "
+        "bold flat colorful cartoon-style backdrop."
     ),
     "Harry Potter": (
         "MATCH ON: round/circular-shaped glasses specifically (not "
@@ -254,22 +226,13 @@ CHARACTER_STYLE_GUIDE = {
         "hair, Gryffindor robes with a red-and-gold scarf, Hogwarts "
         "castle or starry quidditch-pitch backdrop."
     ),
-    "Dr. Doom": (
-        "MATCH ON: match from the face, not a pose -- a strong, broad jaw "
-        "with narrowed, hard-set eyes and mouth corners turned slightly "
-        "down, reading as stern/superior rather than merely neutral. "
-        "Works for either gender presentation. The slight downturn and "
-        "narrowed glare separate this from Batman's totally flat, "
-        "unreadable neutral. POSTER LOOK: full green-and-metal armor, "
-        "smooth expressionless mask, flowing green hooded cloak, gothic "
-        "stone castle or arcane-green-energy backdrop."
-    ),
     "Regina George": (
         "MATCH ON: sleek, smoothed-down hair with a closed-mouth smirk "
         "that is even on BOTH sides (not one-sided), chin held level or "
-        "slightly down. Female-presenting. The even two-sided smirk with "
-        "no head tilt separates this from Gwen Stacy's one-sided "
-        "smirk-plus-tilt. POSTER LOOK: sleek blonde hair, trendy pink or "
+        "slightly down. Female-presenting. The perfectly even, two-sided "
+        "smirk with a level head (no tilt) is the deciding combination -- "
+        "a one-sided smirk or any head tilt points elsewhere instead. "
+        "POSTER LOOK: sleek blonde hair, trendy pink or "
         "designer outfit, glossy high-school-hallway or pastel-pink "
         "backdrop."
     ),
@@ -292,61 +255,134 @@ CHARACTER_STYLE_GUIDE = {
         "cluttered apartment with an equation-covered whiteboard "
         "backdrop."
     ),
+    "Barney Stinson": (
+        "MATCH ON: a big, ear-to-ear confident grin (not a one-sided "
+        "smirk) paired with a polished, put-together look and a "
+        "performative, 'watch this' showman energy -- reads as someone "
+        "who knows exactly how charming he is. Male-presenting. This is "
+        "the loudest, most performative confidence in the roster -- "
+        "distinct from Chulbul Pandey's tougher, more challenging smirk "
+        "and from Rancho's calmer, quieter half-smile. POSTER LOOK: a "
+        "sharply tailored three-piece suit with a crisp tie, slicked-back "
+        "hair, a wide confident grin, an upscale bar or city-skyline "
+        "backdrop with warm nightlife lighting."
+    ),
+    "Bunny from Yeh Jawaani Hai Deewani": (
+        "MATCH ON: a wide, eager grin with bright, restless eyes that "
+        "look like they're about to run off somewhere -- reads as "
+        "can't-sit-still, adventure-hungry excitement rather than "
+        "composed confidence. Male-presenting, young, casual energy. "
+        "Distinct from Barney Stinson's more composed showman grin and "
+        "Rancho's calmer curiosity -- this is the most restless/eager of "
+        "the three. POSTER LOOK: a casual layered jacket and travel gear, "
+        "tousled windswept hair, a mountain trekking trail or hillside "
+        "backdrop at golden hour, a sense of movement and open-road "
+        "freedom."
+    ),
+    "Rancho from 3 Idiots": (
+        "MATCH ON: a relaxed, knowing half-smile with calm, curious eyes "
+        "-- reads as quietly clever and unbothered rather than showy or "
+        "restless. Male-presenting, casual/unpretentious look. This is "
+        "the calmest of the confident-male cluster -- distinct from "
+        "Barney Stinson's showman grin and Bunny's eager, restless "
+        "energy. POSTER LOOK: simple casual college wear with a "
+        "backpack, relaxed windswept hair, an open scenic road or "
+        "college-campus backdrop, warm optimistic sunlit lighting."
+    ),
+    "Chulbul Pandey": (
+        "MATCH ON: a smug, one-sided smirk paired with an intense, "
+        "challenging direct stare -- reads as brash, larger-than-life, "
+        "and daring rather than warm or restrained. Male-presenting. A "
+        "mustache is a strong supporting cue if present, not required. "
+        "The challenging/defiant edge to the stare is what separates "
+        "this from Barney Stinson's warmer showman grin. POSTER LOOK: a "
+        "khaki police uniform with sunglasses tucked into the pocket, a "
+        "thick mustache, a confident stance, a sunlit small-town Indian "
+        "street backdrop with a dramatic, larger-than-life glow."
+    ),
+    "Geet from Jab We Met": (
+        "MATCH ON: wide, animated eyes and an open, mid-expression mouth "
+        "that reads as caught-mid-sentence -- talkative, exuberant, "
+        "borderline non-stop energy rather than simply happy. "
+        "Female-presenting. This is the most hyper/expressive of the "
+        "roster's warm female energies -- distinct from Elle Woods' "
+        "bouncy-but-composed big smile and Naina's much quieter warmth. "
+        "POSTER LOOK: a bright Punjabi-inspired kurti with bold colors "
+        "and jhumka earrings, an energetic train-journey or bustling "
+        "market backdrop, sunlit and full of motion."
+    ),
+    "Penny from The Big Bang Theory": (
+        "MATCH ON: a relaxed, easy half-smile and an unpretentious, "
+        "casual ease -- reads as down-to-earth and approachable rather "
+        "than performative or high-energy. Female-presenting; blonde "
+        "hair is a bonus cue if present. The laid-back, unbothered "
+        "quality is what separates this from Elle Woods' bouncier "
+        "enthusiasm and Geet's hyper-talkative energy. POSTER LOOK: a "
+        "casual chic outfit (fitted top and jeans), wavy blonde hair, a "
+        "cozy city-apartment backdrop, warm relaxed sitcom-style "
+        "lighting."
+    ),
+    "Naina from Yeh Jawaani Hai Deewani": (
+        "MATCH ON: a soft, genuine smile (closed or gently open, not a "
+        "big toothy grin) with calm, thoughtful eyes that still carry "
+        "real warmth -- reads as quietly warm and introspective rather "
+        "than outwardly bouncy or hyper. Female-presenting. The quieter, "
+        "more reflective warmth is what separates this from Elle Woods' "
+        "big open-mouthed bounce and Geet's non-stop expressive energy. "
+        "POSTER LOOK: a flowy bohemian dress with a flower crown, wavy "
+        "open hair, a sunlit hillside or festival backdrop, warm golden "
+        "cinematic light."
+    ),
+    "Chandler Bing": (
+        "MATCH ON: a wry, one-sided smirk that reads as deflecting or "
+        "self-deprecating rather than confident, paired with slightly "
+        "tense, anxious-looking eyes -- the humor reads as a defense "
+        "mechanism, not swagger. Male-presenting. Distinct from Sheldon "
+        "Cooper's prim, composed precision and from Chulbul Pandey's or "
+        "Barney Stinson's confident smirks/grins -- this one should read "
+        "as nervous energy underneath the joke, not confidence. POSTER "
+        "LOOK: a smart-casual 90s outfit (button-down over a plain tee), "
+        "tousled hair, a cozy NYC apartment or coffeehouse backdrop, warm "
+        "nostalgic sitcom lighting."
+    ),
+    "Anakin Skywalker": (
+        "MATCH ON: a furrowed, intense brow with a hard, conflicted "
+        "stare -- reads as simmering inner turmoil or frustration, "
+        "distinct from Sasuke's cold detachment and from Jon Snow's "
+        "weary resignation. Male-presenting, young-to-mid-adult, "
+        "serious/passionate energy. The visible emotional conflict (not "
+        "flat coldness, not weariness) is the deciding cue. POSTER LOOK: "
+        "simple tan-and-brown Jedi robes with a utility belt, a glowing "
+        "blue lightsaber held at the side, a warm desert-planet or "
+        "ancient-temple backdrop, cinematic sci-fi lighting."
+    ),
+    "Belly from The Summer I Turn Pretty": (
+        "MATCH ON: a soft, dreamy expression with a wistful, faraway "
+        "look in the eyes -- reads as gentle romantic longing or "
+        "nostalgia, distinct from Daenerys' regal calm and Naina's "
+        "grounded warmth. Female-presenting, youthful, soft features. "
+        "The wistful, nostalgic quality specifically (not just calm, not "
+        "just warm) is the deciding cue. POSTER LOOK: a flowy sundress, "
+        "loose beach-wave hair, a golden sunset beach backdrop, warm "
+        "nostalgic summer-glow lighting."
+    ),
+    "Jack Sparrow": (
+        "MATCH ON: match this on VIBE, not face or costume -- nobody at "
+        "the booth will actually resemble this specific look. Look for a "
+        "sly, knowing smirk with shifty, darting eyes and an air of "
+        "charming unpredictability -- reads as a mischievous, slightly "
+        "chaotic schemer rather than a polished performer. "
+        "Male-presenting. Distinct from Chulbul Pandey's confrontational "
+        "smirk and Chandler Bing's nervous smirk -- this one should read "
+        "as gleefully unpredictable, not tough or anxious. POSTER LOOK: a "
+        "layered pirate coat with a red bandana and tricorn hat, beads "
+        "and trinkets woven into messy braided hair, kohl-lined eyes, a "
+        "ship's deck or stormy Caribbean backdrop, swashbuckling "
+        "adventure lighting."
+    ),
 }
 
 CHARACTERS = list(CHARACTER_STYLE_GUIDE.keys())
-
-# --------------------------------------------------------------------------
-# Temporarily disabled roster entries. Not part of CHARACTER_STYLE_GUIDE/
-# CHARACTERS above, so the model can never match anyone to these and they
-# won't appear in the frontend showcase (GET /booth/characters) -- pulled
-# out rather than deleted so the hand-tuned MATCH ON/POSTER LOOK text isn't
-# lost. Reason: Iron Man and Spider-Man's poster generations were
-# repeatedly hitting OpenAI's OUTPUT-stage moderation ('moderation_blocked',
-# category 'other') even after image_gen.py's softened-prompt retry --
-# likely their extremely recognizable, heavily-trademarked Marvel costume
-# designs render close enough to the literal copyrighted look that OpenAI's
-# own filter catches it regardless of prompt wording (see image_gen.py's
-# _soften_diffusion_prompt). Black Widow disabled alongside them
-# preemptively for the same reason (another distinctive trademarked Marvel
-# tactical suit), before it actually failed live.
-#
-# To re-enable one: move its entry back into CHARACTER_STYLE_GUIDE above
-# (position in the dict doesn't matter) -- CHARACTERS, the matching
-# instructions, and the frontend showcase all derive from that one dict, so
-# nothing else needs to change.
-DISABLED_CHARACTER_STYLE_GUIDE = {
-    "Iron Man": (
-        "MATCH ON: visible facial hair in a goatee or defined stubble "
-        "shape, paired with a closed-mouth smirk pulling to ONE side. "
-        "Male-presenting. Facial hair is the deciding cue -- a smirk "
-        "without any beard/stubble points to Sheldon or Thomas Shelby "
-        "instead. POSTER LOOK: sleek red-and-gold powered armor, glowing "
-        "blue arc reactor at the chest, faceplate open to reveal the "
-        "goatee underneath, repulsor palms raised, bright high-tech "
-        "backdrop (lab light, sky, explosion glow)."
-    ),
-    "Spider-Man": (
-        "MATCH ON: match this purely from the face, not a costume or "
-        "pose -- nobody will be dressed as or posing like Spider-Man. "
-        "Look for a youthful, boyish face with a lopsided/crooked grin "
-        "(closed or slightly open, higher on one side than the other) "
-        "and bright, slightly squinted, mischievous eyes. Male-presenting, "
-        "no facial hair, leaner/younger-looking build. Distinct from Iron "
-        "Man (no facial hair here) and from Naruto (grin is lopsided/sly "
-        "here, not a big even open-mouth grin). POSTER LOOK: skin-tight "
-        "red-and-blue spandex suit, black web patterning, large white "
-        "reflective eye lenses, city skyline backdrop with web-lines."
-    ),
-    "Black Widow": (
-        "MATCH ON: a completely flat, unsmiling mouth held with a "
-        "straight, level head (no tilt at all), on sharp/angular "
-        "cheekbones. Female-presenting. The no-tilt straight posture is "
-        "what separates this from Gwen Stacy's tilted head. POSTER LOOK: "
-        "fitted black tactical bodysuit, utility straps, wavy red hair, "
-        "cool steel-blue or shadowed tactical backdrop."
-    ),
-}
 
 
 # --------------------------------------------------------------------------
@@ -608,15 +644,16 @@ the same 4-5 famous defaults across many different people.
    costume, pulled from the chosen character's "POSTER LOOK" text above
    (never from "MATCH ON") -- describe it as a complete outfit swap (e.g.
    for the Professor: the entire red jumpsuit AND the white Dali mask, not
-   just "a red accent"; for Dr. Doom: the full green-and-metal armor and
-   hooded cloak, not just a mask). The person's actual clothing should be entirely replaced
+   just "a red accent"; for Jack Sparrow: the full layered pirate coat and
+   tricorn hat, not just an earring). The person's actual clothing should be entirely replaced
    by the costume, not layered with or peeking through it. List the 2-4 most
    defining pieces/colors of that full costume so the model has enough to
    fully cover the subject, but never touch hair, facial structure, or
    anything that would alter the person's actual face,
    (b) one lighting/backdrop cue that evokes that character's own film or
-   franchise (e.g. Gotham-noir shadows for Batman, a Hogwarts corridor for
-   Harry Potter, chakra-burst energy for Naruto) -- the backdrop should feel
+   franchise (e.g. a stormy ship's deck for Jack Sparrow, a Hogwarts
+   corridor for Harry Potter, chakra-burst energy for Naruto) -- the
+   backdrop should feel
    like it belongs to their world, not a generic photo-booth setting,
    (c) "cinematic movie-poster quality" as a closing style tag. Never
    mention a college, fest, campus, event, or any promotional/booth

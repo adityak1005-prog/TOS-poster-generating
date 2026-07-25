@@ -275,27 +275,31 @@
   // ---- character showcase (local placeholder styling; real images can be
   // dropped into /static/characters/<slug>.jpg later -- see fallback below) ----
   const CHAR_STYLE = {
-    "Iron Man":                  { emoji: "🤖", grad: "linear-gradient(135deg,#b91c1c,#d97706)" },
-    "Batman":                    { emoji: "🦇", grad: "linear-gradient(135deg,#1a1a1a,#3b3b55)" },
-    "Spider-Man":                { emoji: "🕷️", grad: "linear-gradient(135deg,#b91c1c,#1d4ed8)" },
     "Thomas Shelby":              { emoji: "🎩", grad: "linear-gradient(135deg,#57534e,#292524)" },
     "Naruto":                    { emoji: "🍥", grad: "linear-gradient(135deg,#ea580c,#1d4ed8)" },
     "Professor from Money Heist": { emoji: "🎭", grad: "linear-gradient(135deg,#7f1d1d,#292524)" },
-    "Gwen Stacy":                { emoji: "🕸️", grad: "linear-gradient(135deg,#ec4899,#f9a8d4)" },
-    "Black Widow":               { emoji: "🕶️", grad: "linear-gradient(135deg,#18181b,#7f1d1d)" },
     "Daenerys Targaryen":        { emoji: "🐉", grad: "linear-gradient(135deg,#94a3b8,#1e3a8a)" },
     "Hermione Granger":          { emoji: "📚", grad: "linear-gradient(135deg,#7f1d1d,#a16207)" },
     "Wednesday Addams":          { emoji: "🖤", grad: "linear-gradient(135deg,#18181b,#3f3f46)" },
     "Kakashi Hatake":            { emoji: "🍃", grad: "linear-gradient(135deg,#1e3a5f,#64748b)" },
     "Sasuke Uchiha":             { emoji: "⚡", grad: "linear-gradient(135deg,#1e1b4b,#3730a3)" },
-    "Joker":                     { emoji: "🃏", grad: "linear-gradient(135deg,#6b21a8,#166534)" },
     "Jon Snow":                  { emoji: "❄️", grad: "linear-gradient(135deg,#334155,#0f172a)" },
     "Shinchan":                  { emoji: "😜", grad: "linear-gradient(135deg,#facc15,#dc2626)" },
     "Harry Potter":              { emoji: "🧙", grad: "linear-gradient(135deg,#7f1d1d,#78350f)" },
-    "Dr. Doom":                  { emoji: "🦾", grad: "linear-gradient(135deg,#166534,#3f3f46)" },
     "Regina George":             { emoji: "💅", grad: "linear-gradient(135deg,#ec4899,#fbcfe8)" },
     "Elle Woods":                { emoji: "🎀", grad: "linear-gradient(135deg,#f472b6,#fde68a)" },
     "Sheldon Cooper":            { emoji: "🤓", grad: "linear-gradient(135deg,#1d4ed8,#64748b)" },
+    "Barney Stinson":            { emoji: "🕴️", grad: "linear-gradient(135deg,#1e293b,#334155)" },
+    "Bunny from Yeh Jawaani Hai Deewani": { emoji: "🎒", grad: "linear-gradient(135deg,#f59e0b,#0ea5e9)" },
+    "Rancho from 3 Idiots":      { emoji: "🎓", grad: "linear-gradient(135deg,#0284c7,#facc15)" },
+    "Chulbul Pandey":            { emoji: "👮", grad: "linear-gradient(135deg,#a16207,#78350f)" },
+    "Geet from Jab We Met":      { emoji: "🚂", grad: "linear-gradient(135deg,#db2777,#f97316)" },
+    "Penny from The Big Bang Theory": { emoji: "☕", grad: "linear-gradient(135deg,#fbbf24,#f472b6)" },
+    "Naina from Yeh Jawaani Hai Deewani": { emoji: "🌼", grad: "linear-gradient(135deg,#fde68a,#fb923c)" },
+    "Chandler Bing":             { emoji: "😏", grad: "linear-gradient(135deg,#6d28d9,#1e293b)" },
+    "Anakin Skywalker":          { emoji: "🗡️", grad: "linear-gradient(135deg,#0f172a,#1d4ed8)" },
+    "Belly from The Summer I Turn Pretty": { emoji: "🌅", grad: "linear-gradient(135deg,#fb7185,#fbbf24)" },
+    "Jack Sparrow":              { emoji: "🏴‍☠️", grad: "linear-gradient(135deg,#78350f,#164e63)" },
   };
   const DEFAULT_STYLE = { emoji: "🎬", grad: "linear-gradient(135deg,#3f3f46,#52525b)" };
 
@@ -303,27 +307,31 @@
   // one per character, deliberately not shown on screen-reveal. Fictional
   // trivia about the character/franchise, not about any real person. ----
   const FUN_FACTS = {
-    "Iron Man": "Robert Downey Jr. reportedly improvised many of Tony Stark's most quotable lines on set.",
-    "Batman": "Unlike most superheroes, Batman has no powers at all -- just training, gadgets, and money.",
-    "Spider-Man": "Spider-Man was one of the first major superheroes written as an actual teenager, not an adult's sidekick.",
     "Thomas Shelby": "Peaky Blinders is loosely inspired by a real Birmingham street gang from the late 1800s.",
     "Naruto": "Naruto's orange jumpsuit was picked specifically to make him stand out clearly in every scene.",
     "Professor from Money Heist": "The Professor's mask depicts Salvador Dali, a real Spanish artist known for surrealism.",
-    "Gwen Stacy": "Gwen Stacy appeared in the comics years before she ever got spider powers of her own.",
-    "Black Widow": "Black Widow's fighting style in the films blends real techniques like judo, boxing, and aikido.",
     "Daenerys Targaryen": "Daenerys' dragons started out as simple stand-in props before being replaced entirely by CGI.",
     "Hermione Granger": "Hermione was the top-scoring student at Hogwarts in every one of her seven years there.",
     "Wednesday Addams": "Wednesday Addams gets her name from the old rhyme 'Wednesday's child is full of woe.'",
     "Kakashi Hatake": "Kakashi earned the nickname 'Copy Ninja' for mastering over a thousand jutsu with his Sharingan.",
     "Sasuke Uchiha": "The Uchiha clan's fan emblem is based on a real traditional Japanese family crest style.",
-    "Joker": "The Joker is one of the only major comic villains who has never had a single agreed-on origin story.",
     "Jon Snow": "Jon Snow's line 'the North remembers' became one of the most quoted lines from the whole show.",
     "Shinchan": "Shinchan's cheeky jokes got the show restricted or edited for content in several countries.",
     "Harry Potter": "Harry Potter's round glasses became one of the most recognizable accessories in movie history.",
-    "Dr. Doom": "Doctor Doom rules his own fictional country, Latveria, as both supervillain and head of state.",
     "Regina George": "Mean Girls' famous 'On Wednesdays we wear pink' line was improvised on set, not in the original script.",
     "Elle Woods": "Legally Blonde was inspired by author Amanda Brown's own time at Stanford Law School.",
     "Sheldon Cooper": "Sheldon Cooper's IQ is often quoted as 187, though the show itself never confirms an exact number on-screen.",
+    "Barney Stinson": "Neil Patrick Harris improvised several of Barney's catchphrases, including bits of 'legen... wait for it... dary.'",
+    "Bunny from Yeh Jawaani Hai Deewani": "Yeh Jawaani Hai Deewani was largely shot on real locations in Manali and Udaipur rather than sets.",
+    "Rancho from 3 Idiots": "3 Idiots is loosely based on the novel 'Five Point Someone' by Chetan Bhagat.",
+    "Chulbul Pandey": "Dabangg's mustache-twirl gesture became such a signature move that it was widely imitated across India after release.",
+    "Geet from Jab We Met": "Jab We Met's train-station meeting scene was shot at a real railway station in India.",
+    "Penny from The Big Bang Theory": "Penny is one of the few main characters on The Big Bang Theory never given an on-screen last name for most of the show's run.",
+    "Naina from Yeh Jawaani Hai Deewani": "Naina's arc in Yeh Jawaani Hai Deewani centers on rediscovering old friendships years later on one last trip.",
+    "Chandler Bing": "Chandler's habit of oddly-stressed sentences ('Could this BE any more...') became one of Friends' most imitated speech patterns.",
+    "Anakin Skywalker": "Anakin Skywalker was originally going to be introduced as an adult before being rewritten as a child for the prequels.",
+    "Belly from The Summer I Turn Pretty": "The Summer I Turn Pretty is based on a novel trilogy by Jenny Han, who also wrote To All the Boys I've Loved Before.",
+    "Jack Sparrow": "Johnny Depp reportedly based some of Jack Sparrow's mannerisms on Keith Richards and the cartoon skunk Pepe Le Pew.",
   };
 
   function showFunFact(character) {
@@ -336,6 +344,51 @@
       el.style.display = "none";
     }
   }
+
+  // ---- per-character face position for the showcase thumbnail ----
+  // The CSS default (object-position: top) assumes every reference photo
+  // has its face near the top-center, which isn't true across a roster
+  // this varied -- some are wide screenshots, full-body shots, or crops
+  // where the face sits off-center. Computed once by running the same
+  // Haar-cascade face detector attention_viz.py already uses (see
+  // detect_face_box) over every photo in static/characters/, expressed as
+  // "x% y%" (the face's center as a percentage of the image's width/
+  // height) for CSS object-position. A few detections were manually
+  // corrected after visual inspection where the cascade clearly
+  // misfired -- mainly the anime-style/stylized images (Naruto, Kakashi,
+  // Sasuke, Shinchan), which Haar cascades aren't designed for (same
+  // caveat noted in attention_viz.py's detect_face_box), plus one
+  // wide/bokeh-heavy photo (Naina) where it locked onto the background
+  // instead of her face. Falls back to the CSS default (top-center) for
+  // any character not listed here, e.g. if a new photo is added later
+  // without updating this map.
+  const CHAR_FACE_POS = {
+    "Thomas Shelby": "45% 21%",
+    "Naruto": "50% 42%",
+    "Professor from Money Heist": "51% 19%",
+    "Daenerys Targaryen": "54% 17%",
+    "Hermione Granger": "44% 12%",
+    "Wednesday Addams": "50% 24%",
+    "Kakashi Hatake": "50% 28%",
+    "Sasuke Uchiha": "42% 26%",
+    "Jon Snow": "44% 28%",
+    "Shinchan": "48% 20%",
+    "Harry Potter": "57% 37%",
+    "Regina George": "53% 32%",
+    "Elle Woods": "55% 23%",
+    "Sheldon Cooper": "48% 27%",
+    "Barney Stinson": "54% 18%",
+    "Bunny from Yeh Jawaani Hai Deewani": "56% 28%",
+    "Rancho from 3 Idiots": "50% 35%",
+    "Chulbul Pandey": "50% 40%",
+    "Geet from Jab We Met": "53% 21%",
+    "Penny from The Big Bang Theory": "24% 24%",
+    "Naina from Yeh Jawaani Hai Deewani": "38% 25%",
+    "Chandler Bing": "47% 36%",
+    "Anakin Skywalker": "53% 39%",
+    "Belly from The Summer I Turn Pretty": "49% 23%",
+    "Jack Sparrow": "48% 22%",
+  };
 
   function slugify(name) { return name.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, ""); }
 
@@ -367,10 +420,11 @@
     names.forEach((name) => {
       const style = CHAR_STYLE[name] || DEFAULT_STYLE;
       const slug = slugify(name);
+      const facePos = CHAR_FACE_POS[name]; // falls back to CSS's object-position: top if absent
       const card = document.createElement("div");
       card.className = "char-card";
       card.innerHTML = `
-        <img class="char-thumb" style="background:${style.grad}">
+        <img class="char-thumb" style="background:${style.grad};${facePos ? ` object-position:${facePos};` : ""}">
         <div class="char-name">${name}</div>`;
       loadCharacterImage(card.querySelector("img"), slug, style.emoji);
       el.appendChild(card);
