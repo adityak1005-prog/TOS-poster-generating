@@ -246,6 +246,10 @@
       <img id="qrImage" alt="QR code">
       <div>
         <p>Scan to download the poster or share it to your Instagram Story.</p>
+        <p style="margin: .35rem 0 0;">
+          <a id="qrLinkText" href="#" target="_blank" rel="noopener"
+             style="color: var(--accent); font-size: .8rem; word-break: break-all;">Or open the image link directly</a>
+        </p>
         <p id="timeTakenBadge" style="display:none; color: var(--text-dim); font-size: .7rem; margin-top: .3rem;"></p>
       </div>
     </div>
@@ -704,6 +708,16 @@
     if (t.glasses) traitsText += ", glasses";
     document.getElementById("traitsLine").innerText = traitsText;
     document.getElementById("qrImage").src = data.qr_url;
+    // Same URL the QR itself now encodes directly (see app.py) -- shown as
+    // a plain clickable/copyable link too, for anyone viewing on a laptop
+    // or whose phone camera can't scan a QR off a screen.
+    const qrLink = document.getElementById("qrLinkText");
+    if (data.image_url) {
+      qrLink.href = data.image_url;
+      qrLink.style.display = "inline";
+    } else {
+      qrLink.style.display = "none";
+    }
 
     const badge = document.getElementById("timeTakenBadge");
     const totalSecs = data.timings && data.timings.total;

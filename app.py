@@ -27,8 +27,7 @@ import base64
 import asyncio
 import datetime
 import traceback
-from urllib.parse import quote
-from fastapi import FastAPI, UploadFile, File, Request
+from fastapi import FastAPI, UploadFile, File
 from fastapi.responses import JSONResponse, HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
@@ -392,14 +391,12 @@ def _sse(payload: dict) -> str:
     return json.dumps(payload) + "\n"
 
 
-async def _stream_capture(image_bytes: bytes, base_url: str):
+async def _stream_capture(image_bytes: bytes):
     """Generator that runs the whole pipeline and yields progress as NDJSON
     lines. Replaces the old job-queue+poll design (see module docstring) --
     everything happens inline within this one request/response, so there's
     no cross-request state (no JOBS dict) for a serverless host to lose
-    track of. base_url is this deployment's own root (e.g.
-    "https://your-app.vercel.app/") -- needed to build an absolute /share
-    link for the QR code, since QR codes can't point at a relative path.
+    track of.
     """
     timings = {}
     t_start = time.time()
@@ -456,11 +453,17 @@ async def _stream_capture(image_bytes: bytes, base_url: str):
         )
         file_id = f"{int(time.time() * 1000)}"
         image_url = await asyncio.to_thread(storage.upload, final_bytes, f"{file_id}.jpg")
-        # QR points at our own /share page (Web Share API, see above), not
-        # directly at the image -- that's what lets a scan open a "Share to
-        # Instagram" button instead of just opening/downloading the photo.
-        share_url = f"{base_url.rstrip('/')}/share?img={quote(image_url, safe='')}"
-        qr_bytes = compose.make_qr_for_url(share_url)
+        # QR points straight at the Supabase-hosted image -- a real,
+        # absolute, publicly-reachable URL regardless of how this server
+        # itself is being accessed (SSH tunnel, LAN, whatever). Simpler and
+        # more robust than routing through our own /share page, at the cost
+        # of losing that page's one-tap "share to Instagram" native sheet --
+        # scanning this just opens/downloads the photo directly, same as
+        # any plain image link. (/share and its Web Share API page above are
+        # still there, just unused by this QR now -- point qr_bytes at a
+        # share_url built from a real base URL again if you want that UX
+        # back later.)
+        qr_bytes = compose.make_qr_for_url(image_url)
         qr_url = await asyncio.to_thread(storage.upload, qr_bytes, f"{file_id}_qr.png")
         mark("compose_and_share", t0)
 
@@ -486,10 +489,10 @@ async def _stream_capture(image_bytes: bytes, base_url: str):
 
 
 @app.post("/booth/capture")
-async def capture(request: Request, file: UploadFile = File(...)):
+async def capture(file: UploadFile = File(...)):
     image_bytes = await file.read()
     return StreamingResponse(
-        _stream_capture(image_bytes, str(request.base_url)),
+        _stream_capture(image_bytes),
         media_type="application/x-ndjson",
     )
 

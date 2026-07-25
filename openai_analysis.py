@@ -248,12 +248,18 @@ CHARACTER_STYLE_GUIDE = {
         "MATCH ON: rectangular or thick-rimmed glasses (not round) with "
         "neat, styled hair, and a thin, prim closed-mouth line where one "
         "corner sits very slightly higher than the other. Male-presenting, "
-        "clean-shaven. The rectangular glasses plus neat hair is the "
-        "deciding combo against Harry Potter's round glasses and messy "
-        "hair -- if hair is messy, go there instead. POSTER LOOK: "
-        "side-swept hair, layered graphic tee under a collared shirt, "
-        "cluttered apartment with an equation-covered whiteboard "
-        "backdrop."
+        "clean-shaven. This is a genuinely low-complexity, easy-to-imagine "
+        "face -- reserve it for when that specific prim mouth shape is a "
+        "clear standout observation on its own, not just because a face is "
+        "calm and wears glasses; a face with other distinctive features "
+        "(strong jaw, notable brow shape, a distinctive smile, etc.) "
+        "belongs to a more specific character instead. Should be one of "
+        "the rarer matches, not a common default. The rectangular glasses "
+        "plus neat hair is the deciding combo against Harry Potter's round "
+        "glasses and messy hair -- if hair is messy, go there instead. "
+        "POSTER LOOK: side-swept hair, layered graphic tee under a "
+        "collared shirt, cluttered apartment with an equation-covered "
+        "whiteboard backdrop."
     ),
     "Barney Stinson": (
         "MATCH ON: a big, ear-to-ear confident grin (not a one-sided "
@@ -371,7 +377,9 @@ CHARACTER_STYLE_GUIDE = {
         "the booth will actually resemble this specific look. Look for a "
         "sly, knowing smirk with shifty, darting eyes and an air of "
         "charming unpredictability -- reads as a mischievous, slightly "
-        "chaotic schemer rather than a polished performer. "
+        "chaotic schemer rather than a polished performer. A warm, "
+        "sun-weathered or tanned complexion (the 'been out at sea for "
+        "years' look) is a supporting cue if present, never required. "
         "Male-presenting. Distinct from Chulbul Pandey's confrontational "
         "smirk and Chandler Bing's nervous smirk -- this one should read "
         "as gleefully unpredictable, not tough or anxious. POSTER LOOK: a "
@@ -582,12 +590,12 @@ entirely when deciding who someone resembles, since nobody at the booth is
 actually wearing a costume.
 
 Weigh ALL of these dimensions together when deciding, with NO fixed priority
-order between them: facial resemblance/features, general vibe or energy,
-complexion, gender presentation, facial hair (or the lack of it), pose, type
-of clothing, and clothing color. Do not default to the same one or two
-dimensions on every photo (e.g. always leaning on outfit color or glasses
-just because they're easy to see) -- look at THIS specific photo and decide
-which single dimension is the strongest, most distinctive match to a
+order between them: facial resemblance/features, face complexity, general
+vibe or energy, complexion, gender presentation, facial hair (or the lack of
+it), pose, type of clothing, and clothing color. Do not default to the same
+one or two dimensions on every photo (e.g. always leaning on outfit color or
+glasses just because they're easy to see) -- look at THIS specific photo and
+decide which single dimension is the strongest, most distinctive match to a
 character on the roster, and let that dimension drive the pick. Different
 photos should land on different characters for different reasons: if
 someone's clothing is generic but their expression and vibe strongly
@@ -596,10 +604,24 @@ match. The goal is a varied, personalized set of matches across many
 people -- avoid converging on the same handful of "safe" characters just
 because their descriptions mention easy-to-spot items like glasses or a
 graphic tee; check the other dimensions (especially facial hair and gender
-presentation) before committing to a match like that. Several roster entries
-(Professor from Money Heist, Sheldon Cooper, Harry Potter) explicitly warn
-that glasses plus a neutral/calm expression is common and weak evidence on
-its own -- respect those warnings rather than defaulting to those names.
+presentation) before committing to a match like that.
+
+Face complexity means: how many distinctive features combine on this
+specific face -- brow shape/thickness, jaw/cheekbone structure, eye shape,
+smile symmetry, dimples, distinctive nose or chin, etc. A face where several
+of these stand out together should be matched to whichever roster entry's
+"MATCH ON" reflects that specific combination, even if it takes more looking
+than an easy glasses-plus-neutral-expression read. Reserve the roster's
+plainest, lowest-complexity entries (Professor from Money Heist, Sheldon
+Cooper, Harry Potter -- all of which explicitly warn that glasses plus a
+neutral/calm expression is common and weak evidence on its own) for faces
+that are genuinely low-complexity, without another combination of features
+strong enough to point elsewhere -- these three should be some of the
+rarer matches across many people, not common defaults. In particular,
+Sheldon Cooper's "prim, one-corner-higher" mouth is an extremely subtle,
+easy-to-imagine-anywhere cue -- do not use it as a tiebreaker or a fallback
+just because a face is calm and wears glasses; only pick it when that
+specific mouth shape is a genuinely clear, standout observation on its own.
 
 If more than one character is a genuinely close, plausible match, do not
 always resolve the tie toward the most famous or most "obvious" name --
