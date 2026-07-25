@@ -110,21 +110,31 @@ _client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 # names.
 CHARACTER_STYLE_GUIDE = {
     "Thomas Shelby": (
-        "MATCH ON: a lean face with high, sharp cheekbones, held in a "
-        "genuinely still, barely-moving closed mouth -- calm, composed, "
-        "and controlled rather than merely blank. Male-presenting, "
-        "clean-shaven, neat hair. The lean/sharp cheekbones plus "
-        "closed-off composure is the deciding combo. POSTER LOOK: "
+        "MATCH ON: a calm, composed, still expression with a closed, "
+        "barely-moving mouth -- controlled and self-possessed rather "
+        "than blank or nervous. Male-presenting, clean-shaven or light "
+        "stubble, generally neat/tidy appearance. Sharp cheekbones or a "
+        "lean face are a bonus cue if visible but not required -- an "
+        "ordinary calm, composed, unbothered expression is enough on its "
+        "own. This should be an easily-reachable match; distinct from "
+        "Chandler/Sheldon mainly by having zero nervousness or awkwardness "
+        "to it -- fully at ease, not fidgety or self-conscious. POSTER "
+        "LOOK: "
         "fitted 1920s tweed three-piece suit, flat cap pulled low, "
         "slicked-back undercut hair, muted sepia Birmingham streets or a "
         "dim pub."
     ),
     "Naruto": (
-        "MATCH ON: a round, full-cheeked young face with a wide, open, "
-        "genuinely happy grin showing the top teeth, eyebrows relaxed "
-        "(not raised, not low/thick). Male-presenting, young, no facial "
-        "hair. Against Shinchan: eyebrows are relaxed, not thick and low. "
-        "POSTER LOOK: orange-and-black jumpsuit, blue forehead protector, "
+        "MATCH ON: an easy, genuine smile or grin -- open-mouthed or "
+        "closed, big or modest, any warm/friendly/upbeat expression "
+        "qualifies, not just an exaggerated toothy grin. Male-presenting, "
+        "young, no facial hair. This should be one of the more common, "
+        "easily-reachable matches -- an ordinary friendly smile is enough "
+        "on its own, it doesn't need to be an especially big or "
+        "energetic one. Against Shinchan: pick Naruto by default for a "
+        "warm/friendly smile, and only go to Shinchan if the expression "
+        "specifically reads as goofy/exaggerated/clowning rather than "
+        "just warm. POSTER LOOK: orange-and-black jumpsuit, blue forehead protector, "
         "spiky blonde hair, whisker cheek markings, anime-style "
         "chakra-burst backdrop."
     ),
@@ -181,13 +191,15 @@ CHARACTER_STYLE_GUIDE = {
         "dress, foggy graveyard or gothic-academy backdrop."
     ),
     "Kakashi Hatake": (
-        "MATCH ON: naturally heavy, half-lidded or sleepy-looking eyes "
-        "combined with a loose, closed-mouth ease -- reads as genuinely "
-        "laid-back rather than merely calm. Male-presenting, "
-        "tousled/messy hair if visible. This should be a distinct "
-        "'sleepy-eyed' look, not just any relaxed face -- if the eyes are "
-        "fully open and alert, this isn't the match; consider Thomas "
-        "Shelby instead. POSTER LOOK: messy silver hair, Leaf "
+        "MATCH ON: a loose, relaxed, easygoing ease -- a casual "
+        "half-smile or closed-mouth calm, unbothered and unhurried. "
+        "Heavy, half-lidded, or sleepy-looking eyes are a bonus cue if "
+        "present but not required -- ordinary relaxed body language is "
+        "enough on its own. Male-presenting, tousled/messy hair if "
+        "visible. This should be an easily-reachable match for general "
+        "laid-back ease; distinct from Thomas Shelby by being more "
+        "casual/loose than composed/controlled, and from Jack Sparrow by "
+        "being calmer/less mischievous. POSTER LOOK: messy silver hair, Leaf "
         "Village forehead protector tilted over one eye, fabric mask over "
         "nose and mouth, navy flak vest, misty forest or rooftop-at-dusk "
         "backdrop."
@@ -203,19 +215,28 @@ CHARACTER_STYLE_GUIDE = {
         "blue lightning backdrop."
     ),
     "Jon Snow": (
-        "MATCH ON: visible beard or heavy stubble covering the jaw, on a "
-        "long face with a weary or serious expression. Male-presenting. "
-        "The beard is close to a requirement -- do not pick this "
-        "clean-shaven, that's Sasuke's or Thomas Shelby's territory. POSTER "
+        "MATCH ON: any visible facial hair -- light stubble, patchy "
+        "stubble, or a fuller beard all count, it does not need to be "
+        "heavy -- on a serious, weary, or thoughtful expression. "
+        "Male-presenting. This should be an easily-reachable match: some "
+        "amount of visible facial hair plus a serious (not smiling) "
+        "expression is enough on its own, it doesn't need to be a full "
+        "beard. Do not pick this fully clean-shaven -- that's Sasuke's or "
+        "Thomas Shelby's territory. POSTER "
         "LOOK: dark tousled shoulder-length hair, thick black furs and "
         "leather armor, snow-covered northern landscape or icy-wall "
         "backdrop."
     ),
     "Shinchan": (
-        "MATCH ON: thick, low-set eyebrows drawn down close to the eyes, "
-        "combined with a wide, open-mouthed laugh -- reads as goofy/silly "
-        "rather than warm. Distinct from Naruto (neutral brows, warmer "
-        "grin) by the low, thick brow position specifically. POSTER LOOK: spiky messy "
+        "MATCH ON: an exaggerated, goofy, or clowning expression -- a "
+        "big silly grin, a funny face, a playful smirk, eyebrows "
+        "scrunched or raised in a cheeky way, anything that reads as "
+        "intentionally comedic or over-the-top rather than a plain warm "
+        "smile. Thick/low eyebrows are a bonus cue if visible but not "
+        "required -- the goofy/mugging-for-the-camera energy is what "
+        "matters most. Works for a wide age/style range, not just kids. "
+        "Distinct from Naruto by being more exaggerated/clowning than a "
+        "simple genuine smile. POSTER LOOK: spiky messy "
         "black hair, simple bright shirt and shorts, bold flat colorful "
         "cartoon-style backdrop."
     ),
@@ -267,12 +288,15 @@ CHARACTER_STYLE_GUIDE = {
         "backdrop."
     ),
     "Jack Sparrow": (
-        "MATCH ON: a loose, lopsided, sly grin with droopy, half-lidded "
-        "'tipsy' eyes and an unbothered, swaggering ease -- reads as "
-        "roguish and unpredictable, more theatrical/staggering than "
-        "Kakashi's laid-back sleepiness. Male-presenting; light stubble "
-        "or a scruffy, unkempt look is a bonus cue if present. Energy is "
-        "mischievous and carefree, closer to chaotic charm than calm. "
+        "MATCH ON: any casual, mischievous, or lopsided smirk/grin paired "
+        "with a relaxed, easygoing, unbothered energy -- droopy/half-lidded "
+        "'tipsy' eyes are a bonus cue if present but not required, a "
+        "regular playful smirk is enough on its own. Male-presenting; "
+        "light stubble or a scruffy, unkempt look is a bonus cue if "
+        "present but not required. This should be an easily-reachable "
+        "match for a generally carefree, joking, don't-take-it-too-"
+        "seriously energy, distinct from Kakashi mainly by being more "
+        "playful/roguish than sleepy-calm. "
         "POSTER LOOK: weathered pirate coat, tricorn hat, beaded braided "
         "hair and beard, an ornate cutlass worn sheathed at the hip "
         "purely as a stylized costume piece (never drawn or wielded), a "
@@ -292,14 +316,16 @@ CHARACTER_STYLE_GUIDE = {
         "cinematic Bollywood-poster quality."
     ),
     "Chandler Bing": (
-        "MATCH ON: a dry, deadpan half-smile or smirk mid-quip, "
-        "eyebrows slightly raised in a sarcastic, self-aware way -- "
-        "reads as nervous energy channeled into humor, awkward and "
-        "self-deprecating rather than confident. Male-presenting. This "
-        "is a good home for genuine social awkwardness/nervousness "
-        "specifically because it's paired with a dry, joking half-smile -- "
-        "distinct from Sheldon's rigid superiority (Chandler deflects "
-        "with self-deprecating humor, never condescension). POSTER "
+        "MATCH ON: any slightly awkward, self-conscious half-smile or "
+        "closed-mouth smirk -- a little hesitant, a little nervous, "
+        "maybe an uneasy or unsure half-grin, eyebrows raised slightly "
+        "as if mid-joke or mid-deflection. Male-presenting. This should "
+        "be one of the easiest, most common matches on the roster -- an "
+        "ordinary awkward or shy smile is enough on its own, it does not "
+        "need to look sharply sarcastic or dramatic. Distinct from "
+        "Sheldon's rigid, prim superiority (Chandler is soft/self-"
+        "deprecating and a little goofy about the awkwardness, never "
+        "condescending). POSTER "
         "LOOK: a smart-casual button-down shirt, a cozy New York "
         "apartment or coffee-shop backdrop with warm sitcom-style "
         "lighting, cinematic quality."
@@ -593,33 +619,60 @@ this decision ONLY on the "MATCH ON" text -- ignore "POSTER LOOK" details
 entirely when deciding who someone resembles, since nobody at the booth is
 actually wearing a costume.
 
-Weigh ALL of these dimensions together when deciding, with NO fixed priority
-order between them: facial resemblance/features, general vibe or energy,
-complexion, gender presentation, facial hair (or the lack of it), pose, type
-of clothing, and clothing color. Do not default to the same one or two
-dimensions on every photo (e.g. always leaning on outfit color or glasses
-just because they're easy to see) -- look at THIS specific photo and decide
-which single dimension is the strongest, most distinctive match to a
-character on the roster, and let that dimension drive the pick. Different
-photos should land on different characters for different reasons: if
-someone's clothing is generic but their expression and vibe strongly
-resemble a specific character, match on that instead of forcing an outfit
-match. The goal is a varied, personalized set of matches across many
-people -- avoid converging on the same handful of "safe" characters just
-because their descriptions mention easy-to-spot items like glasses or a
-graphic tee; check the other dimensions (especially facial hair and gender
-presentation) before committing to a match like that. Several roster entries
+HARD BOUNDARY -- gender presentation: never match a male-presenting person to
+a female-presenting character, or a female-presenting person to a
+male-presenting character. This is not one of several weighted signals, it
+is a strict filter applied BEFORE anything else -- narrow the roster to only
+characters whose gender presentation matches the person in the photo first,
+then choose among that narrowed set using the dimensions below. No exception.
+
+Within that gender-filtered set, weigh ALL of these dimensions together when
+deciding, with NO fixed priority order between them: facial
+resemblance/features, general vibe or energy, complexion, facial hair (or
+the lack of it), pose, type of clothing, and clothing color. Do not default
+to the same one or two dimensions on every photo (e.g. always leaning on
+outfit color or glasses just because they're easy to see) -- look at THIS
+specific photo and decide which single dimension is the strongest, most
+distinctive match to a character on the roster, and let that dimension drive
+the pick. Different photos should land on different characters for
+different reasons: if someone's clothing is generic but their expression
+and vibe strongly resemble a specific character, match on that instead of
+forcing an outfit match. The goal is a varied, personalized set of matches
+across many people -- avoid converging on the same handful of "safe"
+characters just because their descriptions mention easy-to-spot items like
+glasses or a graphic tee; check the other dimensions (especially facial
+hair) before committing to a match like that. Several roster entries
 explicitly warn against single-cue defaults: Professor from Money Heist and
 Harry Potter warn that glasses plus a neutral/calm expression is common and
 weak evidence on its own, and Sheldon Cooper warns that a generally nervous
-or reserved vibe alone (common among people meeting an AI photo booth) is
-not enough without the specific rigid/prim posture too -- respect those
-warnings rather than defaulting to those names. These warnings exist to stop
-lazy, one-cue-only matching, NOT to exclude these characters -- they are
-common, correct, fully valid picks whenever their fuller combination of cues
-genuinely fits best. Never avoid a character just because it was recently
-over-picked or because a warning exists on its entry; the goal is accuracy
-per photo, not enforcing a quota across visitors.
+or reserved vibe alone (common among people meeting an AI photo booth for
+the first time) is not enough without the specific rigid/prim posture too
+-- respect those warnings rather than defaulting to those names. These
+warnings exist to stop lazy, one-cue-only matching, NOT to exclude these
+characters -- they are common, correct, fully valid picks whenever their
+fuller combination of cues genuinely fits best. Never avoid a character
+just because it was recently over-picked or because a warning exists on its
+entry; the goal is accuracy per photo, not enforcing a quota across
+visitors.
+
+A specific, common case: many freshers photographed for the first time
+read as generally nervous, reserved, or awkward, without any one feature
+standing out sharply. Do NOT treat this as automatically pointing to one
+single character. At minimum Sheldon Cooper (rigid/prim), Chandler Bing
+(self-deprecating, dry half-smile), Harry Potter (wide-eyed, startled/eager,
+male-presenting), and Hermione Granger (furrowed brow, alert concentration,
+female-presenting) can all genuinely fit a nervous/reserved photo depending
+on the exact expression -- treat these as real competing options (narrowed
+further by the gender boundary above and by whichever of their specific
+cues, e.g. glasses shape, hair neatness, mouth shape, actually matches) and
+choose between them based on which specific cue fits best, varying the pick
+across different photos rather than always landing on the same one. If two
+or more characters are genuinely comparably plausible for a given photo
+with no clear winner, do not resolve the tie the same way every time --
+alternate/vary which one wins across different requests, and periodically
+favor a less-recently-considered character over the most obvious one, so
+that over many visitors the full 17-character roster actually gets used,
+not just 3-4 "reserved energy" characters.
 
 If more than one character is a genuinely close, plausible match, do not
 always resolve the tie toward the most famous or most "obvious" name --
@@ -657,11 +710,15 @@ the same 4-5 famous defaults across many different people.
    above (never from "MATCH ON") -- describe it as a complete outfit swap
    (e.g. for the Professor: the entire red jumpsuit AND the white Dali mask,
    not just "a red accent"; for Jon Snow: the full furs and leather armor,
-   not just a cloak clasp). The person's actual clothing should be entirely
-   replaced by the costume, not layered with or peeking through it. List the
-   2-4 most defining pieces/colors of that full costume so the model has
-   enough to fully cover the subject, but never touch hair, facial structure,
-   or anything that would alter the person's actual face,
+   not just a cloak clasp). The costume must be immediately recognizable as
+   THIS specific character on sight, not a generic vibe or color palette
+   loosely inspired by them -- someone glancing at the poster who knows the
+   character should instantly know who it is. The person's actual clothing
+   should be entirely replaced by the costume, not layered with or peeking
+   through it. List the 2-4 most defining, most recognizable pieces/colors
+   of that full costume so the model has enough to fully cover the subject
+   and nail the resemblance, but never touch hair, facial structure, or
+   anything that would alter the person's actual face,
    (b) one lighting/backdrop cue that evokes that character's own film or
    franchise (e.g. a Hogwarts corridor for Harry Potter, chakra-burst
    energy for Naruto, sepia Birmingham streets for Thomas Shelby) -- the
